@@ -150,6 +150,7 @@ class ScanEcus():
                 self.vhcls.append([vehiclename,file,vehTypeCode,vehTCOM,vehindexTopo])
 
     def scanAllEcus(self):
+        print('scan')
         if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '': mod_globals.savedEcus = 'savedEcus.p'
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
         if mod_globals.opt_can2:
@@ -163,27 +164,25 @@ class ScanEcus():
                 self.allecus = OrderedDict()
                 for i in self.detectedEcus:
                     self.allecus[i['ecuname']] = i
-
                 self.read_Uces_file()
                 self.detectedEcus = []
                 for i in list(self.allecus.keys()):
                     self.detectedEcus.append(self.allecus[i])
-
                 self.detectedEcus = sorted(self.detectedEcus, key=lambda k: int(k['idf']))
                 if len(self.detectedEcus):
                     pickle.dump(self.detectedEcus, open(SEFname, 'wb'))
             return None
         mod_globals.opt_scan = True
         mod_globals.state_scan = True
-        lbltxt = Label(text='Init', font_size=20)
-        popup_scan = Popup(title='Scanning CAN bus', content=lbltxt, size=(400, 400), size_hint=(None, None))
-        base.runTouchApp(slave=True)
-        popup_scan.open()
+        self.lbltxt = Label(text='Init', font_size=20)
+        EventLoop.idle()
+        self.popup_scan = Popup(title='Scanning CAN bus', content=self.lbltxt, size=(400, 400), size_hint=(None, None))
+        self.popup_scan.open()
         EventLoop.idle()
         self.reqres = []
         self.errres = []
         i = 0
-        lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+        self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
         EventLoop.idle()
         canH = '6'
         canL = '14'
@@ -194,35 +193,32 @@ class ScanEcus():
         for ecu, row in sorted(iter(self.allecus.items()), key=lambda x_y1: x_y1[1]['idf'] + x_y1[1]['protocol']+str(1/float(len(x_y1[1]['ids'])))):
             if self.allecus[ecu]['pin'] == 'can' and self.allecus[ecu]['pin1'] == canH and self.allecus[ecu]['pin2'] == canL:
                 i = i + 1
-                lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+                self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
                 EventLoop.idle()
                 self.elm.set_can_addr(self.allecus[ecu]['dst'], self.allecus[ecu])
                 self.scan_can(self.allecus[ecu])
-                
 
         self.elm.close_protocol()
         if not mod_globals.opt_can2:
-            popup_scan.title = 'Scanning ISO bus'
+            self.popup_scan.title = 'Scanning ISO bus'
             self.elm.init_iso()
             for ecu, row in sorted(iter(self.allecus.items()), key=lambda x_y: x_y[1]['idf'] + x_y[1]['protocol']):
                 if self.allecus[ecu]['pin'] == 'iso' and self.allecus[ecu]['pin1'] == '7' and self.allecus[ecu]['pin2'] == '15':
                     i = i + 1
-                    lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+                    self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
                     EventLoop.idle()
                     self.elm.set_iso_addr(self.allecus[ecu]['dst'], self.allecus[ecu])
                     self.scan_iso(self.allecus[ecu])
 
-        lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+        self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
         EventLoop.idle()
         mod_globals.state_scan = False
         self.detectedEcus = sorted(self.detectedEcus, key=lambda k: int(k['idf']))
         if len(self.detectedEcus):
             pickle.dump(self.detectedEcus, open(SEFname, 'wb'))
-        EventLoop.window.remove_widget(popup_scan)
-        popup_scan.dismiss()
-        base.stopTouchApp()
+        self.popup_scan.dismiss()
         EventLoop.window.canvas.clear()
-        del popup_scan
+        
 
     def reScanErrors(self):
         mod_globals.opt_scan = True
@@ -593,7 +589,6 @@ class ScanEcus():
                 req = row[base]
                 if row[base] != req:
                     rrsp = self.elm.cmd(req)[3:]
-                    print(rrsp)
                     ttrrsp = rrsp.replace(' ', '')
                     if not all((c in string.hexdigits for c in ttrrsp)):
                         return False

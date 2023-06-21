@@ -9,6 +9,8 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.utils import platform
+from kivy import base
+
 import mod_globals
 if platform != 'android':
     import ctypes
@@ -160,6 +162,7 @@ class widgetChoiceLong(App):
         global choice_result
         choice_result = [instance.txt, instance.ID]
         self.stop()
+        base.EventLoop.window.canvas.clear()
 
     def build(self):
         fs = mod_globals.fontSize

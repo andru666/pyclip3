@@ -830,6 +830,7 @@ class ECU():
                 return
 
     def show_screen(self, screen):
+        print('show_screen')
         while 1:
             clearScreen()
             menu = []

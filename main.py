@@ -9,6 +9,9 @@ Config.set('kivy', 'exit_on_escape', '0')
 if platform != 'android':
     import ctypes
     user32 = ctypes.windll.user32
+    Config.set('graphics', 'position', 'custom')
+    Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/3))
+    Config.set('graphics', 'top',  20)
     from kivy.core.window import Window
     Window.size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
     if Window.size[1] > Window.size[0]:
@@ -18,6 +21,7 @@ if platform != 'android':
         fs = Window.size[0]*8.0/Window.size[1]
         Window.size = Window.size[1]*0.8, Window.size[1]*0.9
 else:
+    mod_globals.os = 'android'
     from kivy.core.window import Window
     if Window.size[1] > Window.size[0]:
         fs = Window.size[1]*8.0/Window.size[0]
@@ -114,7 +118,9 @@ def my_excepthook(excType, excValue, tb):
     for m in message:
         string += m
     error = TextInput(text=string)
-    with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:fout.write(str(string))
+    if mod_globals.os == 'android':
+        with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
+            fout.write(str(string))
     popup = Popup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
     popup.open()
     base.runTouchApp()
@@ -141,6 +147,7 @@ class screenConfig(App):
     def __init__(self):
         self.button = {}
         self.textInput = {}
+        self.elm = None
         super(screenConfig, self).__init__()
         Window.bind(on_keyboard=self.key_handler)
 
@@ -168,7 +175,6 @@ class screenConfig(App):
             activity.setRequestedOrientation(AndroidActivityInfo.SCREEN_ORIENTATION_SENSOR)
 
     def make_box_switch(self, str1, active, callback = None):
-        
         label1 = MyLabel(text=str1, halign='left', size_hint=(1, None), height=fs*3)
         sw = Switch(active=active, size_hint=(1, None), height=fs*3)
         if callback:
@@ -202,7 +208,6 @@ class screenConfig(App):
         return glay
 
     def make_input(self, str1, iText):
-        
         label1 = MyLabel(text=str1, halign='left', size_hint=(1, None), height=fs*3)
         ti = TextInput(text=iText, multiline=False)
         self.textInput[str1] = ti
@@ -286,7 +291,7 @@ class screenConfig(App):
         glay.add_widget(self.langbutton)
         return glay
 
-    def finish(self, instance):
+    def finish(self):
         mod_globals.opt_port = ''
         mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
         mod_globals.opt_ecuid = str(self.textInput['OPT ecuid'].text)
@@ -304,7 +309,6 @@ class screenConfig(App):
             mod_globals.fontSize = int(self.textInput['Font size'].text)
         except:
             mod_globals.fontSize = 20
-
         mod_globals.opt_demo = self.button['Demo mode'].active
         mod_globals.opt_scan = self.button['Scan vehicle'].active
         mod_globals.opt_csv = self.button['CSV Log'].active
@@ -319,7 +323,9 @@ class screenConfig(App):
         mod_globals.opt_exp = False
         mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
-        if 'wifi' in self.mainbutton.text.lower():
+        if 'com1' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
+            mod_globals.opt_port = '127.0.0.1:35000'
+        elif 'wifi' in self.mainbutton.text.lower():
             mod_globals.opt_port = '192.168.0.10:35000'
         else:
             bt_device = self.mainbutton.text.split('>')
@@ -333,7 +339,7 @@ class screenConfig(App):
             if len(bt_device) > 1:
                 mod_globals.opt_dev_address = bt_device[-1]
             mod_globals.bt_dev = self.mainbutton.text
-        self.stop()
+        self.settings.save()
 
     def change_orientation(self, inst, val):
         if val:
@@ -343,7 +349,84 @@ class screenConfig(App):
             set_orientation_portrait()
             mod_globals.screen_orient = False
 
+    def start(self, dt):
+        self.finish()
+        lbltxt = Label(text='Loading language', font_size=20)
+        popup_load = Popup(title='Status', content=lbltxt, size=(400, 400), size_hint=(None, None))
+        popup_load.open()
+        base.EventLoop.idle()
+        sys.stdout.flush()
+        lang = mod_zip.get_lang_dict(mod_globals.opt_lang)
+        if lang:
+            mod_globals.language_dict = lang
+        popup_load.dismiss()
+        base.EventLoop.window.canvas.clear()
+        self.stop()
+        elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
+        if mod_globals.opt_speed < mod_globals.opt_rate and not mod_globals.opt_demo:
+            elm.port.soft_boudrate(mod_globals.opt_rate)
+        se = ScanEcus(elm)
+        if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
+            mod_globals.savedEcus = 'savedEcus.p'
+        SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
+        if mod_globals.opt_can2:
+            if mod_globals.opt_can2 or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
+                mod_globals.savedEcus = 'savedEcus_can2.p'
+            SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus_can2
+        if not os.path.exists(SEFname):
+            SEFname = './' + mod_globals.savedEcus
+        if mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
+            se.read_Uces_file(all=True)
+            se.detectedEcus = []
+            for i in mod_globals.opt_ecuid.split(','):
+                if i in se.allecus.keys():
+                    se.allecus[i]['ecuname'] = i
+                    se.allecus[i]['idf'] = se.allecus[i]['ModelId'][2:4]
+                    if se.allecus[i]['idf']!='':
+                        if se.allecus[i]['idf'][0] == '0':
+                            se.allecus[i]['idf'] = se.allecus[i]['idf'][1]
+                    se.allecus[i]['pin'] = 'can'
+                    se.detectedEcus.append(se.allecus[i])
+        else:
+            if not os.path.isfile(SEFname) or mod_globals.opt_scan:
+                se.chooseModel(mod_globals.opt_car)
+            se.scanAllEcus()
+        while 1:
+            choosen_ecu = se.chooseECU(mod_globals.opt_ecuid)
+            mod_globals.opt_ecuid = ''
+            if choosen_ecu == -1:
+                continue
+            ecucashfile = mod_globals.cache_dir + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + '.p'
+            if os.path.isfile(ecucashfile):
+                ecu = pickle.load(open(ecucashfile, 'rb'))
+            else:
+                ecu = ECU(choosen_ecu, mod_globals.language_dict)
+                pickle.dump(ecu, open(ecucashfile, 'wb'))
+            ecu.initELM(self.elm)
+            if mod_globals.opt_demo:
+                lbltxt = Label(text='Loading dump', font_size=20)
+                popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
+                popup_init.open()
+                base.EventLoop.idle()
+                sys.stdout.flush()
+                ecu.loadDump()
+                base.EventLoop.window.remove_widget(popup_init)
+                popup_init.dismiss()
+                base.EventLoop.window.canvas.clear()
+            elif mod_globals.opt_dump:
+                lbltxt = Label(text='Save dump', font_size=20)
+                popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
+                popup_init.open()
+                base.EventLoop.idle()
+                sys.stdout.flush()
+                ecu.saveDump()
+                base.EventLoop.window.remove_widget(popup_init)
+                popup_init.dismiss()
+                base.EventLoop.window.canvas.clear()
+            ecu.show_screens()
+
     def build(self):
+        self.settings = mod_globals.Settings()
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, None))
         layout.bind(minimum_height=layout.setter('height'))
         layout.add_widget(MyLabel(text='PyClip', font_size=fs*4, size_hint=(1, None)))
@@ -356,7 +439,7 @@ class screenConfig(App):
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=fs, height=fs*1.5, multiline=True, size_hint=(1, None)))
         termbtn = MyButton(text='MACRO', height=(fs*5), size_hint=(1, None), on_press=self.term)
         check = MyButton(text='Check ELM327', height=(fs*5), size_hint=(1, None), on_press=self.check_elm)
-        gobtn = MyButton(text='START', font_size=fs*3, size_hint=(1, None), on_press=self.finish)
+        gobtn = MyButton(text='START', font_size=fs*3, size_hint=(1, None), on_press=self.start)
         layout.add_widget(gobtn)
         layout.add_widget(self.make_opt_ecuid())
         layout.add_widget(self.make_savedEcus())
@@ -409,7 +492,6 @@ def kivyScreenConfig():
         resizeFont = False
 
 def main():
-    version_file_name = 'version09r_1_0_0.txt'
     if not os.path.exists(mod_globals.crash_dir):
         os.makedirs(mod_globals.crash_dir)
     if not os.path.exists(mod_globals.cache_dir):
@@ -422,118 +504,13 @@ def main():
         os.makedirs(mod_globals.csv_dir)
     if not os.path.exists(mod_globals.macro_dir):
         os.makedirs(mod_globals.macro_dir)
-    
-    import glob
     zip_macro = sorted(glob.glob(os.path.join('./', 'macro.zip')), reverse=True)
     if len(zip_macro):
         import zipfile
         with zipfile.ZipFile(zip_macro[0], 'r') as zip_file:
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
-    
-    settings = mod_globals.Settings()
     kivyScreenConfig()
-    settings.save()
-    try:
-        elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    except:
-        labelText = '''
-            Could not connect to the ELM.
 
-            Possible causes:
-            - Bluetooth is not enabled
-            - other applications are connected to your ELM e.g Torque
-            - other device is using this ELM
-            - ELM got unpaired
-            - ELM is read under new name or it changed its name
-
-            Check your ELM connection and try again.
-        '''
-        lbltxt = Label(text=labelText, font_size=mod_globals.fontSize)
-        popup_load = Popup(title='ELM connection error', title_size=fs*1.5, title_align='center', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
-        popup_load.open()
-        base.runTouchApp()
-        exit(2)
-    if mod_globals.opt_speed < mod_globals.opt_rate and not mod_globals.opt_demo:
-        elm.port.soft_boudrate(mod_globals.opt_rate)
-    se = ScanEcus(elm)
-    if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
-        mod_globals.savedEcus = 'savedEcus.p'
-    SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
-    if mod_globals.opt_can2:
-        if mod_globals.opt_can2 or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
-            mod_globals.savedEcus = 'savedEcus_can2.p'
-        SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus_can2
-    if not os.path.exists(SEFname):
-        SEFname = './' + mod_globals.savedEcus
-    
-    if mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
-        se.read_Uces_file(all=True)
-        se.detectedEcus = []
-        for i in mod_globals.opt_ecuid.split(','):
-            if i in list(se.allecus.keys()):
-                se.allecus[i]['ecuname'] = i
-                se.allecus[i]['idf'] = se.allecus[i]['ModelId'][2:4]
-                if se.allecus[i]['idf']!='':
-                    if se.allecus[i]['idf'][0] == '0':
-                        se.allecus[i]['idf'] = se.allecus[i]['idf'][1]
-                se.allecus[i]['pin'] = 'can'
-                se.detectedEcus.append(se.allecus[i])
-
-    else:
-        if not os.path.isfile(SEFname) or mod_globals.opt_scan:
-            se.chooseModel(mod_globals.opt_car)
-        se.scanAllEcus()
-    lbltxt = MyLabel(text='Loading language', font_size=20)
-    popup_load = Popup(title='Status', content=lbltxt, size=(400, 400), size_hint=(None, None))
-    popup_load.open()
-    base.EventLoop.idle()
-    sys.stdout.flush()
-    lang = mod_zip.get_lang_dict(mod_globals.opt_lang)
-    if lang:
-        mod_globals.language_dict = lang
-    base.EventLoop.window.remove_widget(popup_load)
-    popup_load.dismiss()
-    base.EventLoop.window.canvas.clear()
-    if not os.path.isfile(mod_globals.cache_dir + version_file_name):
-        for root, dirs, files in os.walk(mod_globals.cache_dir):
-            for sfile in files:
-                if sfile.startswith('ver') or sfile.startswith('FG'):
-                    full_path = os.path.join(mod_globals.cache_dir, sfile)
-                    os.remove(full_path)
-    while 1:
-        clearScreen()
-        choosen_ecu = se.chooseECU(mod_globals.opt_ecuid)
-        mod_globals.opt_ecuid = ''
-        if choosen_ecu == -1:
-            continue
-        ecucashfile = mod_globals.cache_dir + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + '.p'
-        if os.path.isfile(ecucashfile):
-            ecu = pickle.load(open(ecucashfile, 'rb'))
-        else:
-            ecu = ECU(choosen_ecu, mod_globals.language_dict)
-            pickle.dump(ecu, open(ecucashfile, 'wb'))
-        ecu.initELM(elm)
-        if mod_globals.opt_demo:
-            lbltxt = MyLabel(text='Loading dump', font_size=20)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
-            popup_init.open()
-            base.EventLoop.idle()
-            sys.stdout.flush()
-            ecu.loadDump()
-            base.EventLoop.window.remove_widget(popup_init)
-            popup_init.dismiss()
-            base.EventLoop.window.canvas.clear()
-        elif mod_globals.opt_dump:
-            lbltxt = MyLabel(text='Save dump', font_size=20)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
-            popup_init.open()
-            base.EventLoop.idle()
-            sys.stdout.flush()
-            ecu.saveDump()
-            base.EventLoop.window.remove_widget(popup_init)
-            popup_init.dismiss()
-            base.EventLoop.window.canvas.clear()
-        ecu.show_screens()
 
 if __name__ == '__main__':
     main()
