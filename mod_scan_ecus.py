@@ -150,7 +150,6 @@ class ScanEcus():
                 self.vhcls.append([vehiclename,file,vehTypeCode,vehTCOM,vehindexTopo])
 
     def scanAllEcus(self):
-        print('scan')
         if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '': mod_globals.savedEcus = 'savedEcus.p'
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
         if mod_globals.opt_can2:
@@ -164,25 +163,27 @@ class ScanEcus():
                 self.allecus = OrderedDict()
                 for i in self.detectedEcus:
                     self.allecus[i['ecuname']] = i
+
                 self.read_Uces_file()
                 self.detectedEcus = []
                 for i in list(self.allecus.keys()):
                     self.detectedEcus.append(self.allecus[i])
+
                 self.detectedEcus = sorted(self.detectedEcus, key=lambda k: int(k['idf']))
                 if len(self.detectedEcus):
                     pickle.dump(self.detectedEcus, open(SEFname, 'wb'))
             return None
         mod_globals.opt_scan = True
         mod_globals.state_scan = True
-        self.lbltxt = Label(text='Init', font_size=20)
-        EventLoop.idle()
-        self.popup_scan = Popup(title='Scanning CAN bus', content=self.lbltxt, size=(400, 400), size_hint=(None, None))
-        self.popup_scan.open()
+        lbltxt = Label(text='Init', font_size=20)
+        popup_scan = Popup(title='Scanning CAN bus', content=lbltxt, size=(400, 400), size_hint=(None, None))
+        base.runTouchApp(embedded=True)
+        popup_scan.open()
         EventLoop.idle()
         self.reqres = []
         self.errres = []
         i = 0
-        self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+        lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
         EventLoop.idle()
         canH = '6'
         canL = '14'
@@ -193,32 +194,35 @@ class ScanEcus():
         for ecu, row in sorted(iter(self.allecus.items()), key=lambda x_y1: x_y1[1]['idf'] + x_y1[1]['protocol']+str(1/float(len(x_y1[1]['ids'])))):
             if self.allecus[ecu]['pin'] == 'can' and self.allecus[ecu]['pin1'] == canH and self.allecus[ecu]['pin2'] == canL:
                 i = i + 1
-                self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+                lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
                 EventLoop.idle()
                 self.elm.set_can_addr(self.allecus[ecu]['dst'], self.allecus[ecu])
                 self.scan_can(self.allecus[ecu])
+                
 
         self.elm.close_protocol()
         if not mod_globals.opt_can2:
-            self.popup_scan.title = 'Scanning ISO bus'
+            popup_scan.title = 'Scanning ISO bus'
             self.elm.init_iso()
             for ecu, row in sorted(iter(self.allecus.items()), key=lambda x_y: x_y[1]['idf'] + x_y[1]['protocol']):
                 if self.allecus[ecu]['pin'] == 'iso' and self.allecus[ecu]['pin1'] == '7' and self.allecus[ecu]['pin2'] == '15':
                     i = i + 1
-                    self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+                    lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
                     EventLoop.idle()
                     self.elm.set_iso_addr(self.allecus[ecu]['dst'], self.allecus[ecu])
                     self.scan_iso(self.allecus[ecu])
 
-        self.lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
+        lbltxt.text = 'Scanning:' + str(i) + '/' + str(len(self.allecus)) + ' Detected: ' + str(len(self.detectedEcus))
         EventLoop.idle()
         mod_globals.state_scan = False
         self.detectedEcus = sorted(self.detectedEcus, key=lambda k: int(k['idf']))
         if len(self.detectedEcus):
             pickle.dump(self.detectedEcus, open(SEFname, 'wb'))
-        self.popup_scan.dismiss()
+        EventLoop.window.remove_widget(popup_scan)
+        popup_scan.dismiss()
+        base.stopTouchApp()
         EventLoop.window.canvas.clear()
-        
+        del popup_scan
 
     def reScanErrors(self):
         mod_globals.opt_scan = True
@@ -273,13 +277,13 @@ class ScanEcus():
                 if families[row['idf']] in list(mod_globals.language_dict.keys()):
                     fmlyn = mod_globals.language_dict[families[row['idf']]]
                     if mod_globals.opt_scan:
-                        line = '%-35s %s' % (fmlyn, row['rerr'])
+                        line = '%-40s %s' % (fmlyn, row['rerr'])
                     else:
-                        line = '%-35s %s' % (fmlyn, row['stdType'])
+                        line = '%-40s %s' % (fmlyn, row['stdType'])
                 elif mod_globals.opt_scan:
-                    line = '%-35s %s' % (row['doc'].strip(), row['rerr'])
+                    line = '%-40s %s' % (row['doc'].strip(), row['rerr'])
                 else:
-                    line = '%-35s %s' % (row['doc'].strip(), row['stdType'])
+                    line = '%-40s %s' % (row['doc'].strip(), row['stdType'])
                 listecu.append(line)
         else:
             for row in self.detectedEcus:
@@ -291,18 +295,18 @@ class ScanEcus():
                 if row['idf'] in list(families.keys()) and families[row['idf']] in list(mod_globals.language_dict.keys()):
                     fmlyn = mod_globals.language_dict[families[row['idf']]]
                     if mod_globals.opt_scan:
-                        line = '%-2s(%4s) %-4s %-5s %-35s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['rerr'])
+                        line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['rerr'])
                     else:
-                        line = '%-2s(%4s) %-4s %-5s %-35s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['stdType'])
+                        line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['stdType'])
                 elif mod_globals.opt_scan:
-                    line = '%-2s(%4s) %-4s %-5s %-35s %s' % (row['dst'],
+                    line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],
                      m_elm.dnat[row['dst']],
                      row['idf'],
                      row['ecuname'],
                      row['doc'].strip(),
                      row['rerr'])
                 else:
-                    line = '%-2s(%4s) %-4s %-5s %-35s %s' % (row['dst'],
+                    line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],
                      m_elm.dnat[row['dst']],
                      row['idf'],
                      row['ecuname'],
@@ -589,6 +593,7 @@ class ScanEcus():
                 req = row[base]
                 if row[base] != req:
                     rrsp = self.elm.cmd(req)[3:]
+                    print(rrsp)
                     ttrrsp = rrsp.replace(' ', '')
                     if not all((c in string.hexdigits for c in ttrrsp)):
                         return False
@@ -762,6 +767,87 @@ class ScanEcus():
             if familynotdeteced:
                 row['rerr'] = rerr
                 self.detectedEcus.append(row)
+
+def readECUIds(elm):
+    elm.clear_cache()
+    StartSession = ''
+    DiagVersion = ''
+    Supplier = ''
+    Version = ''
+    Soft = ''
+    Std = ''
+    VIN = ''
+    rsp = ''
+    if elm.startSession == '':
+        res = elm.request(req='10C0', positive='50', cache=False)
+        if res == '' or 'ERROR' in res:
+            return (StartSession,
+             DiagVersion,
+             Supplier,
+             Version,
+             Soft,
+             Std,
+             VIN)
+        if res.startswith('50'):
+            StartSession = '10C0'
+        else:
+            res = elm.request(req='1003', positive='50', cache=False)
+            if res.startswith('50'):
+                StartSession = '1003'
+            else:
+                res = elm.request(req='10A0', positive='50', cache=False)
+                if res.startswith('50'):
+                    StartSession = '10A0'
+                else:
+                    res = elm.request(req='10B0', positive='50', cache=False)
+                    if res.startswith('50'):
+                        StartSession = '10B0'
+    else:
+        StartSession = elm.startSession
+        res = elm.request(req=elm.startSession, positive='50', cache=False)
+    if not res.startswith('50'):
+        pass
+    IdRsp = elm.request(req='2180', positive='61', cache=False)
+    if len(IdRsp) > 59:
+        DiagVersion = str(int(IdRsp[21:23], 16))
+        Supplier = IdRsp[24:32].replace(' ', '').strip().decode('hex').decode('ASCII', errors='ignore')
+        Soft = IdRsp[48:53].strip().replace(' ', '')
+        Version = IdRsp[54:59].strip().replace(' ', '')
+        Std = 'STD_A'
+        vinRsp = elm.request(req='2181', positive='61', cache=False)
+        if len(vinRsp) > 55 and 'NR' not in vinRsp:
+            VIN = vinRsp[6:56].strip().replace(' ', '').decode('hex').decode('ASCII', errors='ignore')
+    else:
+        try:
+            IdRsp_F1A0 = elm.request(req='22F1A0', positive='62', cache=False)
+            if len(IdRsp_F1A0) > 8 and 'NR' not in IdRsp_F1A0 and 'BUS' not in IdRsp_F1A0:
+                DiagVersion = str(int(IdRsp_F1A0[9:11], 16))
+            IdRsp_F18A = elm.request(req='22F18A', positive='62', cache=False)
+            if len(IdRsp_F18A) > 8 and 'NR' not in IdRsp_F18A and 'BUS' not in IdRsp_F18A:
+                Supplier = IdRsp_F18A[9:].strip().replace(' ', '').decode('hex').decode('ASCII', errors='ignore')
+            IdRsp_F194 = elm.request(req='22F194', positive='62', cache=False)
+            if len(IdRsp_F194) > 8 and 'NR' not in IdRsp_F194 and 'BUS' not in IdRsp_F194:
+                Soft = IdRsp_F194[9:].strip().replace(' ', '').decode('hex').decode('ASCII', errors='ignore')
+            IdRsp_F195 = elm.request(req='22F195', positive='62', cache=False)
+            if len(IdRsp_F195) > 8 and 'NR' not in IdRsp_F195 and 'BUS' not in IdRsp_F195:
+                Version = IdRsp_F195[9:].strip().replace(' ', '').decode('hex').decode('ASCII', errors='ignore')
+            Std = 'STD_B'
+            vinRsp = elm.request(req='22F190', positive='62', cache=False)
+            if len(vinRsp) > 58:
+                VIN = vinRsp[9:59].strip().replace(' ', '').decode('hex').decode('ASCII', errors='ignore')
+        except:
+            pass
+    if not DiagVersion.isalnum(): DiagVersion = '0'
+    if not Supplier.isalnum(): Supplier = '000'
+    if not Soft.isalnum(): Soft = '0000'
+    if not Version.isalnum(): Version = '0000'
+    return (StartSession,
+     DiagVersion,
+     Supplier,
+     Version,
+     Soft,
+     Std,
+     VIN)
 
 def findTCOM(addr, cmd, rsp):
     ecuvhc = {}

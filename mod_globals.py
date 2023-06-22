@@ -16,6 +16,7 @@ opt_lang = ''
 opt_car = ''
 opt_log = ''
 opt_ecuid_on = False
+opt_obdlink   = False
 opt_demo = False
 opt_scan = False
 opt_csv = False
