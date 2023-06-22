@@ -210,7 +210,6 @@ class Scenario(App):
         
         if self.vdiagExists:
             if not self.correctEcu:
-                print('*'*80)
                 ch = input('Unknown diagnostic version. Press ENTER to exit')
                 return
         

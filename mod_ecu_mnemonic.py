@@ -8,19 +8,46 @@ def get_mnemonicDTC(m, resp):
     bytes = 1
     bits = int(m.bitsLength)
     if bits > 7:
-        bytes = bits / 8
+        bytes = int(bits//8)
     hexval = '00'
     sb = int(m.startByte) - 1
-    if sb * 3 + bytes * 3 - 1 > len(resp):
+    if (sb * 3 + bytes * 3 - 1) > len(resp):
         return hexval
     hexval = resp[sb * 3:(sb + bytes) * 3 - 1]
     hexval = hexval.replace(' ', '')
     if bits < 8:
         val = int(hexval, 16)
-        val = val << int(m.startBit) >> 8 - bits & 2 ** bits - 1
+        val = (val << int(m.startBit) >> (8 - bits)) & (2 ** bits - 1)
         hexval = str(val)
     return hexval
 
+
+def get_mnemonic(m, se, elm):
+    if not m.serviceID and mod_globals.ext_cur_DTC != '000000':
+        for sid in list(se.keys()):
+            startReq = se[sid].startReq
+            if startReq.startswith("12") and startReq.endswith(mod_globals.ext_cur_DTC[:4]):
+                m.startByte = se[sid].responces[list(se[sid].responces.keys())[0]].mnemolocations[m.name].startByte
+                m.startBit = se[sid].responces[list(se[sid].responces.keys())[0]].mnemolocations[m.name].startBit
+                m.request = se[sid].startReq
+                m.positive = se[sid].simpleRsp
+                m.delay = '100' 
+    if len(m.sids) > 0:
+        for sid in m.sids:
+            service = se[sid]
+            resp = executeService(service, elm, [], '', True)
+    else:
+        resp = elm.request(m.request, m.positive, True, m.delay)
+    resp = resp.strip().replace(' ', '')
+    if not all((c in string.hexdigits for c in resp)):
+        resp = ''
+    resp = ' '.join((a + b for a, b in zip(resp[::2], resp[1::2])))
+    if len(m.startByte) == 0:
+        m.startByte = '01'
+    hexval = getHexVal(m, m.startByte, m.startBit, resp)
+    return hexval
+    
+    
 def get_SnapShotMnemonic(m, se, elm, dataids):
     snapshotService = ""
     byteLength = 3
@@ -36,7 +63,7 @@ def get_SnapShotMnemonic(m, se, elm, dataids):
     if not snapshotService:
         return "00"
     resp = executeService( snapshotService, elm, [], "", True )
-    if ((mod_globals.opt_demo and not resp) or not resp.startswith(snapshotService.simpleRsp) or len(resp)/2 == 6):
+    if ((mod_globals.opt_demo and not resp) or not resp.startswith(snapshotService.simpleRsp) or len(resp)//2 == 6):
         return '00'
     resp = resp.strip().replace(' ', '')
     if not all((c in string.hexdigits for c in resp)):
@@ -75,9 +102,9 @@ def get_SnapShotMnemonic(m, se, elm, dataids):
                     bytePos += 1
             continue
 
-        didDataLength = int(dataids[dataId].dataBitLength)/8
-        didData = resp[posInResp: posInResp + didDataLength*3]
-        posInResp += didDataLength*3
+        didDataLength = int(dataids[dataId].dataBitLength)//8
+        didData = resp[posInResp: posInResp + didDataLength*byteLength]
+        posInResp += didDataLength*byteLength
         didDict[dataId] = didData
     
     startByte = '1'
@@ -91,55 +118,30 @@ def get_SnapShotMnemonic(m, se, elm, dataids):
                 startBit = dataids[dataId].mnemolocations[m.name].startBit
     
     if dataId not in didDict:
-        didDict[dataId] = '0' * (int(dataids[dataId].dataBitLength)/8)
+        didDict[dataId] = '0' * (int(dataids[dataId].dataBitLength)//8)
 
     hexval = getHexVal(m, startByte, startBit, didDict[dataId])
     return hexval
 
-
-def get_mnemonic(m, se, elm):
-    if not m.serviceID and mod_globals.ext_cur_DTC != '000000':
-        for sid in list(se.keys()):
-            startReq = se[sid].startReq
-            if startReq.startswith("12") and startReq.endswith(mod_globals.ext_cur_DTC[:4]):
-                m.startByte = se[sid].responces[list(se[sid].responces.keys())[0]].mnemolocations[m.name].startByte
-                m.startBit = se[sid].responces[list(se[sid].responces.keys())[0]].mnemolocations[m.name].startBit
-                m.request = se[sid].startReq
-                m.positive = se[sid].simpleRsp
-                m.delay = '100' 
-    if len(m.sids) > 0:
-        for sid in m.sids:
-            service = se[sid]
-            resp = executeService(service, elm, [], '', True)
-    else:
-        resp = elm.request(m.request, m.positive, True, m.delay)
-    resp = resp.strip().replace(' ', '')
-    if not all((c in string.hexdigits for c in resp)):
-        resp = ''
-    resp = ' '.join((a + b for a, b in zip(resp[::2], resp[1::2])))
-    if len(m.startByte) == 0:
-        m.startByte = '01'
-    hexval = getHexVal(m, m.startByte, m.startBit, resp)
-    return hexval
     
 def getHexVal(m, startByte, startBit, resp):
     sb = int(startByte) - 1
     bits = int(m.bitsLength)
     sbit = int(startBit)
-    bytes = (bits + sbit - 1) / 8 + 1
+    bytes = int((bits+sbit-1)//8+1)
     rshift = ((bytes + 1) * 8 - (bits + sbit)) % 8
-    if sb * 3 + bytes * 3 - 1 > len(resp):
+    if (sb * 3 + bytes * 3 - 1) > len(resp):
         return '00'
     hexval = resp[sb * 3:(sb + bytes) * 3 - 1]
     hexval = hexval.replace(' ', '')
-    val = int(hexval, 16) >> rshift & 2 ** bits - 1
+    val = (int(hexval, 16) >> rshift) & (2 ** bits - 1)
     hexval = hex(val)[2:]
     if hexval[-1:].upper() == 'L':
         hexval = hexval[:-1]
     if len(hexval) % 2:
         hexval = '0' + hexval
-    if (len(hexval)/2)%bytes:
-        hexval = '00' * (bytes - len(hexval)/2) + hexval
+    if (len(hexval)//2)%bytes:
+        hexval = '00' * (bytes - len(hexval)//2) + hexval
     if m.littleEndian == '1':
         a = hexval
         b = ''

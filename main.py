@@ -48,7 +48,7 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.00'
+__version__ = '0.01.02'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -113,7 +113,7 @@ def my_excepthook(excType, excValue, tb):
     if mod_globals.os == 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
-    popup = Popup(title='Crash', content=error, size=(800, 800), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
+    popup = Popup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
     popup.open()
     base.runTouchApp()
     exit(2)

@@ -9,7 +9,6 @@ from mod_optfile import *
 if __name__ == '__main__':
     zipoutput = StringIO()
     if len(sys.argv) < 2:
-        print('Usage : convert_db.py [path/to/GenAppli]')
         exit()
     inputpath = sys.argv[1]
     ecudir = os.path.join(inputpath, 'EcuRenault')

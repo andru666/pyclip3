@@ -36,21 +36,16 @@ def prepareECU():
     pyren.optParser()
     if len(mod_globals.opt_log) == 0:
         mod_globals.opt_log = 'commander_log.txt'
-    print('Opening ELM')
     elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    print('Loading ECUs list')
     se = ScanEcus(elm)
     if not os.path.isfile('savedEcus.p') or mod_globals.opt_scan:
         se.chooseModel(mod_globals.opt_car)
     se.scanAllEcus()
-    print('Loading language ')
     sys.stdout.flush()
     lang = optfile('../Location/DiagOnCan_' + mod_globals.opt_lang + '.bqm', True)
     mod_globals.language_dict = lang.dict
-    print('Done')
     choosen_ecu = se.chooseECU(mod_globals.opt_ecuid)
     if choosen_ecu == -1:
-        print('#\n#\n#\n', '#   Unknown ECU defined!!!\n', '#\n#\n#\n')
         exit(1)
     ecucashfile = './cache/' + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + '.p'
     if os.path.isfile(ecucashfile):
@@ -63,19 +58,12 @@ def prepareECU():
 
 def main():
     prepareECU()
-    print(elm.request(req='2180', positive='61', cache=False))
-    print(elm.request(req='2181', positive='61', cache=False))
     for i in range(1, 10):
         value1, datastr1 = ecu.get_st('E019')
         value2, datastr2 = ecu.get_pr('PR141')
         value3, datastr3 = ecu.get_val('PR091')
         value4, datastr4 = ecu.get_id('ID008')
         clearScreen()
-        print()
-        print('E019 ', value1)
-        print('RP141', value2)
-        print('PR091', value3)
-        print('ID008', value4)
         time.sleep(0.3)
 
     ecu.run_cmd('RZ001')

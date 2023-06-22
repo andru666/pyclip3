@@ -146,7 +146,6 @@ def main():
     pycom = 0
     vers = ''
     res = ''
-    print('Opening ELM')
     elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     elm.portTimeout = 5
     for st in cmdb.split('#'):
@@ -169,7 +168,6 @@ def main():
                     chre = '[OK]'
                     good += 1
                     vers = cm[0]
-                print('%5s %10s %6s' % (cm[0], cm[2], chre))
                 sys.stdout.flush
 
     if pycom > 0:

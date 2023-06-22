@@ -185,7 +185,6 @@ class Port:
                 self.hdr.connect((self.macaddr, self.channel))
                 self.hdr.setblocking(True)
             except Exception as e:
-                print(" \n\nERROR: Can't connect to BT adapter\n\n", e)
                 mod_globals.opt_demo = True
                 sys.exit()
         elif re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$", portName):
@@ -200,10 +199,6 @@ class Port:
         elif mod_globals.os == 'android' and (portName == 'bt' or MAC != None):
             self.portType = 2
             self.droid = android.Android()
-            if self.droid:
-                print('SL4A loaded') 
-            print('BT is enabled:', self.droid.toggleBluetoothState(True).result)
-            print('BT discovery canceled:', self.droid.bluetoothDiscoveryCancel().result)
             retry = 0
             while 1:
                 time.sleep(1)
@@ -215,11 +210,9 @@ class Port:
                         self.btcid = self.droid.bluetoothConnect(uuid='00001101-0000-1000-8000-00805F9B34FB', address=MAC).result
                 except:
                     pass
-                print('Try ',retry, ":", self.btcid)
                 if self.btcid != None and len(self.btcid) > 10:  #uuid length greater then 10
                     break
                 if retry > 5:
-                    print(" \n\nERROR: Can't connect to BT adapter")
                     exit()
         else:
             self.portName = portName
@@ -323,10 +316,7 @@ class Port:
                     else:
                         byte = self.hdr.read(1)
         except:
-            print()
-            print('*' * 40)
-            print('*       Connection to ELM was lost')
-            mod_globals.opt_demo = True
+            pass
         
         if type(byte) == str:
             byte = byte.encode()
@@ -355,14 +345,9 @@ class Port:
                 rcv_bytes = self.hdr.sendall(data)
             return rcv_bytes
         elif self.portType == 2:
-            # return self.droid.bluetoothWrite(data , self.btcid)
             return self.droid.bluetoothWrite(data.decode("utf-8"), self.btcid)
         else:
             return self.hdr.write(data)
-        #except:
-        #    print('*' * 40)
-        #    print('*       Connection to ELM was lost')
-        #    mod_globals.opt_demo = True
     
     def expect(self, pattern, time_out=1):
         
@@ -427,16 +412,10 @@ class Port:
             return
         
         if self.portType == 1:  # wifi is not supported
-            print("ERROR - wifi/bluetooth do not support changing boud rate")
             return
         
-        # stop any read/write
         self.rwLock = False
         self.kaLock = False
-        #if self.ka_timer:
-        #    self.ka_timer.cancel()
-        
-        print("Changing baud rate to:", boudrate, end=' ')
         
         if mod_globals.opt_obdlink:
             self.write("ST SBR " + str(boudrate) + "\r")
@@ -468,7 +447,6 @@ class Port:
             if 'OK' in self.buff:
                 break
             if(tc - tb) > 1:
-                print("ERROR - command not supported")
                 return
         
         self.hdr.timeout = 1
@@ -494,7 +472,6 @@ class Port:
                 mod_globals.opt_rate = mod_globals.opt_speed
                 break
             if(tc - tb) > 1:
-                print("ERROR - something went wrong. Let's back.")
                 self.hdr.timeout = self.portTimeout
                 self.hdr.baudrate = mod_globals.opt_speed
                 self.rwLock = False
@@ -502,7 +479,6 @@ class Port:
                 #self.elm_at_KeepAlive()
                 return
         
-        print("OK")
         self.rwLock = False
         # disable at_keepalive
         #self.elm_at_KeepAlive()
@@ -599,28 +575,6 @@ class ELM:
         if self.lf != 0:
             self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n" + '#' * 60 + "\n")
             self.lf.flush()
-        """
-        # check OBDLink
-        elm_rsp = self.cmd("STI")
-        print(elm_rsp)
-        if elm_rsp and '?' not in elm_rsp:
-            firmware_version = elm_rsp.split(" ")[-1]
-            try:
-                firmware_version = firmware_version.split(".")
-                version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
-                stpx_introduced_in_version_number = 420 #STN1110 got STPX last in version v4.2.0
-                if version_number >= stpx_introduced_in_version_number:
-                    mod_globals.opt_obdlink = True
-            except:
-                pass
-
-            # check STN
-            elm_rsp = self.cmd("STP 53")
-            print(elm_rsp)
-            if '?' not in elm_rsp:
-                mod_globals.opt_stn = True
-        """
-        # Max out the UART speed for the fastest polling rate
         if mod_globals.opt_csv and not mod_globals.opt_demo:
             if mod_globals.opt_obdlink:
                 self.port.soft_boudrate(2000000)
@@ -635,21 +589,12 @@ class ELM:
                 self.run_allow_event.clear()
     
     def clear_cache(self):
-        """ Clear L2 cache before screen update
-        """
-        #print 'Clearing L2 cache'
         self.rsp_cache = OrderedDict()
 
-        # if not mod_globals.opt_demo:
-        #  self.rsp_cache = {}
-    
     def setDump(self, ecudump):
-        """ define ecudum for demo mode"""
         self.ecudump = ecudump
 
     def loadDump(self, dumpname):
-
-        print('Loading dump:', dumpname)
 
         df = open(dumpname, 'rt')
         lines = df.readlines()
@@ -768,11 +713,7 @@ class ELM:
 
     def setMonitorFilter(self, filt, mask):
         if mod_globals.opt_demo or self.monitorCallBack is None: return
-        # if len(filter)!=3 or len(mask)!=3: return
-        
-        print()
-        print("Filter : " + filt)
-        print("Mask   : " + mask)
+
         sys.stdout.flush()
         
         # stop monitor
@@ -789,7 +730,6 @@ class ELM:
     
     def startMonitor(self, callback, sendAllow=None, c_t=0.1, c_f=10):
         if self.currentprotocol != "can":
-            print("Monitor mode is possible only on CAN bus")
             return
         self.run_allow_event = threading.Event()
         self.run_allow_event.set()
@@ -882,7 +822,6 @@ class ELM:
 
     def nr78_startMonitor(self, callback, sendAllow=None, c_t=0.1, c_f=1):
         if self.currentprotocol != "can":
-            print("Monitor mode is possible only on CAN bus")
             return
         self.run_allow_event = threading.Event()
         self.run_allow_event.set()
@@ -925,8 +864,6 @@ class ELM:
                 if nBytes<8:
                     self.rspLen = 1
                     self.fToWait = 0 # becouse we've recieved it
-                else:
-                    print('\n ERROR #1 in waitFramesCallBack')
                 self.endWaitingFrames = True
 
             elif l[:1]=='1':  #first frame

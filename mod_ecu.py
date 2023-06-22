@@ -134,21 +134,27 @@ ecudump = {}
 resizeFont = False
 favouriteScreen = ecu_own_screen('FAV')
 
-class MyLabelBlue(ButtonBehavior, Label):
-
+class MyLabelGreen(ButtonBehavior, Label):
+    def __init__(self, **kwargs):
+        self.bind(size=self.setter('text_size'))
+        if 'halign' not in kwargs:
+            self.halign = 'center'
+        if 'valign' not in kwargs:
+            self.valign = 'middle'
+        super(MyLabelGreen, self).__init__(**kwargs)
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
             Color(0, 1, 0, 0.25)
             Rectangle(pos=self.pos, size=self.size)
 
-class MyLabelGreen(ButtonBehavior, Label):
+class MyLabelBlue(ButtonBehavior, Label):
 
     def __init__(self, mfs = None, **kwargs):
         if 'param_name' in kwargs:
             self.param_name = kwargs['param_name']
             del kwargs ['param_name']
-        super(MyLabelGreen, self).__init__(**kwargs)
+        super(MyLabelBlue, self).__init__(**kwargs)
         self.text_size = self.size
         self.bind(size=self.on_size)
         self.bind(text=self.on_text_changed)
@@ -196,7 +202,7 @@ class showDatarefGui(App):
 
     def __init__(self, ecu, datarefs, path):
         self.ecu = ecu
-        self.blue_part_size = 0.75
+        self.blue_part_size = 0.65
         self.datarefs = datarefs
         self.labels = {}
         self.needupdate = False
@@ -243,10 +249,10 @@ class showDatarefGui(App):
     def make_box_params(self, parameter_name, val):
         fs = mod_globals.fontSize
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None), height=fs * 2.5)
-        label1 = MyLabelGreen(text=self.paramsLabels[parameter_name], halign='left', valign='top', size_hint_x=(self.blue_part_size), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
+        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], halign='left', valign='top', size_hint_x=(self.blue_part_size), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
         if len(label1.text)*2.5 > label1.width*self.blue_part_size:
             glay.height += fs
-        label2 = MyLabelBlue(text=val, halign='right', valign='top', size_hint=(1 - self.blue_part_size, 1), font_size=fs)
+        label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, 1), font_size=fs)
         glay.add_widget(label1)
         glay.add_widget(label2)
         self.labels[parameter_name] = label2
@@ -265,7 +271,7 @@ class showDatarefGui(App):
         if mod_globals.opt_csv and self.csvf!=0:
             self.csvline = self.csvline + "\n"
             self.csvline = self.csvline.replace(';','\t')
-            self.csvf.write(pyren_decode(self.csvline).encode('utf8') if mod_globals.opt_csv_human else self.csvline)
+            self.csvf.write(self.csvline if mod_globals.opt_csv_human else self.csvline)
             self.csvf.flush()
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
@@ -740,7 +746,7 @@ class ECU():
                 csvline = csvline.replace(';', '\t')
                 csvf.write(pyren_decode(csvline).encode('utf8') if mod_globals.opt_csv_human else csvline)
                 csvf.flush()
-                csvline = datetime.now().strftime('%H:%M:%S.%f')
+                csvline = datetime.now().strftime('%H:%M:%S,%f')
             self.elm.clear_cache()
             if mod_globals.opt_csv and mod_globals.opt_csv_only:
                 clearScreen()
@@ -830,7 +836,6 @@ class ECU():
                 return
 
     def show_screen(self, screen):
-        print('show_screen')
         while 1:
             clearScreen()
             menu = []
