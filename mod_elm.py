@@ -198,30 +198,15 @@ class Port:
             self.hdr.settimeout(3)
             self.hdr.connect((self.ipaddr, self.tcpprt))
             self.hdr.setblocking(True)
-        elif mod_globals.os == 'android' and (portName == 'bt' or MAC != None):
+        elif mod_globals.os == 'android':
             self.portType = 2
-            self.droid = android.Android()
-            retry = 0
-            while 1:
-                time.sleep(1)
-                retry = retry + 1
-                try:
-                    if MAC == None:
-                        self.btcid = self.droid.bluetoothConnect('00001101-0000-1000-8000-00805F9B34FB').result
-                    else:
-                        self.btcid = self.droid.bluetoothConnect(uuid='00001101-0000-1000-8000-00805F9B34FB', address=MAC).result
-                except:
-                    pass
-                if self.btcid != None and len(self.btcid) > 10:  #uuid length greater then 10
-                    break
-                if retry > 5:
-                    exit()
+            self.getConnected()
         else:
             self.portName = portName
             self.portType = 0
             try:
                 self.hdr = serial.Serial(self.portName, baudrate=speed, timeout=portTimeout)
-            except:  # serial.SerialException:
+            except:
                 iterator = sorted(list(list_ports.comports()))
                 mod_globals.opt_demo = True
                 exit()
