@@ -48,11 +48,11 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.05'
+__version__ = '0.01.06'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
-    try:
+    if True:
         from jnius import cast, autoclass
         from android import mActivity, api_version
         import glob
@@ -144,7 +144,7 @@ if mod_globals.os == 'android':
         mod_globals.dumps_dir = user_datadir + '/dumps/'
         mod_globals.macro_dir = user_datadir + '/macro/'
         mod_globals.csv_dir = user_datadir + '/csv/'
-    except:
+    else:
         mod_globals.ecu_root = '../'
         try:
             import serial
