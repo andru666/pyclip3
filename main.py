@@ -48,108 +48,100 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.07'
+__version__ = '0.01.08'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
-    if True:
-        from jnius import cast, autoclass
-        from android import mActivity, api_version
-        import glob
-        
-        from android.permissions import request_permissions, check_permission, Permission
+    from jnius import cast, autoclass
+    from android import mActivity, api_version
+    import glob
+    
+    from android.permissions import request_permissions, check_permission, Permission
 
-        permissions = []
-        if api_version > 30:
-            try:
-                if (check_permission('android.permission.BLUETOOTH_CONNECT') == False):
-                    permissions.append('android.permission.BLUETOOTH_CONNECT')
-            except:
-                pass
-            try:
-                if (check_permission('android.permission.BLUETOOTH_SCAN') == False):
-                    permissions.append('android.permission.BLUETOOTH_SCAN')
-            except:
-                pass
-
-        if api_version <= 29:
-            try:
-                if (check_permission('android.permission.WRITE_EXTERNAL_STORAGE') == False):
-                    permissions.append('android.permission.WRITE_EXTERNAL_STORAGE')
-            except:
-                pass
-            try:
-                if (check_permission('android.permission.READ_EXTERNAL_STORAGE') == False):
-                    permissions.append('android.permission.READ_EXTERNAL_STORAGE')
-            except:
-                pass
-
+    permissions = []
+    if api_version > 30:
         try:
-            request_permissions (permissions)
-        except:
-            print('Permission request error!')
-
-        Environment = autoclass('android.os.Environment')       
-        AndroidPythonActivity = autoclass('org.kivy.android.PythonActivity')
-
-        try:
-            if api_version > 29:
-                Intent = autoclass("android.content.Intent")
-                Settings = autoclass("android.provider.Settings")
-                Uri = autoclass("android.net.Uri")
-                if Environment.isExternalStorageManager():
-                    pass
-                else:
-                    try:
-                        activity = mActivity.getApplicationContext()
-                        uri = Uri.parse("package:" + activity.getPackageName())
-                        intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
-                        currentActivity = cast(
-                        "android.app.Activity", AndroidPythonActivity.mActivity
-                        )
-                        currentActivity.startActivityForResult(intent, 101)
-                    except:
-                        intent = Intent()
-                        intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                        currentActivity = cast(
-                        "android.app.Activity", AndroidPythonActivity.mActivity
-                        )
-                        currentActivity.startActivityForResult(intent, 101)
-        except:
-            print('ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION unavailable')
-
-        waitPermissionTimer = 0
-        permissionIsGranted = False
-        while (permissionIsGranted == False) & (waitPermissionTimer < 5):
-            time.sleep(0.5)
-            waitPermissionTimer = waitPermissionTimer + 0.5
-            permissionIsGranted = True
-            for perm in permissions:
-                if (check_permission(perm) == False):
-                    permissionIsGranted = False
-
-            if api_version > 29:
-                if (Environment.isExternalStorageManager() == False):
-                    permissionIsGranted = False
-        
-        AndroidActivityInfo = autoclass('android.content.pm.ActivityInfo')
-        Environment = autoclass('android.os.Environment')
-        Params = autoclass('android.view.WindowManager$LayoutParams')
-        user_datadir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/'
-        mod_globals.user_data_dir = user_datadir
-        mod_globals.cache_dir = user_datadir + '/cache/'
-        mod_globals.crash_dir = user_datadir + '/crashs/'
-        mod_globals.log_dir = user_datadir + '/logs/'
-        mod_globals.dumps_dir = user_datadir + '/dumps/'
-        mod_globals.macro_dir = user_datadir + '/macro/'
-        mod_globals.csv_dir = user_datadir + '/csv/'
-    else:
-        mod_globals.ecu_root = '../'
-        try:
-            import serial
-            from serial.tools import list_ports
+            if (check_permission('android.permission.BLUETOOTH_CONNECT') == False):
+                permissions.append('android.permission.BLUETOOTH_CONNECT')
         except:
             pass
+        try:
+            if (check_permission('android.permission.BLUETOOTH_SCAN') == False):
+                permissions.append('android.permission.BLUETOOTH_SCAN')
+        except:
+            pass
+
+    if api_version <= 29:
+        try:
+            if (check_permission('android.permission.WRITE_EXTERNAL_STORAGE') == False):
+                permissions.append('android.permission.WRITE_EXTERNAL_STORAGE')
+        except:
+            pass
+        try:
+            if (check_permission('android.permission.READ_EXTERNAL_STORAGE') == False):
+                permissions.append('android.permission.READ_EXTERNAL_STORAGE')
+        except:
+            pass
+
+    try:
+        request_permissions (permissions)
+    except:
+        print('Permission request error!')
+
+    Environment = autoclass('android.os.Environment')       
+    AndroidPythonActivity = autoclass('org.kivy.android.PythonActivity')
+
+    try:
+        if api_version > 29:
+            Intent = autoclass("android.content.Intent")
+            Settings = autoclass("android.provider.Settings")
+            Uri = autoclass("android.net.Uri")
+            if Environment.isExternalStorageManager():
+                pass
+            else:
+                try:
+                    activity = mActivity.getApplicationContext()
+                    uri = Uri.parse("package:" + activity.getPackageName())
+                    intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                    currentActivity = cast(
+                    "android.app.Activity", AndroidPythonActivity.mActivity
+                    )
+                    currentActivity.startActivityForResult(intent, 101)
+                except:
+                    intent = Intent()
+                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    currentActivity = cast(
+                    "android.app.Activity", AndroidPythonActivity.mActivity
+                    )
+                    currentActivity.startActivityForResult(intent, 101)
+    except:
+        print('ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION unavailable')
+
+    waitPermissionTimer = 0
+    permissionIsGranted = False
+    while (permissionIsGranted == False) & (waitPermissionTimer < 5):
+        time.sleep(0.5)
+        waitPermissionTimer = waitPermissionTimer + 0.5
+        permissionIsGranted = True
+        for perm in permissions:
+            if (check_permission(perm) == False):
+                permissionIsGranted = False
+
+        if api_version > 29:
+            if (Environment.isExternalStorageManager() == False):
+                permissionIsGranted = False
+    
+    AndroidActivityInfo = autoclass('android.content.pm.ActivityInfo')
+    Environment = autoclass('android.os.Environment')
+    Params = autoclass('android.view.WindowManager$LayoutParams')
+    user_datadir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/'
+    mod_globals.user_data_dir = user_datadir
+    mod_globals.cache_dir = user_datadir + '/cache/'
+    mod_globals.crash_dir = user_datadir + '/crashs/'
+    mod_globals.log_dir = user_datadir + '/logs/'
+    mod_globals.dumps_dir = user_datadir + '/dumps/'
+    mod_globals.macro_dir = user_datadir + '/macro/'
+    mod_globals.csv_dir = user_datadir + '/csv/'
 
 elif mod_globals.os == 'nt':
     import pip
@@ -202,12 +194,10 @@ def set_orientation_landscape():
         activity = AndroidPythonActivity.mActivity
         activity.setRequestedOrientation(AndroidActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
-
 def set_orientation_portrait():
     if mod_globals.os == 'android':
         activity = AndroidPythonActivity.mActivity
         activity.setRequestedOrientation(AndroidActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-
 
 class screenConfig(App):
 
@@ -437,11 +427,10 @@ class screenConfig(App):
             permissionErrorLayout.add_widget(MyButton(text='Click to exit and check permissions!!!', valign = 'middle', halign = 'center', size_hint=(1, 1), font_size=fs*1.5, height=fs*3, on_press=exit))
             if (permissionIsGranted == False):
                 return permissionErrorLayout
-
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        layout.add_widget(MyLabel(text='PyClip3', font_size=fs*4, size_hint=(1, None)))
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs, height=fs*2, multiline=True, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text='PyClip3', height=fs*5, font_size=fs*4, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs*1.5, height=fs*2, multiline=True, size_hint=(1, None)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
@@ -525,6 +514,7 @@ def main():
     settings = mod_globals.Settings()
     kivyScreenConfig()
     settings.save()
+    elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     try:
         elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     except:
