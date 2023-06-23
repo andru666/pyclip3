@@ -53,8 +53,6 @@ __version__ = '0.01.04'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     try:
-        try:
-
         from jnius import cast, autoclass
         from android import mActivity, api_version
         import glob
