@@ -48,14 +48,92 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.03'
+__version__ = '0.01.04'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
     try:
-        from jnius import autoclass
+        try:
+
+        from jnius import cast, autoclass
+        from android import mActivity, api_version
         import glob
-        AndroidPythonActivity = autoclass('org.renpy.android.PythonActivity')
+        
+        from android.permissions import request_permissions, check_permission, Permission
+
+        permissions = []
+        if api_version > 30:
+            try:
+                if (check_permission('android.permission.BLUETOOTH_CONNECT') == False):
+                    permissions.append('android.permission.BLUETOOTH_CONNECT')
+            except:
+                pass
+            try:
+                if (check_permission('android.permission.BLUETOOTH_SCAN') == False):
+                    permissions.append('android.permission.BLUETOOTH_SCAN')
+            except:
+                pass
+
+        if api_version <= 29:
+            try:
+                if (check_permission('android.permission.WRITE_EXTERNAL_STORAGE') == False):
+                    permissions.append('android.permission.WRITE_EXTERNAL_STORAGE')
+            except:
+                pass
+            try:
+                if (check_permission('android.permission.READ_EXTERNAL_STORAGE') == False):
+                    permissions.append('android.permission.READ_EXTERNAL_STORAGE')
+            except:
+                pass
+
+        try:
+            request_permissions (permissions)
+        except:
+            print('Permission request error!')
+
+        Environment = autoclass('android.os.Environment')       
+        AndroidPythonActivity = autoclass('org.kivy.android.PythonActivity')
+
+        try:
+            if api_version > 29:
+                Intent = autoclass("android.content.Intent")
+                Settings = autoclass("android.provider.Settings")
+                Uri = autoclass("android.net.Uri")
+                if Environment.isExternalStorageManager():
+                    pass
+                else:
+                    try:
+                        activity = mActivity.getApplicationContext()
+                        uri = Uri.parse("package:" + activity.getPackageName())
+                        intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                        currentActivity = cast(
+                        "android.app.Activity", AndroidPythonActivity.mActivity
+                        )
+                        currentActivity.startActivityForResult(intent, 101)
+                    except:
+                        intent = Intent()
+                        intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        currentActivity = cast(
+                        "android.app.Activity", AndroidPythonActivity.mActivity
+                        )
+                        currentActivity.startActivityForResult(intent, 101)
+        except:
+            print('ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION unavailable')
+
+        waitPermissionTimer = 0
+        permissionIsGranted = False
+        while (permissionIsGranted == False) & (waitPermissionTimer < 5):
+            time.sleep(0.5)
+            waitPermissionTimer = waitPermissionTimer + 0.5
+            permissionIsGranted = True
+            for perm in permissions:
+                if (check_permission(perm) == False):
+                    permissionIsGranted = False
+
+            if api_version > 29:
+                if (Environment.isExternalStorageManager() == False):
+                    permissionIsGranted = False
+        
         PythonActivity = autoclass('org.renpy.android.PythonActivity')
         AndroidActivityInfo = autoclass('android.content.pm.ActivityInfo')
         Environment = autoclass('android.os.Environment')
