@@ -48,7 +48,7 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.06'
+__version__ = '0.01.07'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -132,7 +132,6 @@ if mod_globals.os == 'android':
                 if (Environment.isExternalStorageManager() == False):
                     permissionIsGranted = False
         
-        PythonActivity = autoclass('org.renpy.android.PythonActivity')
         AndroidActivityInfo = autoclass('android.content.pm.ActivityInfo')
         Environment = autoclass('android.os.Environment')
         Params = autoclass('android.view.WindowManager$LayoutParams')
