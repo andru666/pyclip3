@@ -40,7 +40,7 @@ from kivy.uix.switch import Switch
 from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy import base
-import traceback, time
+import traceback, time, mod_globals
 
 if int(Window.size[1]) > int(Window.size[0]):
     fs = int(Window.size[1])/(int(Window.size[0])/9)
@@ -48,7 +48,7 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.04'
+__version__ = '0.01.05'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -417,6 +417,28 @@ class screenConfig(App):
             mod_globals.screen_orient = False
 
     def build(self):
+        if mod_globals.os == 'android':
+            permissionIsGranted = True
+            permissionErrorLayout = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
+            permissionErrorLayout.add_widget(MyLabel(text='Permission not granted', font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+            for perm in permissions:
+                if (check_permission(perm) == False):
+                    permissionIsGranted = False
+                    permissionErrorLayout.add_widget(MyLabel(text=perm + ':' +str(check_permission(perm)), font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+            if api_version > 29:
+                if (Environment.isExternalStorageManager() == False):
+                    permissionErrorLayout.add_widget(MyLabel(text='FILES_ACCESS_PERMISSION : False', font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+                    permissionIsGranted = False
+            if api_version == 29:
+                if (Environment.isExternalStorageLegacy() == False):
+                    permissionErrorLayout.add_widget(MyLabel(text='LegacyExternalStorage : False', font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+                    permissionIsGranted = False
+            permissionErrorLayout.add_widget(MyLabel(text='Android api: ' + str(api_version), font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+            permissionErrorLayout.add_widget(MyLabel(text='Version: ' + str(__version__), font_size=(fs*0.9), height=fs*1.4, multiline=True, size_hint=(1, 1)))
+            permissionErrorLayout.add_widget(MyButton(text='Click to exit and check permissions!!!', valign = 'middle', halign = 'center', size_hint=(1, 1), font_size=fs*1.5, height=fs*3, on_press=exit))
+            if (permissionIsGranted == False):
+                return permissionErrorLayout
+
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
         layout.add_widget(MyLabel(text='PyClip3', font_size=fs*4, size_hint=(1, None)))
