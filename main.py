@@ -48,7 +48,7 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.02'
+__version__ = '0.01.03'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
