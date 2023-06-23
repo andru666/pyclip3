@@ -277,13 +277,13 @@ class ScanEcus():
                 if families[row['idf']] in list(mod_globals.language_dict.keys()):
                     fmlyn = mod_globals.language_dict[families[row['idf']]]
                     if mod_globals.opt_scan:
-                        line = '%-40s %s' % (fmlyn, row['rerr'])
+                        line = '%-30s %s' % (fmlyn, row['rerr'])
                     else:
-                        line = '%-40s %s' % (fmlyn, row['stdType'])
+                        line = '%-30s %s' % (fmlyn, row['stdType'])
                 elif mod_globals.opt_scan:
-                    line = '%-40s %s' % (row['doc'].strip(), row['rerr'])
+                    line = '%-30s %s' % (row['doc'].strip(), row['rerr'])
                 else:
-                    line = '%-40s %s' % (row['doc'].strip(), row['stdType'])
+                    line = '%-30s %s' % (row['doc'].strip(), row['stdType'])
                 listecu.append(line)
         else:
             for row in self.detectedEcus:
@@ -295,18 +295,18 @@ class ScanEcus():
                 if row['idf'] in list(families.keys()) and families[row['idf']] in list(mod_globals.language_dict.keys()):
                     fmlyn = mod_globals.language_dict[families[row['idf']]]
                     if mod_globals.opt_scan:
-                        line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['rerr'])
+                        line = '%-2s(%8s) %-6s %-5s %-30s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['rerr'])
                     else:
-                        line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['stdType'])
+                        line = '%-2s(%8s) %-6s %-5s %-30s %s' % (row['dst'],m_elm.dnat[row['dst']],row['idf'],row['ecuname'],fmlyn,row['stdType'])
                 elif mod_globals.opt_scan:
-                    line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],
+                    line = '%-2s(%8s) %-6s %-5s %-30s %s' % (row['dst'],
                      m_elm.dnat[row['dst']],
                      row['idf'],
                      row['ecuname'],
                      row['doc'].strip(),
                      row['rerr'])
                 else:
-                    line = '%-2s(%8s) %-6s %-5s %-40s %s' % (row['dst'],
+                    line = '%-2s(%8s) %-6s %-5s %-30s %s' % (row['dst'],
                      m_elm.dnat[row['dst']],
                      row['idf'],
                      row['ecuname'],

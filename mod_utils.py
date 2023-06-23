@@ -10,6 +10,7 @@ from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.utils import platform
 from kivy import base
+from kivy.uix.popup import Popup
 
 import mod_globals
 if platform != 'android':
@@ -36,6 +37,46 @@ try:
     import webbrowser
 except:
     pass
+class MyPopup(Popup):
+    def __init__(self, **kwargs):
+        super(MyPopup, self).__init__(**kwargs)
+        if 'title' not in kwargs:
+            self.title='INFO'
+        if 'title_size' not in kwargs:
+            self.title_size=fs*1.5
+        if 'title_align' not in kwargs:
+            self.title_align='center'
+        if 'size' in kwargs:
+            self.size_hint=(None, None)
+    """def MyPopup(self, close=True, title=None, content_box=None, content=None, height=None, weigh=None, stop=None):
+        if title:
+            title = title
+        else:
+            title = 'INFO'
+        if content:
+            content = content
+        else:
+            content = 'INFO'
+        if not height:
+            height = self.Window_size[1]*0.9
+        if not weigh:
+            weigh = self.Window_size[0]*0.9
+        layout = GridLayout(cols=1, padding=10, spacing=20, size_hint=(1, 1))
+        if not content_box:
+            label = MyLabel(text=content, size_hint=(1, 1))
+            if label.height > self.Window_size[1] * 0.8:
+                label.height = self.Window_size[1] *0.6
+        else:
+            label = content_box
+        layout.add_widget(label)
+        btn = MyButton(text=LANG.b_close, height=fs*3)
+        if close: layout.add_widget(btn)
+        popup = Popup(title=title, title_size=fs*1.5, title_align='center', content=layout, size_hint=(None, None), size=(weigh, height))
+        popup.open()
+        if stop:
+            btn.bind(on_press=stop)
+        else:
+            btn.bind(on_press=popup.dismiss)"""
 
 class MyButton(Button):
     def __init__(self, **kwargs):
@@ -178,7 +219,7 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         for entry in self.menu_entries:
-            btn = Button(text='  ' + (entry), height=fs*3, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
+            btn = Button(text='  ' + (entry), height=fs*4, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
             btn.bind(size=btn.setter('text_size'))
             btn.txt = entry
             btn.ID = i

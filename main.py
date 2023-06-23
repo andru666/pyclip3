@@ -48,7 +48,7 @@ else:
     fs = int(Window.size[0])/(int(Window.size[1])/9)
     
 __all__ = 'install_android'
-__version__ = '0.01.10'
+__version__ = '0.01.11'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -348,54 +348,63 @@ class screenConfig(App):
         return glay
 
     def finish(self, instance):
-        mod_globals.opt_port = ''
-        mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
-        mod_globals.opt_ecuid = str(self.textInput['OPT ecuid'].text)
-        mod_globals.opt_ecuid_on = self.button['OPT ecuid'].active
-        mod_globals.opt_speed = 38400
-        mod_globals.opt_rate = 38400
-        mod_globals.savedEcus = self.ecusbutton.text
-        mod_globals.opt_lang = self.langbutton.text
-        mod_globals.opt_car = 0
-        if self.button['Generate logs'].active:
-            mod_globals.opt_log = 'log.txt' if self.textInput['Log name'].text == '' else self.textInput['Log name'].text
+        if self.langbutton.text == 'SELECT':
+            layout = GridLayout(cols=1, padding=10, spacing=20, size_hint=(1, 1))
+            btn = MyButton(text='CLOSE', height=fs*8)
+            layout.add_widget(MyLabel(text='Not select language!', font_size=fs*6, height=fs*20, size_hint=(1, 1)))
+            layout.add_widget(btn)
+            popup = MyPopup(content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9))
+            popup.open()
+            btn.bind(on_press=popup.dismiss)
         else:
-            mod_globals.opt_log = ''
-        try:
-            mod_globals.fontSize = int(self.textInput['Font size'].text)
-        except:
-            mod_globals.fontSize = 20
-        mod_globals.opt_demo = self.button['Demo mode'].active
-        mod_globals.opt_scan = self.button['Scan vehicle'].active
-        mod_globals.opt_csv = self.button['CSV Log'].active
-        mod_globals.opt_csv_only = False
-        mod_globals.opt_csv_human = False
-        if mod_globals.opt_csv : mod_globals.opt_csv_human = True
-        mod_globals.opt_usrkey = ''
-        mod_globals.opt_verbose = False
-        mod_globals.opt_si = self.button['KWP Force SlowInit'].active
-        mod_globals.opt_cfc0 = self.button['Use CFC0'].active
-        mod_globals.opt_n1c = False
-        mod_globals.opt_exp = False
-        mod_globals.opt_dump = self.button['DUMP'].active
-        mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
-        if 'com1' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
-            mod_globals.opt_port = '127.0.0.1:35000'
-        elif 'wifi' in self.mainbutton.text.lower():
-            mod_globals.opt_port = '192.168.0.10:35000'
-        else:
-            bt_device = self.mainbutton.text.split('>')
-            if mod_globals.os != 'android':
-                try:
-                    mod_globals.opt_port = bt_device[1]
-                except:
-                    mod_globals.opt_port = bt_device[0]
+            mod_globals.opt_port = ''
+            mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
+            mod_globals.opt_ecuid = str(self.textInput['OPT ecuid'].text)
+            mod_globals.opt_ecuid_on = self.button['OPT ecuid'].active
+            mod_globals.opt_speed = 38400
+            mod_globals.opt_rate = 38400
+            mod_globals.savedEcus = self.ecusbutton.text
+            mod_globals.opt_lang = self.langbutton.text
+            mod_globals.opt_car = 0
+            if self.button['Generate logs'].active:
+                mod_globals.opt_log = 'log.txt' if self.textInput['Log name'].text == '' else self.textInput['Log name'].text
             else:
-                mod_globals.opt_port = bt_device[0]
-            if len(bt_device) > 1:
-                mod_globals.opt_dev_address = bt_device[-1]
-            mod_globals.bt_dev = self.mainbutton.text
-        self.stop()
+                mod_globals.opt_log = ''
+            try:
+                mod_globals.fontSize = int(self.textInput['Font size'].text)
+            except:
+                mod_globals.fontSize = 20
+            mod_globals.opt_demo = self.button['Demo mode'].active
+            mod_globals.opt_scan = self.button['Scan vehicle'].active
+            mod_globals.opt_csv = self.button['CSV Log'].active
+            mod_globals.opt_csv_only = False
+            mod_globals.opt_csv_human = False
+            if mod_globals.opt_csv : mod_globals.opt_csv_human = True
+            mod_globals.opt_usrkey = ''
+            mod_globals.opt_verbose = False
+            mod_globals.opt_si = self.button['KWP Force SlowInit'].active
+            mod_globals.opt_cfc0 = self.button['Use CFC0'].active
+            mod_globals.opt_n1c = False
+            mod_globals.opt_exp = False
+            mod_globals.opt_dump = self.button['DUMP'].active
+            mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
+            if 'com1' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
+                mod_globals.opt_port = '127.0.0.1:35000'
+            elif 'wifi' in self.mainbutton.text.lower():
+                mod_globals.opt_port = '192.168.0.10:35000'
+            else:
+                bt_device = self.mainbutton.text.split('>')
+                if mod_globals.os != 'android':
+                    try:
+                        mod_globals.opt_port = bt_device[1]
+                    except:
+                        mod_globals.opt_port = bt_device[0]
+                else:
+                    mod_globals.opt_port = bt_device[0]
+                if len(bt_device) > 1:
+                    mod_globals.opt_dev_address = bt_device[-1]
+                mod_globals.bt_dev = self.mainbutton.text
+            self.stop()
 
     def change_orientation(self, inst, val):
         if val:
@@ -562,7 +571,7 @@ def main():
                 se.detectedEcus.append(se.allecus[i])
 
     else:
-        if not os.path.isfile(SEFname) or mod_globals.opt_scan:
+        if mod_globals.opt_scan:
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
     lbltxt = Label(text='Loading language', font_size=20)
