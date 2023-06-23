@@ -8,7 +8,9 @@ import threading
 import socket
 from datetime import datetime
 from collections import OrderedDict
-if mod_globals.os != 'android':
+from kivy.utils import platform
+
+if platform != 'android':
     import serial
     from serial.tools import list_ports
 else:
