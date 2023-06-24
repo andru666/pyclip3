@@ -62,8 +62,7 @@ class MyButton(Button):
             self.height = fmn*lines*fs*simb
         if 'font_size' not in kwargs and len(self.text)*1.8 < self.height:
             self.font_size = self.height*0.6
-            
-        
+
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
         if 'spadding' in kwargs:
@@ -101,7 +100,7 @@ class MyLabel(Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs*1.2
+            self.font_size = fs*1.6
         if 'height' not in kwargs:
             fmn = 1.7
             lines = len(self.text.split('\n'))
@@ -175,7 +174,7 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         for entry in self.menu_entries:
-            btn = Button(text='  ' + (entry), height=fs*4, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
+            btn = MyButton(text=' ' + (entry), height=fs*4, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
             btn.bind(size=btn.setter('text_size'))
             btn.txt = entry
             btn.ID = i
