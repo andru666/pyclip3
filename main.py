@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.19'
+__version__ = '0.01.20'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -453,6 +453,11 @@ class screenConfig(App):
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
         except:
             self.archive = str(mod_globals.db_archive_file).rpartition('\\')[2]
+        if self.archive == 'None':
+            self.archive = 'NOT BASE'
+            root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
+            popup = Popup(title='INFO', title_size=fs*1.5, title_align='center', content=Label(text=self.archive, font_size=fs*5), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
+            return popup
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=fs*0.9, height=fs*2, multiline=True, size_hint=(1, None)))
         termbtn = Button(text='MACRO', height=fs*3.8, size_hint=(1, None), on_press=self.term)
         check = Button(text='Check ELM327', height=fs*4, size_hint=(1, None), on_press=self.check_elm)
