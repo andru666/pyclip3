@@ -155,3 +155,4 @@ cython_debug/
 *.zip
 *.cmd
 *.csv
+*.xml

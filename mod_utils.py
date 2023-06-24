@@ -188,7 +188,7 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         for entry in self.menu_entries:
-            btn = MyButton(text=' ' + (entry), height=fs*4, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
+            btn = MyButton(text=' ' + (entry), font_size=fs, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
             btn.bind(size=btn.setter('text_size'))
             btn.txt = entry
             btn.ID = i
