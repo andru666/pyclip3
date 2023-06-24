@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.18'
+__version__ = '0.01.19'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -408,7 +408,7 @@ class screenConfig(App):
             self.MyPopup('Not select ELM!')
         elif mod_globals.opt_lang == 'SELECT':
             self.MyPopup('Not select language!')
-        elif not mod_globals.savedEcus:
+        elif not mod_globals.savedEcus and not mod_globals.opt_scan:
             self.MyPopup('Not select savedEcus!')
         else:
             self.stop()
