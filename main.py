@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.13'
+__version__ = '0.01.14'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -449,8 +449,6 @@ class screenConfig(App):
         except:
             self.archive = str(mod_globals.db_archive_file).rpartition('\\')[2]
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=fs*0.9, height=fs*2, multiline=True, size_hint=(1, None)))
-        print(pycl.text_language)
-
         termbtn = Button(text='MACRO', height=fs*3.8, size_hint=(1, None), on_press=self.term)
         check = Button(text='Check ELM327', height=fs*4, size_hint=(1, None), on_press=self.check_elm)
         gobtn = Button(text='START', font_size=fs*3.5, height=fs*3.7, size_hint=(1, None), on_press=self.finish)

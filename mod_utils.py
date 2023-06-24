@@ -29,6 +29,8 @@ class MyPopup(Popup):
             self.title='INFO'
         if 'title_size' not in kwargs:
             self.title_size=fs*1.5
+        if 'text' not in kwargs:
+            self.text='Loading'
         if 'title_align' not in kwargs:
             self.title_align='center'
         if 'size' in kwargs:
@@ -61,7 +63,7 @@ class MyButton(Button):
                 lines = lines*1.05
             self.height = fmn*lines*fs*simb
         if 'font_size' not in kwargs and len(self.text)*1.8 < self.height:
-            self.font_size = self.height*0.6
+            self.font_size = self.height*0.4
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
@@ -191,7 +193,13 @@ class widgetChoiceLong(App):
 def kivyChoiceLong(list, question, header = ''):
     global widgetglobal
     global resizeFont
+    pop = MyPopup()
     while 1:
+        base.runTouchApp(embedded=True)
+        pop.open()
+        base.EventLoop.idle()
+        base.stopTouchApp()
+        pop.dismiss()
         widgetglobal = widgetChoiceLong(list, question, header)
         widgetglobal.run()
         if not resizeFont:
@@ -200,10 +208,12 @@ def kivyChoiceLong(list, question, header = ''):
 
 
 def Choice(list, question):
+    print('Choose')
     return kivyChoiceLong(list, question)
 
 
 def ChoiceLong(list, question, header = ''):
+    print('ChoiceLong')
     return kivyChoiceLong(list, question, header)
 
 

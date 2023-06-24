@@ -371,7 +371,7 @@ class showDatarefGui(App):
                 layout.add_widget(prelabel)
             else:
                 layout.add_widget(self.make_box_params(paramName, val))
-        quitbutton = Button(text='<BACK>', height=fs * bmn, size_hint=(1, None), on_press=self.finish)
+        quitbutton = MyButton(text='<BACK>', height=fs * bmn * 1.5, size_hint=(1, None), on_press=self.finish)
         layout.add_widget(quitbutton)
         root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
