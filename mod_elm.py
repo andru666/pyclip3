@@ -543,8 +543,8 @@ class ELM:
             self.port = Port(portName, speed, self.portTimeout)
         
         if len(mod_globals.opt_log)>0: # and mod_globals.opt_demo==False:
-            self.lf = open("./logs/elm_" + mod_globals.opt_log, "at")
-            self.vf = open("./logs/ecu_" + mod_globals.opt_log, "at")
+            self.lf = open(mod_globals.log_dir + "elm_" + mod_globals.opt_log, "at")
+            self.vf = open(mod_globals.log_dir + "ecu_" + mod_globals.opt_log, "at")
         self.lastCMDtime = 0
         self.ATCFC0 = mod_globals.opt_cfc0
 
@@ -590,7 +590,7 @@ class ELM:
         byte = ""
         try:
             if self.dmf is None:
-                self.dmf = open("./logs/" + mod_globals.opt_log, "rt")
+                self.dmf = open(mod_globals.log_dir + mod_globals.opt_log, "rt")
             byte = self.dmf.read(1)
         except:
             pass
@@ -623,7 +623,7 @@ class ELM:
         
         self.mlf = 0
         if not mod_globals.opt_demo and len(mod_globals.opt_log) > 0:
-            self.mlf = open("./logs/" + mod_globals.opt_log, "wt")
+            self.mlf = open(mod_globals.log_dir + mod_globals.opt_log, "wt")
         
         while self.run_allow_event.isSet():
             if not mod_globals.opt_demo:

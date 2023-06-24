@@ -336,7 +336,7 @@ def getVIN(de, elm, getFirst = False):
 
     l_vin = m_vin
     if os.path.exists('savedVIN.txt'):
-        with open('savedVIN.txt') as vinfile:
+        with open(mod_globals.user_data_dir + 'savedVIN.txt') as vinfile:
             vinlines = vinfile.readlines()
             for l in vinlines:
                 l = l.strip()

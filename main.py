@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.20'
+__version__ = '0.01.21'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
