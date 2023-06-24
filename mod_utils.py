@@ -13,23 +13,8 @@ from kivy import base
 from kivy.uix.popup import Popup
 
 import mod_globals
-if platform != 'android':
-    import ctypes
-    user32 = ctypes.windll.user32
-    from kivy.core.window import Window
-    Window.size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    if Window.size[1] > Window.size[0]:
-        fs = Window.size[1]*8.0/Window.size[0]
-        Window.size = Window.size[0]*0.8, Window.size[0]*0.9
-    else:
-        fs = Window.size[0]*8.0/Window.size[1]
-        Window.size = Window.size[1]*0.8, Window.size[1]*0.9
-else:
-    from kivy.core.window import Window
-    if Window.size[1] > Window.size[0]:
-        fs = Window.size[1]*8.0/Window.size[0]
-    else:
-        fs = Window.size[0]*8.0/Window.size[1]
+fs = mod_globals.fontSize
+
 widgetglobal = None
 choice_result = None
 resizeFont = False
@@ -48,35 +33,6 @@ class MyPopup(Popup):
             self.title_align='center'
         if 'size' in kwargs:
             self.size_hint=(None, None)
-    """def MyPopup(self, close=True, title=None, content_box=None, content=None, height=None, weigh=None, stop=None):
-        if title:
-            title = title
-        else:
-            title = 'INFO'
-        if content:
-            content = content
-        else:
-            content = 'INFO'
-        if not height:
-            height = self.Window_size[1]*0.9
-        if not weigh:
-            weigh = self.Window_size[0]*0.9
-        layout = GridLayout(cols=1, padding=10, spacing=20, size_hint=(1, 1))
-        if not content_box:
-            label = MyLabel(text=content, size_hint=(1, 1))
-            if label.height > self.Window_size[1] * 0.8:
-                label.height = self.Window_size[1] *0.6
-        else:
-            label = content_box
-        layout.add_widget(label)
-        btn = MyButton(text=LANG.b_close, height=fs*3)
-        if close: layout.add_widget(btn)
-        popup = Popup(title=title, title_size=fs*1.5, title_align='center', content=layout, size_hint=(None, None), size=(weigh, height))
-        popup.open()
-        if stop:
-            btn.bind(on_press=stop)
-        else:
-            btn.bind(on_press=popup.dismiss)"""
 
 class MyButton(Button):
     def __init__(self, **kwargs):
@@ -104,7 +60,10 @@ class MyButton(Button):
             if fs > 20: 
                 lines = lines*1.05
             self.height = fmn*lines*fs*simb
-
+        if 'font_size' not in kwargs and len(self.text)*1.8 < self.height:
+            self.font_size = self.height*0.6
+            
+        
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
         if 'spadding' in kwargs:
@@ -126,26 +85,23 @@ class MyGridLayout(GridLayout):
 
 class MyLabel(Label):
     global fs
-    
     def __init__(self, **kwargs):
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']
             del kwargs['bgcolor']
         else:
             self.bgcolor = (0.5, 0.5, 0, 1)
-        
         if 'multiline' in kwargs:
             del kwargs['multiline']
-        
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
             self.halign = 'center'
         if 'valign' not in kwargs:
             self.valign = 'middle'
-        if 'font_size' not in kwargs:
-            self.font_size = fs*1.8
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
+        if 'font_size' not in kwargs:
+            self.font_size = fs*1.2
         if 'height' not in kwargs:
             fmn = 1.7
             lines = len(self.text.split('\n'))

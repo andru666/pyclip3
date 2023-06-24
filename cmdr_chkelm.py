@@ -1,15 +1,9 @@
 #!/usr/bin/env python
-from kivy.config import Config
 try:
     from kivy_deps import sdl2, glew
 except:
     pass
 from kivy.utils import platform
-Config.set('kivy', 'exit_on_escape', '0')
-if platform != 'android':
-    Config.set('graphics', 'position', 'custom')
-    Config.set('graphics', 'left', 300)
-    Config.set('graphics', 'top',    50)
 from kivy.core.window import Window
 from kivy.app import App
 from kivy.uix.button import Button
