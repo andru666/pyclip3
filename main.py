@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.16'
+__version__ = '0.01.17'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -354,6 +354,7 @@ class screenConfig(App):
         btn.bind(on_press=popup.dismiss)
 
     def finish(self, instance):
+        InfoPopup(1)
         mod_globals.opt_port = ''
         mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
         mod_globals.opt_ecuid = str(self.textInput['OPT ecuid'].text)

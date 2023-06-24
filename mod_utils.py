@@ -23,6 +23,16 @@ try:
 except:
     pass
 
+def InfoPopup(bas=None):
+    pop = MyPopup(content=Label(text='LOADING', font_size=fs*3, halign = 'center'))
+    if not bas:
+        base.runTouchApp(embedded=True)
+    pop.open()
+    base.EventLoop.idle()
+    pop.dismiss()
+    if not bas:
+        base.stopTouchApp()
+
 class MyPopup(Popup):
     def __init__(self, **kwargs):
         super(MyPopup, self).__init__(**kwargs)
@@ -161,12 +171,7 @@ class widgetChoiceLong(App):
         global choice_result
         choice_result = [instance.txt, instance.ID]
         self.stop()
-        pop = MyPopup()
-        base.runTouchApp(embedded=True)
-        pop.open()
-        base.EventLoop.idle()
-        pop.dismiss()
-        base.stopTouchApp()
+        InfoPopup()
         base.EventLoop.window.canvas.clear()
 
     def build(self):
