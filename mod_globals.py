@@ -111,12 +111,12 @@ class Settings:
         if not sysos.path.isfile(user_data_dir + '/settings.p'):
             self.save()
         try:
-            with open('settings.p', 'rb') as f:
+            with open(user_data_dir + 'settings.p', 'rb') as f:
                 tmp_dict = pickle.load(f)
         except:
             sysos.remove(user_data_dir + '/settings.p')
             self.save()
-            with open('settings.p', 'rb') as f:
+            with open(user_data_dir + 'settings.p', 'rb') as f:
                 tmp_dict = pickle.load(f)
         self.__dict__.update(tmp_dict)
 
@@ -133,5 +133,5 @@ class Settings:
         self.useDump = opt_dump
         self.csv = opt_csv
         self.dev_address = opt_dev_address
-        with open('settings.p', 'wb') as f:
+        with open(user_data_dir + 'settings.p', 'wb') as f:
             pickle.dump(self.__dict__, f)

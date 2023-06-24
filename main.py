@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.15'
+__version__ = '0.01.16'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -543,7 +543,7 @@ def main():
             Check your ELM connection and try again.
         '''
         lbltxt = Label(text=labelText, font_size=mod_globals.fontSize)
-        popup_load = Popup(title='ELM connection error', content=lbltxt, size=(800, 800), auto_dismiss=True, on_dismiss=exit)
+        popup_load = Popup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
         exit(2)
@@ -578,7 +578,7 @@ def main():
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
     lbltxt = Label(text='Loading language', font_size=20)
-    popup_load = Popup(title='Status', content=lbltxt, size=(400, 400), size_hint=(None, None))
+    popup_load = Popup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
     popup_load.open()
     base.EventLoop.idle()
@@ -606,7 +606,7 @@ def main():
         ecu.initELM(elm)
         if mod_globals.opt_demo:
             lbltxt = Label(text='Loading dump', font_size=20)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
+            popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
             base.EventLoop.idle()
@@ -618,7 +618,7 @@ def main():
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
             lbltxt = Label(text='Save dump', font_size=20)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
+            popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
             base.EventLoop.idle()
