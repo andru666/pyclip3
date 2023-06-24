@@ -23,46 +23,46 @@ if __name__ == '__main__':
     scnerariosfiles = glob.glob(os.path.join(ecudir, 'Scenarios', '*.xml'))
     with zipfile.ZipFile(zipoutput, mode='w', compression=zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
         for vf in scnerariosfiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             f = open(vf, 'r')
             data = f.read()
             zf.writestr(os.path.join('EcuRenault', 'Scenarios', os.path.basename(vf)), str(data))
 
         for vf in vehiclesfiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             f = open(vf, 'r')
             data = f.read()
             zf.writestr(os.path.join('Vehicles', os.path.basename(vf)), str(data))
 
         for vf in ecufiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             f = open(vf, 'r')
             data = f.read()
             zf.writestr(os.path.join('EcuRenault', os.path.basename(vf)), str(data))
 
         for vf in fbsessionfiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             f = open(vf, 'r')
             data = f.read()
             zf.writestr(os.path.join('EcuRenault', 'Sessions', os.path.basename(vf)), str(data))
 
         for vf in locationsfiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             try:
                 optf = optfile(vf)
             except:
-                print('Skipping file ', vf)
+                #print('Skipping file ', vf)
                 continue
 
             data = pickle.dumps(optf.dict)
             zf.writestr(os.path.join('Location', os.path.basename(vf).replace('.bqm', '.p')), str(data))
 
         for vf in fgsessionfiles:
-            print('Processing file ', vf)
+            #print('Processing file ', vf)
             try:
                 optf = optfile(vf)
             except:
-                print('Skipping file ', vf)
+                #print('Skipping file ', vf)
                 continue
 
             data = pickle.dumps(optf.dict)

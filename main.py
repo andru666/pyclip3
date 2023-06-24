@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.14'
+__version__ = '0.01.15'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -82,7 +82,8 @@ if mod_globals.os == 'android':
     try:
         request_permissions (permissions)
     except:
-        print('Permission request error!')
+        pass
+        #print('Permission request error!')
 
     Environment = autoclass('android.os.Environment')       
     AndroidPythonActivity = autoclass('org.kivy.android.PythonActivity')
@@ -111,7 +112,8 @@ if mod_globals.os == 'android':
                     )
                     currentActivity.startActivityForResult(intent, 101)
     except:
-        print('ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION unavailable')
+        pass
+        #print('ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION unavailable')
 
     waitPermissionTimer = 0
     permissionIsGranted = False
@@ -344,7 +346,7 @@ class screenConfig(App):
 
     def MyPopup(self, txt):
         layout = GridLayout(cols=1, padding=10, spacing=20, size_hint=(1, 1))
-        btn = MyButton(text='CLOSE', height=fs*2)
+        btn = MyButton(text='CLOSE', size_hint=(1, 0.5))
         layout.add_widget(MyLabel(text=txt, font_size=fs*5, size_hint=(1, 1)))
         layout.add_widget(btn)
         popup = MyPopup(content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9))

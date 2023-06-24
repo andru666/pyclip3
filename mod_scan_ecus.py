@@ -11,10 +11,7 @@ from xml.dom.minidom import parse
 from collections import OrderedDict
 import xml.dom.minidom
 import pickle
-from mod_utils import Choice
-from mod_utils import ChoiceLong
-from mod_utils import pyren_encode
-from mod_utils import DBG
+from mod_utils import Choice, ChoiceLong, pyren_encode, DBG, MyPopup
 import mod_zip
 import mod_elm as m_elm
 import mod_globals
@@ -177,6 +174,7 @@ class ScanEcus():
         mod_globals.state_scan = True
         lbltxt = Label(text='Init', font_size=20)
         popup_scan = Popup(title='Scanning CAN bus', content=lbltxt, size=(400, 400), size_hint=(None, None))
+        pop = MyPopup()
         base.runTouchApp(embedded=True)
         popup_scan.open()
         EventLoop.idle()
@@ -593,7 +591,6 @@ class ScanEcus():
                 req = row[base]
                 if row[base] != req:
                     rrsp = self.elm.cmd(req)[3:]
-                    print(rrsp)
                     ttrrsp = rrsp.replace(' ', '')
                     if not all((c in string.hexdigits for c in ttrrsp)):
                         return False

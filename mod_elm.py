@@ -210,11 +210,8 @@ class Port:
                 iterator = sorted(list(list_ports.comports()))
                 mod_globals.opt_demo = True
                 exit()
-            # print self.hdr.BAUDRATES
             if mod_globals.opt_speed == 38400 and mod_globals.opt_rate != mod_globals.opt_speed:
                 self.check_elm()
-        
-        #self.elm_at_KeepAlive()
     
     def __del__(self):
         pass
@@ -541,12 +538,8 @@ class ELM:
     def __init__(self, portName, speed, log, startSession='10C0'):
         
         self.portName = portName
-        
-        # debug
-        # print 'Port Open'
-        
+       
         if not mod_globals.opt_demo:
-            # self.port = serial.Serial(portName, baudrate=speed, timeout=self.portTimeout)
             self.port = Port(portName, speed, self.portTimeout)
         
         if len(mod_globals.opt_log)>0: # and mod_globals.opt_demo==False:
@@ -637,14 +630,11 @@ class ELM:
                 byte = self.port.read()
             else:
                 byte = self.debugMonitor()
-
             ct = time.time()  # current time
             if(ct - lst) > coalescing_time:  # and frameBuffLen>0:
                 if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                     self.monitorSendAllow.set()
-                    #print 'time callback'
                     callback(frameBuff)
-                    #print 'return from callback'
                 lst = ct
                 frameBuff = ""
                 frameBuffLen = 0
@@ -673,35 +663,23 @@ class ELM:
                 
                 # save log
                 if self.mlf:
-                    #self.mlf.write(line + '\n')
-
-                    #debug
                     self.mlf.write(log_tmstr() + ' : ' + line + '\n')
-                
                 if frameBuffLen >= coalescing_frames:
                     if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                         self.monitorSendAllow.set()
-                        #print 'frame callback'
                         callback(frameBuff)
-                        #print 'return from callback'
                     lst = ct
                     frameBuff = ""
                     frameBuffLen = 0
-                
                 continue
-
             buff += byte
             if byte == '>':
                 self.port.write("\r")
 
     def setMonitorFilter(self, filt, mask):
         if mod_globals.opt_demo or self.monitorCallBack is None: return
-
         sys.stdout.flush()
-        
-        # stop monitor
         self.stopMonitor()
-
         if len(filt) != 3 or len(mask) != 3 or filt == '000':
             self.cmd("at cf 000")
             self.cmd("at cm 000")
@@ -763,9 +741,7 @@ class ELM:
             if(ct - lst) > coalescing_time:  # and frameBuffLen>0:
                 if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                     self.monitorSendAllow.set()
-                    # print 'time callback'
                     callback(frameBuff)
-                    # print 'return from callback'
                 lst = ct
                 frameBuff = ""
                 frameBuffLen = 0
@@ -782,23 +758,16 @@ class ELM:
 
                 frameBuff = frameBuff + line + '\n'
                 frameBuffLen = frameBuffLen + 1
-
-                # save log
                 if self.lf:
                     self.lf.write('mon: '+log_tmstr() + ' : ' + line + '\n')
-
                 if frameBuffLen >= coalescing_frames:
                     if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                         self.monitorSendAllow.set()
-                        # print 'frame callback'
                         callback(frameBuff)
-                        # print 'return from callback'
                     lst = ct
                     frameBuff = ""
                     frameBuffLen = 0
-
                 continue
-
             buff += byte
             if byte == '>':
                 self.port.write("\r")
@@ -879,14 +848,7 @@ class ELM:
 
         while not self.endWaitingFrames and (time.time()-beg < timeout):
             time.sleep(0.01)
-
-        #debug
-        #print '>>>> ', self.waitedFrames
         self.nr78_stopMonitor()
-
-        #debug
-        #print '>>>> ', self.waitedFrames
-
         return self.waitedFrames
 
     def getFromCache(self, req):
@@ -1068,24 +1030,17 @@ class ELM:
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "Switch back from dev mode\n")
                 self.lf.flush()
-                
-                # add srvsDelay to time gap before send next command
         self.srvsDelay = float(serviceDelay) / 1000.
-        
-        # check for negative response from k-line(CAN NR processed in send_can***)
         for line in cmdrsp.split('\n'):
             line = line.strip().upper()
             if line.startswith("7F") and len(line) == 8 and line[6:8] in list(negrsp.keys()) and self.currentprotocol != "can":
-                # if not mod_globals.state_scan: print line, negrsp[line[6:8]]
                 if self.lf != 0:
-                    # tm = str(time.time())
                     self.lf.write("#[" + str(tc - tb) + "] rsp:" + line + ":" + negrsp[line[6:8]] + "\n")
                     self.lf.flush()
                 if self.vf != 0:
                     tmp_addr = self.currentaddress
                     if self.currentaddress in list(dnat.keys()):
                         tmp_addr = dnat[self.currentaddress]
-
                     self.vf.write(log_tmstr() + ";" + tmp_addr + ";" + command + ";" + line + ";" + negrsp[line[6:8]] + "\n")
                     self.vf.flush()
 
@@ -1094,9 +1049,6 @@ class ELM:
     def send_cmd(self, command):
         
         command = command.upper()
-        
-        # deal with exceptions
-        # boudrate 38400 not enough to read full information about errors
         if not mod_globals.opt_obdlink and len(command) == 6 and command[:4] == '1902':
             command = '1902AF'
         
@@ -1221,18 +1173,12 @@ class ELM:
             self.l1_cache[command] = str(hex(nframes))[2:].upper()
         
         if len(result) // 2 >= nbytes and noerrors:
-            # trim padding
             result = result[:nbytes*2]
-            # split by bytes and return
             result = ' '.join(a + b for a, b in zip(result[::2], result[1::2]))
             return result
         else:
-            # check for negative response(repeat the same as in cmd())
             if result[:2] == '7F' and result[4:6] in list(negrsp.keys()):
                 if self.vf != 0:
-                    #debug
-                    #print result
-
                     self.vf.write(
                         log_tmstr() + ";" + dnat[self.currentaddress] + ";" + command + ";" + result + ";" + negrsp[result[4:6]] + "\n")
                     self.vf.flush()
@@ -1240,7 +1186,6 @@ class ELM:
             else:
                 return "WRONG RESPONSE"
 
-    # Can be used only with OBDLink based ELM, wireless especially.
     def send_can_cfc_caf(self, command):
         if len(command) == 0:
             return
@@ -1279,17 +1224,12 @@ class ELM:
             if all(c in string.hexdigits for c in s):  # some data
                 result = s
 
-        # Check for negative
         if result[:2] == '7F': noerrors = False
 
         if noerrors:
-            # split by bytes and return
             result = ' '.join(a + b for a, b in zip(result[::2], result[1::2]))
             return result
         else:
-            # check for negative response(repeat the same as in cmd())
-            # debug
-            # print "Size error: ", result
             if result[:2] == '7F' and result[4:6] in list(negrsp.keys()):
                 if self.vf != 0:
                     self.vf.write(
@@ -1299,8 +1239,7 @@ class ELM:
                 return "NR:" + result[4:6] + ':' + negrsp[result[4:6]]
             else:
                 return "WRONG RESPONSE"
-    
-    # Can be used only with OBDLink based ELM
+
     def send_can_cfc(self, command):
 
         command = command.strip().replace(' ', '').upper()
@@ -1377,13 +1316,10 @@ class ELM:
                             ST = int(ST[1:2], 16) * 100
                         else:
                             ST = int(ST, 16)
-                            # print 'BS:',BS,'ST:',ST
                         break  # go to sending consequent frames
                     else:
                         responses.append(s)
                         continue
-
-            # sending consequent frames according to FlowControl
             frames_left =(Fn - Fc)
             cf = min({BS, frames_left})  # number of frames to send without response
 
@@ -1487,15 +1423,10 @@ class ELM:
             self.l1_cache[init_command] = str(nFrames)
 
         if noerrors and len(result) // 2 >= nBytes:
-            # trim padding
             result = result[:rspLen*2]
-            # split by bytes and return
             result = ' '.join(a + b for a, b in zip(result[::2], result[1::2]))
             return result
         else:
-            # check for negative response(repeat the same as in cmd())
-            # debug
-            # print "Size error: ", result
             if result[:2] == '7F' and result[4:6] in list(negrsp.keys()):
                 if self.vf != 0:
                     self.vf.write(
@@ -1598,15 +1529,12 @@ class ELM:
                     BS = s[2:4]
                     if BS == '': BS = '03'
                     BS = int(BS, 16)
-
-                    # extract Frame Interval
                     ST = s[4:6]
                     if ST == '': ST = 'EF'
                     if ST[:1].upper() == 'F':
                         ST = int(ST[1:2], 16) * 100
                     else:
                         ST = int(ST, 16)
-                        # print 'BS:',BS,'ST:',ST
                     break  # go to sending consequent frames
                 elif s[:4] == '037F' and s[6:8] == '78': # NR:78
                     if len(s0)>0 and s == s0[-1]: # it should be the last one
@@ -1618,12 +1546,7 @@ class ELM:
                 else:
                     responses.append(s)
                     continue
-            
-            # sending consequent frames according to FlowControl
-            
             cf = min({BS - 1,(Fn - Fc) - 1})  # number of frames to send without response
-            
-            # disable responses
             if cf > 0:
                 if self.ATR1:
                     frsp = self.send_raw('at r0')
@@ -1640,13 +1563,7 @@ class ELM:
                 
                 frsp = self.send_raw(raw_command[Fc])
                 Fc = Fc + 1
-
-        #debug
-        #print '\nbp8>',responses,'<\n'
-
-        # now we are going to receive data. st or ff should be in responses[0]
         if len(responses) != 1:
-            # print "Something went wrong. len responces != 1"
             return "WRONG RESPONSE"
         
         result = ""
@@ -1712,15 +1629,10 @@ class ELM:
             noErrors = False
 
         if len(result) // 2 >= nBytes and noErrors and result[:2] != '7F':
-            # trim padding
             result = result[:rspLen*2]            
-            # split by bytes and return
             result = ' '.join(a + b for a, b in zip(result[::2], result[1::2]))
             return result
         else:
-            # check for negative response(repeat the same as in cmd())
-            #debug
-            #print "Size error: ", result
             if result[:2] == '7F' and result[4:6] in list(negrsp.keys()):
                 if self.vf != 0:
                     self.vf.write(
@@ -1735,11 +1647,8 @@ class ELM:
         
         command = command.upper()
         
-        tb = time.time()  # start time
-        
-        # save command to log
+        tb = time.time()
         if self.lf != 0:
-            # tm = str(time.time())
             self.lf.write(">[" + log_tmstr() + "]" + command + "\n")
             self.lf.flush()
         

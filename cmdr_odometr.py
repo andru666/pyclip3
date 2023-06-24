@@ -37,18 +37,18 @@ def prepareECUs():
     pyren.optParser()
     if len(mod_globals.opt_log) == 0:
         mod_globals.opt_log = 'commander_log.txt'
-    print('Opening ELM')
+    #print('Opening ELM')
     elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    print('Loading ECUs list')
+    #print('Loading ECUs list')
     se = ScanEcus(elm)
     if not os.path.isfile('savedEcus.p') or mod_globals.opt_scan:
         se.chooseModel(mod_globals.opt_car)
     se.scanAllEcus()
-    print('Loading language ')
+    #print('Loading language ')
     sys.stdout.flush()
     lang = optfile('../Location/DiagOnCan_' + mod_globals.opt_lang + '.bqm', True)
     mod_globals.language_dict = lang.dict
-    print('Done')
+    #print('Done')
     return se.detectedEcus
 
 
@@ -56,7 +56,7 @@ def chooseEcu(ecu_number):
     global ecu
     choosen_ecu = se.chooseECU(ecu_number)
     if choosen_ecu == -1:
-        print('#\n#\n#\n', '#   Unknown ECU defined!!!\n', '#\n#\n#\n')
+        #print('#\n#\n#\n', '#   Unknown ECU defined!!!\n', '#\n#\n#\n')
         exit(1)
     ecucashfile = './cache/' + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + '.p'
     if os.path.isfile(ecucashfile):
@@ -72,54 +72,54 @@ def main():
     tot = ''
     for l in list:
         if l['idf'] == '1':
-            print('### Connecting to Engine ###')
+            #print('### Connecting to Engine ###')
             chooseEcu(l['ecuname'])
             tot += 'Engine    PR025 : '
             num, string = ecu.get_pr('PR025')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
             tot += 'Engine    PR992 : '
             num, string = ecu.get_pr('PR992')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
             num, string = ecu.get_pr('PR391')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             num, string = ecu.get_pr('PR412')
-            print(pyren_encode(string))
-            print()
+            #print(pyren_encode(string))
+            #print()
         if l['idf'] == '2':
-            print('### Connecting to ABS ###')
+            #print('### Connecting to ABS ###')
             chooseEcu(l['ecuname'])
             tot += 'ABS       PR121 : '
             num, string = ecu.get_pr('PR121')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
-            print()
+            #print()
         if l['idf'] == '3':
-            print('### Connecting to TDB ###')
+            #print('### Connecting to TDB ###')
             chooseEcu(l['ecuname'])
             tot += 'TDB       PR009 : '
             num, string = ecu.get_pr('PR009')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
             tot += 'TDB (km)  PR025 : '
             num, string = ecu.get_pr('PR025')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
             tot += 'TDB (mil) PR026 : '
             num, string = ecu.get_pr('PR026')
-            print(pyren_encode(string))
+            #print(pyren_encode(string))
             tot += str(num)
             tot += '\n'
-            print()
+            #print()
 
     if mod_globals.os != 'android':
-        print(pyren_encode('Listening to CAN. Please wait a bit...'))
+        #print(pyren_encode('Listening to CAN. Please wait a bit...'))
         elm.cmd('at z')
         elm.cmd('at e1')
         elm.cmd('at l1')

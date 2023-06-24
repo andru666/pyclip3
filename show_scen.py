@@ -88,12 +88,8 @@ class Scenarii(App):
                     if p_value.isdigit() and p_value in list(mod_globals.language_dict.keys()):
                         p_value = mod_globals.language_dict[p_value]
                     lab = MyLabel(text="%-20s : %s" % (pyren_encode(p_name), pyren_encode(p_value)), height=fs*1.5,font_size=fs, halign= 'left')
-                    print(lab.text)
-                    print(len(lab.text))
-                    print(lab.height)
                     while len(lab.text)/fs < 2:
                         lab.height += fs*1.5
-                    print(lab.height)
                     layout_popup.add_widget(lab)
                 else:
                     lab = MyLabel(text=str(pyren_encode( line.strip().encode('utf-8', 'ignore').decode('utf-8'))), font_size=fs,  halign= 'left')

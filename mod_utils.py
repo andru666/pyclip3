@@ -22,6 +22,7 @@ try:
     import webbrowser
 except:
     pass
+
 class MyPopup(Popup):
     def __init__(self, **kwargs):
         super(MyPopup, self).__init__(**kwargs)
@@ -29,8 +30,8 @@ class MyPopup(Popup):
             self.title='INFO'
         if 'title_size' not in kwargs:
             self.title_size=fs*1.5
-        if 'text' not in kwargs:
-            self.text='Loading'
+        if 'content' not in kwargs:
+            self.content=Label(text='Loading')
         if 'title_align' not in kwargs:
             self.title_align='center'
         if 'size' in kwargs:
@@ -160,6 +161,12 @@ class widgetChoiceLong(App):
         global choice_result
         choice_result = [instance.txt, instance.ID]
         self.stop()
+        pop = MyPopup()
+        base.runTouchApp(embedded=True)
+        pop.open()
+        base.EventLoop.idle()
+        pop.dismiss()
+        base.stopTouchApp()
         base.EventLoop.window.canvas.clear()
 
     def build(self):
@@ -193,13 +200,7 @@ class widgetChoiceLong(App):
 def kivyChoiceLong(list, question, header = ''):
     global widgetglobal
     global resizeFont
-    pop = MyPopup()
     while 1:
-        base.runTouchApp(embedded=True)
-        pop.open()
-        base.EventLoop.idle()
-        base.stopTouchApp()
-        pop.dismiss()
         widgetglobal = widgetChoiceLong(list, question, header)
         widgetglobal.run()
         if not resizeFont:
@@ -208,12 +209,10 @@ def kivyChoiceLong(list, question, header = ''):
 
 
 def Choice(list, question):
-    print('Choose')
     return kivyChoiceLong(list, question)
 
 
 def ChoiceLong(list, question, header = ''):
-    print('ChoiceLong')
     return kivyChoiceLong(list, question, header)
 
 
@@ -350,6 +349,11 @@ def getVIN(de, elm, getFirst = False):
             ret = ''
 
         return ret
+    base.runTouchApp(embedded=True)
+    pop.open()
+    base.EventLoop.idle()
+    pop.dismiss()
+    base.stopTouchApp()
     choice = Choice(l_vin, 'Choose VIN : ')
     return choice[0]
 

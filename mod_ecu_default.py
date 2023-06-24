@@ -2,7 +2,6 @@
 from mod_ecu_mnemonic import *
 from mod_ecu_screen import *
 from mod_ecu_service import *
-from mod_utils import Choice
 from xml.dom.minidom import parse
 from xml.dom.minidom import parseString
 import xml.dom.minidom

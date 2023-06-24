@@ -657,7 +657,6 @@ class ECU():
                     datastr = self.Commands[dr.name].codeMR + ' ' + self.Commands[dr.name].label
                     cmds.append(dr.name)
                 menu.append(datastr)
-
             menu.append('<Up>')
             choice = ChoiceLong(menu, 'Choose :', header)
             if choice[0] == '<Up>':
@@ -825,7 +824,6 @@ class ECU():
             if len(function.subfunctions) != 0:
                 for sfu in function.subfunctions:
                     menu.append(sfu.text)
-
                 menu.append('<Up>')
                 choice = Choice(menu, 'Choose :')
                 if choice[0] == '<Up>':
@@ -842,7 +840,6 @@ class ECU():
             if len(screen.functions) != 0:
                 for fu in screen.functions:
                     menu.append(fu.text)
-
                 menu.append('<Up>')
                 choice = Choice(menu, 'Choose :')
                 if choice[0] == '<Up>':
@@ -854,8 +851,8 @@ class ECU():
 
     def show_defaults_std_a(self):
         while 1:
-            path = 'DE (STD_A)'
             clearScreen()
+            path = 'DE (STD_A)'
             header = 'ECU : ' + self.ecudata['ecuname'] + '  ' + self.ecudata['doc'] + '\n'
             header = header + 'Screen : ' + path
             menu = []
@@ -899,8 +896,8 @@ class ECU():
 
     def show_defaults_std_b(self):
         while 1:
-            path = 'DE (STD_B)'
             clearScreen()
+            path = 'DE (STD_B)'
             header = 'ECU : ' + self.ecudata['ecuname'] + '  ' + self.ecudata['doc'] + '\n'
             header = header + 'Screen : ' + path
             menu = []
@@ -956,7 +953,6 @@ class ECU():
             dtcs, defstr, hlpstr = get_default_failflag(self.Defaults, self.Mnemonics, self.Services, self.elm, self.calc)
             for d in sorted(defstr.keys()):
                 menu.append(defstr[d])
-
             menu.append('<Up>')
             menu.append('<Clear>')
             choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
