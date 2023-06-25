@@ -44,7 +44,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.22'
+__version__ = '0.01.23'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -408,8 +408,10 @@ class screenConfig(App):
             self.MyPopup('Not select ELM!')
         elif mod_globals.opt_lang == 'SELECT':
             self.MyPopup('Not select language!')
-        elif not mod_globals.savedEcus and not mod_globals.opt_scan:
+        elif not mod_globals.savedEcus and not mod_globals.opt_scan and not mod_globals.opt_ecuid_on and not os.path.exists(mod_globals.user_data_dir + '/' + mod_globals.savedEcus):
             self.MyPopup('Not select savedEcus!')
+        elif mod_globals.opt_ecuid_on and not mod_globals.opt_ecuid:
+            self.MyPopup('Not enter ECU!')
         else:
             self.stop()
 
@@ -585,7 +587,7 @@ def main():
         if mod_globals.opt_scan:
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
-    lbltxt = Label(text='Loading language', font_size=20)
+    lbltxt = Label(text='Loading language', font_size=fs*2)
     popup_load = Popup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
     popup_load.open()
@@ -613,7 +615,7 @@ def main():
             pickle.dump(ecu, open(ecucashfile, 'wb'))
         ecu.initELM(elm)
         if mod_globals.opt_demo:
-            lbltxt = Label(text='Loading dump', font_size=20)
+            lbltxt = Label(text='Loading dump', font_size=fs*2)
             popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
@@ -625,7 +627,7 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
-            lbltxt = Label(text='Save dump', font_size=20)
+            lbltxt = Label(text='Save dump', font_size=fs*2)
             popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()

@@ -1,6 +1,6 @@
 #Embedded file name: /build/PyCLIP/android/app/mod_ecu_command.py
 import string
-import xml.dom.minidom
+import xml.dom.minidom, mod_globals
 from xml.dom.minidom import parse
 from kivy.app import App
 from kivy.base import EventLoop
@@ -19,12 +19,11 @@ from mod_ecu_scenario import playScenario
 from mod_ecu_screen import *
 from mod_ecu_service import *
 from mod_ecu_state import get_state
-from mod_utils import hex_VIN_plus_CRC
-from mod_utils import StringToIntToHex
-from mod_utils import ASCIITOHEX
-fmn = 1.7
-bmn = 2.5
+from mod_utils import hex_VIN_plus_CRC, StringToIntToHex, ASCIITOHEX, MyTextInput
 
+fmn = 2
+bmn = 2.5
+fs = mod_globals.fontSize
 Window.softinput_mode = 'below_target'
 
 def runCommand(command, ecu, elm, param = '', cmdt = 'HEX'):
@@ -146,6 +145,8 @@ class MyLabelBlue(Label):
     def __init__(self, **kwargs):
         super(MyLabelBlue, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
+        if 'valign' not in kwargs:
+            self.valign = 'middle'
 
     def on_size(self, *args):
         if not self.canvas:
@@ -161,6 +162,8 @@ class MyLabelGreen(Label):
     def __init__(self, **kwargs):
         super(MyLabelGreen, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
+        if 'valign' not in kwargs:
+            self.valign = 'middle'
 
     def on_size(self, *args):
         if not self.canvas:
@@ -189,8 +192,8 @@ class kivyExecCommand(App):
     #     self.ecu.elm.send_cmd(self.ecu.ecudata['startDiagReq'])
 
     def make_box(self, str1, str2):
-        label1 = MyLabelBlue(text=str1, halign='left', size_hint=(0.35, 1))
-        label2 = MyLabelGreen(text=str2, halign='center', size_hint=(0.65, 1))
+        label1 = MyLabelBlue(text=str1, halign='left', valign='middle', size_hint=(0.35, 1))
+        label2 = MyLabelGreen(text=str2, halign='center', valign='middle', size_hint=(0.65, 1))
         glay = GridLayout(cols=2, height=mod_globals.fontSize * fmn, size_hint=(1, None), spacing=(5, 5))
         glay.add_widget(label1)
         glay.add_widget(label2)
@@ -254,9 +257,9 @@ class kivyExecCommand(App):
 
         popup2.dismiss()
         if error:
-            popup = Popup(title='ERROR', content=Label(text=error), size=(400, 400), size_hint=(None, None))
+            popup = Popup(title='ERROR', title_align='center', content=Label(text=error, font_size=fs), size=(400, 400), size_hint=(None, None))
         else:
-            popup = Popup(title='Done', content=Label(text=responses), size=(400, 400), size_hint=(None, None))
+            popup = Popup(title='Done', title_align='center', content=Label(text=responses, font_size=fs), size=(400, 400), size_hint=(None, None))
         popup.open()
 
     def exec_command(self, instance):
@@ -348,13 +351,7 @@ class kivyExecCommand(App):
                 lines = 7
             if lines > 20:
                 lines = 20
-            prelabel = TextInput(text=(self.command.prerequisite), size_hint=(1, None), multiline=True, height=mod_globals.fontSize * fmn * lines, readonly=True, foreground_color=[1,
-             0,
-             0,
-             1], background_color=[0,
-             0,
-             0,
-             1])
+            prelabel = MyTextInput(text=(self.command.prerequisite), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1, 0, 0, 1], background_color=[0, 0, 0, 1])
             layout.add_widget(prelabel)
         layout.add_widget(self.make_box('name', self.command.name))
         layout.add_widget(self.make_box('label', (self.command.label)))
@@ -387,7 +384,7 @@ class kivyExecCommand(App):
             btn = Button(text='/!\\ SCENARIO NOT SUPPORTED YET /!\\', height=mod_globals.fontSize * bmn, size_hint=(1, None))
             layout.add_widget(btn)
         if has_param and not self.command.inputlist and not has_scenario:
-            self.userInput = TextInput(multiline=False, height=mod_globals.fontSize * 3, size_hint=(1, None), background_color=(0.55,0.55,0.55,1))
+            self.userInput = MyTextInput(multiline=False, size_hint=(1, None), background_color=(0.55,0.55,0.55,1))
             hexBtn = Button(text='HEX', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
             decBtn = Button(text='DEC', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
             asciiBtn = Button(text='ASCII', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))

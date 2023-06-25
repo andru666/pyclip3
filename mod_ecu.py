@@ -38,7 +38,7 @@ from mod_optfile import *
 from mod_ply import *
 from mod_utils import *
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
-fmn = 1.7
+fmn = 2
 bmn = 2.5
 F2A = {'01': '7A',
  '02': '01',
@@ -367,7 +367,7 @@ class showDatarefGui(App):
                     lines += 1
                 if fs >= 40:
                     lines += 1
-                prelabel = TextInput(text=pyren_encode(paramName), font_size=fs*0.9, size_hint=(1, None), multiline=True, height=fs * fmn * lines, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
+                prelabel = MyTextInput(text=pyren_encode(paramName), font_size=fs*0.9, size_hint=(1, None), multiline=True, height=fs * fmn * lines, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
                 layout.add_widget(prelabel)
             else:
                 layout.add_widget(self.make_box_params(paramName, val))
@@ -975,41 +975,88 @@ class ECU():
             menu = []
             for l in self.screens:
                 if l.name == 'DE':
-                    l.name = 'DE : Device errors'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'DE : Ошибки устройства'
+                    else:
+                        l.name = 'DE : Device errors'
                 if l.name == 'ID':
-                    l.name = 'ID : Identifications'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'ID : Идентификации'
+                    else:
+                        l.name = 'ID : Device errors'
                 if l.name == 'SY':
-                    l.name = 'SY : System state'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'SY : Состояние системы'
+                    else:
+                        l.name = 'SY : System state'
                 if l.name == 'LC':
-                    l.name = 'LC : System configuration'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'LC : Конфигурация системы'
+                    else:
+                        l.name = 'LC : System configuration'
                 if l.name == 'SP':
-                    l.name = 'SP : System parameters'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'SP : Системные параметры'
+                    else:
+                        l.name = 'SP : System parameters'
                 if l.name == 'AC':
-                    l.name = 'AC : Executing tests'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'AC : Выполнение тестов'
+                    else:
+                        l.name = 'AC : Executing tests'
                 if l.name == 'CF':
-                    l.name = 'CF : Changing configuration'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'CF : Изменение конфигурации'
+                    else:
+                        l.name = 'CF : Changing configuration'
                 if l.name == 'VP':
-                    l.name = 'VP : VIN programming'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'VP : Программирование VIN'
+                    else:
+                        l.name = 'VP : VIN programming'
                 if l.name == 'RZ':
-                    l.name = 'RZ : Resets'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'RZ : Сбрасывает'
+                    else:
+                        l.name = 'RZ : Resets'
                 if l.name == 'SC':
-                    l.name = 'SC : Configuration scenarios'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'SC : Сценарии конфигурации'
+                    else:
+                        l.name = 'SC : Configuration scenarios'
                 if l.name == 'SCS':
-                    l.name = 'SCS : Security configuration scenarios'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'SCS : Сценарии настройки безопасности'
+                    else:
+                        l.name = 'SCS : Security configuration scenarios'
                 if l.name == 'EZ':
-                    l.name = 'EZ : EZSTEP'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'EZ : EZSTEP'
+                    else:
+                        l.name = 'EZ : EZSTEP'
                 if l.name == 'FAV':
-                    l.name = 'FAV : Favourite Parameteres'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'FAV : Избранные параметры'
+                    else:
+                        l.name = 'FAV : Favourite Parameteres'
                 if l.name == 'ED':
                     self.ext_de = l.datarefs
-                    l.name = 'ED : DE extra information'
+                    if mod_globals.opt_lang == 'RU':
+                        l.name = 'ED : Дополнительная информация'
+                    else:
+                        l.name = 'ED : DE extra information'
                     continue
                 menu.append(l.name)
-
             if mod_globals.opt_cmd:
-                menu.append('ECM : Extended command set')
+                if mod_globals.opt_lang == 'RU':
+                    menu.append('ECM : Расширенный набор команд')
+                else:
+                    menu.append('ECM : Extended command set')
             menu.append('<Up>')
-            choice = Choice(menu, 'Choose :')
+            if mod_globals.opt_lang == 'RU':
+                choice = Choice(menu, 'Выбор :')
+            else:
+                choice = Choice(menu, 'Choose :')
             if choice[0] == '<Up>':
                 favouriteScreen.datarefs = []
                 return

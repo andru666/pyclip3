@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
@@ -32,6 +33,24 @@ def InfoPopup(bas=None):
     pop.dismiss()
     if not bas:
         base.stopTouchApp()
+
+class MyTextInput(TextInput):
+    def __init__(self, **kwargs):
+        global fs
+        super(MyTextInput, self).__init__(**kwargs)
+        if 'font_size' not in kwargs:
+            self.font_size = fs*0.9
+        if 'height' not in kwargs:
+            fmn = 1.7
+            lines = len(self.text.split('\n'))
+            simb = len(self.text) / 60
+            if 1 > simb: simb = 1
+            if lines < simb: lines = simb
+            if lines < 2: lines = 2
+            if lines > 20: lines = 20
+            if fs > 20: 
+                lines = lines*1.05
+            self.height = fmn*lines*fs
 
 class MyPopup(Popup):
     def __init__(self, **kwargs):
@@ -65,14 +84,14 @@ class MyButton(Button):
         if 'height' not in kwargs:
             fmn = 1.7
             lines = len(self.text.split('\n'))
-            simb = len(self.text)*2.0 / self.width
+            simb = len(self.text) / 60
             if 1 > simb: simb = 1
             if lines < simb: lines = simb
             if lines < 2: lines = 2
             if lines > 20: lines = 20
             if fs > 20: 
                 lines = lines*1.05
-            self.height = fmn*lines*fs*simb
+            self.height = fmn*lines*fs
         if 'font_size' not in kwargs and len(self.text)*1.8 < self.height:
             self.font_size = self.height*0.4
 
