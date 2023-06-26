@@ -50,8 +50,6 @@ class MyTextInput(TextInput):
             if 2 < lines < 3: lines = lines * 1.5
             if lines < 2: lines = lines * 1.75
             self.height = lines * fs
-        if self.height <= fs*2:
-            self.font_size = fs*1.2
         self.padding = self.font_size / self.height
 
 class MyPopup(Popup):
@@ -95,23 +93,24 @@ class MyButton(Button):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs
+            self.font_size = fs*0.8
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
             print(self.text)
+            print(len(self.text))
+            print(simb)
             print(lines)
             if lines < simb: lines = simb
-            if 2 < lines < 3: lines = lines * 1.5
-            if lines < 2: lines = 2
-            print(lines)
-            print(simb)
-            print(len(self.text))
-            self.height = lines * self.font_size
-        if 'font_size' not in kwargs and (len(self.text) * self.font_size * 0.9)  < (Window.size[0] * self.size_hint[0]):
-            self.font_size = self.height*0.5 
+            if lines < 1.5: lines = 1.5
+            if 1.5 < lines < 2: lines = 2
+            if 2 < lines < 3: lines = 3
+            if self.font_size > fs:
+                self.height = lines * fs
+            else:
+                self.height = lines * self.font_size
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
@@ -151,16 +150,14 @@ class MyLabel(Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs * 1.5
+            self.font_size = fs
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines == 0: lines = 1
-            if lines < 2: lines = lines * 1.75
+            if lines < 2: lines = 1.5
             self.height = lines * fs
-        if self.height > fs*2 and 'font_size' not in kwargs:
-            self.font_size = fs
         
     def on_size(self, *args):
         if not self.canvas:

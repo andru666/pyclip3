@@ -13,11 +13,11 @@ if platform != 'android':
     Config.set('graphics', 'top',  20)
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
     from kivy.core.window import Window
-    Window.size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    if Window.size[1] > Window.size[0]:
-        Window.size = Window.size[0]*0.8, Window.size[0]*0.9
-    else:
-        Window.size = Window.size[1]*0.8, Window.size[1]*0.9
+    size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    Window.size = 720, 1280
+    while Window.size[1] > size[1]:
+        Window.size = 720*0.75, 1280*0.75
+print(Window.size)
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_scan_ecus import ScanEcus
@@ -400,6 +400,7 @@ class screenConfig(App):
                     mod_globals.opt_dev_address = bt_device[-1]
                 mod_globals.bt_dev = self.mainbutton.text
         self.settings.save()
+        fs = mod_globals.fontSize
         if not mod_globals.opt_port and not mod_globals.opt_demo:
             MyPopup(content=MyLabel(text='Not select ELM!', font_size=fs*5), close=True).open()
         elif mod_globals.opt_lang == 'SELECT':
