@@ -14,7 +14,6 @@ from kivy import base
 from kivy.uix.popup import Popup
 
 import mod_globals
-fs = mod_globals.fontSize
 
 widgetglobal = None
 choice_result = None
@@ -23,8 +22,8 @@ try:
     import webbrowser
 except:
     pass
-
 def InfoPopup(bas=None):
+    fs = mod_globals.fontSize
     pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=fs*3, halign = 'center'))
     if not bas:
         base.runTouchApp(embedded=True)
@@ -36,6 +35,7 @@ def InfoPopup(bas=None):
 
 class MyTextInput(TextInput):
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         super(MyTextInput, self).__init__(**kwargs)
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
@@ -57,6 +57,7 @@ class MyTextInput(TextInput):
 class MyPopup(Popup):
     close = ''
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         if 'close' in kwargs:
             self.close = kwargs['close']
             del kwargs ['close']
@@ -82,6 +83,7 @@ class MyPopup(Popup):
 
 class MyButton(Button):
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         id = ''
         if 'id' in kwargs:
             self.id = kwargs['id']
@@ -92,16 +94,24 @@ class MyButton(Button):
             self.halign = 'center'
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
+        if 'font_size' not in kwargs:
+            self.font_size = fs
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
+            print(self.text)
+            print(lines)
             if lines < simb: lines = simb
-            if lines < 2: lines = lines * 2
-            self.height = lines * fs
-        if 'font_size' not in kwargs and (len(self.text) * fs * 0.9)  < (Window.size[0] * self.size_hint[0]):
-            self.font_size = self.height*0.6
+            if 2 < lines < 3: lines = lines * 1.5
+            if lines < 2: lines = 2
+            print(lines)
+            print(simb)
+            print(len(self.text))
+            self.height = lines * self.font_size
+        if 'font_size' not in kwargs and (len(self.text) * self.font_size * 0.9)  < (Window.size[0] * self.size_hint[0]):
+            self.font_size = self.height*0.5 
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
@@ -125,6 +135,7 @@ class MyGridLayout(GridLayout):
 
 class MyLabel(Label):
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         self.bgcolor = ''
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']

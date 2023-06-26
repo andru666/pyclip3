@@ -36,11 +36,8 @@ from kivy.uix.switch import Switch
 from kivy import base
 import traceback, time, mod_globals
 
-if mod_globals.fontSize:
-    fs = mod_globals.fontSize
-
 __all__ = 'install_android'
-__version__ = '0.01.24'
+__version__ = '0.01.25'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -170,7 +167,7 @@ def my_excepthook(excType, excValue, tb):
     string = ''
     for m in message:
         string += m
-    error = MyTextInput(text=string)
+    error = MyTextInput(text=string, size_hint=(1, 1))
     if mod_globals.os == 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
@@ -423,6 +420,7 @@ class screenConfig(App):
             mod_globals.screen_orient = False
 
     def build(self):
+        fs = mod_globals.fontSize
         if mod_globals.os == 'android':
             permissionIsGranted = True
             permissionErrorLayout = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
@@ -587,6 +585,7 @@ def main():
         if mod_globals.opt_scan:
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
+    fs = mod_globals.fontSize
     lbltxt = MyLabel(text='Loading language', font_size=fs*4, size_hint=(1, 1))
     popup_load = MyPopup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
