@@ -25,7 +25,7 @@ except:
     pass
 
 def InfoPopup(bas=None):
-    pop = MyPopup(content=Label(text='LOADING', font_size=fs*3, halign = 'center'))
+    pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=fs*3, halign = 'center'))
     if not bas:
         base.runTouchApp(embedded=True)
     pop.open()
@@ -36,39 +36,52 @@ def InfoPopup(bas=None):
 
 class MyTextInput(TextInput):
     def __init__(self, **kwargs):
-        global fs
         super(MyTextInput, self).__init__(**kwargs)
+        if 'size_hint' not in kwargs:
+            self.size_hint = (1, None)
+        if 'halign' not in kwargs:
+            self.halign='center'
         if 'font_size' not in kwargs:
-            self.font_size = fs*0.9
+            self.font_size = fs
         if 'height' not in kwargs:
-            fmn = 1.7
             lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
-            if 1 > simb: simb = 1
+            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
-            if lines < 2: lines = 2
-            if lines > 20: lines = 20
-            if fs > 20: 
-                lines = lines*1.05
-            self.height = fmn*lines*fs
+            if 2 < lines < 3: lines = lines * 1.5
+            if lines < 2: lines = lines * 1.75
+            self.height = lines * fs
+        if self.height <= fs*2:
+            self.font_size = fs*1.2
+        self.padding = self.font_size / self.height
 
 class MyPopup(Popup):
+    close = ''
     def __init__(self, **kwargs):
+        if 'close' in kwargs:
+            self.close = kwargs['close']
+            del kwargs ['close']
+        else:
+            self.close = False
         super(MyPopup, self).__init__(**kwargs)
         if 'title' not in kwargs:
             self.title='INFO'
         if 'title_size' not in kwargs:
             self.title_size=fs*1.5
         if 'content' not in kwargs:
-            self.content=Label(text='Loading')
+            self.content=MyLabel(text='LOADING', size_hint = (1, 1))
         if 'title_align' not in kwargs:
             self.title_align='center'
         if 'size' in kwargs:
             self.size_hint=(None, None)
+        if self.close:
+            layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
+            btn = MyButton(text='CLOSE', height=fs*5, on_press=self.dismiss, size_hint=(1, 0.3))
+            layout.add_widget(MyLabel(text=self.content.text, font_size=self.content.font_size, size_hint=(1, 1)))
+            layout.add_widget(btn)
+            self.content=layout
 
 class MyButton(Button):
     def __init__(self, **kwargs):
-        global fs
         id = ''
         if 'id' in kwargs:
             self.id = kwargs['id']
@@ -82,30 +95,26 @@ class MyButton(Button):
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
-            fmn = 1.7
             lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
-            if 1 > simb: simb = 1
+            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
-            if lines < 2: lines = 2
-            if lines > 20: lines = 20
-            if fs > 20: 
-                lines = lines*1.05
-            self.height = fmn*lines*fs
-        if 'font_size' not in kwargs and len(self.text)*1.8 < self.height:
-            self.font_size = self.height*0.4
+            if lines < 2: lines = lines * 2
+            self.height = lines * fs
+        if 'font_size' not in kwargs and (len(self.text) * fs * 0.9)  < (Window.size[0] * self.size_hint[0]):
+            self.font_size = self.height*0.6
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
         if 'spadding' in kwargs:
             del kwargs ['spadding']
         super(MyGridLayout, self).__init__(**kwargs)
-        self.pos_hint={"top": 1, "left": 1}
-        
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']
         else:
             self.bgcolor =(1, 0, 0, 1)
+        if 'size_hint' not in kwargs:
+            self.size_hint = (1, None)
+    
     def on_size(self, *args):
         if not self.canvas:
             return
@@ -115,15 +124,14 @@ class MyGridLayout(GridLayout):
             Rectangle(pos=(self.pos[0],self.pos[1]), size=(self.size[0], self.size[1]))
 
 class MyLabel(Label):
-    global fs
     def __init__(self, **kwargs):
+        self.bgcolor = ''
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']
             del kwargs['bgcolor']
-        else:
-            self.bgcolor = (0.5, 0.5, 0, 1)
         if 'multiline' in kwargs:
             del kwargs['multiline']
+        super(MyLabel, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
             self.halign = 'center'
@@ -132,28 +140,25 @@ class MyLabel(Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs*1.6
+            self.font_size = fs * 1.5
         if 'height' not in kwargs:
-            fmn = 1.7
             lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
+            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
-            if lines < 7: lines = 5
-            if lines > 20: lines = 15
-            if 1 > simb: lines = 1.5
-            if fs > 20: 
-                lines = lines*1.05
-                fmn = 1.5
-            self.height = fmn*lines*fs
-        super(MyLabel, self).__init__(**kwargs)
+            if lines == 0: lines = 1
+            if lines < 2: lines = lines * 1.75
+            self.height = lines * fs
+        if self.height > fs*2 and 'font_size' not in kwargs:
+            self.font_size = fs
         
     def on_size(self, *args):
         if not self.canvas:
             return
         self.canvas.before.clear()
-        with self.canvas.before:
-            Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
-            Rectangle(pos=self.pos, size=self.size)
+        if self.bgcolor:
+            with self.canvas.before:
+                Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
+                Rectangle(pos=self.pos, size=self.size)
 
 class widgetChoiceLong(App):
 
@@ -198,16 +203,16 @@ class widgetChoiceLong(App):
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
         if self.header:
-            titlelabel = Label(text=self.header, height=fs*3, size_hint=(1.0, None))
+            titlelabel = MyLabel(text=self.header)
             titlelabel.bind(size=titlelabel.setter('text_size'))
             titlelabel.texture_update()
             titlelabel.height = titlelabel.texture_size[1]
             layout.add_widget(titlelabel)
-        question = Label(text=self.question, height=fs, size_hint=(1.0, None))
+        question = MyLabel(text=self.question)
         layout.add_widget(question)
         i = 1
         for entry in self.menu_entries:
-            btn = MyButton(text=' ' + (entry), font_size=fs, size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
+            btn = MyButton(text=' ' + (entry), size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
             btn.bind(size=btn.setter('text_size'))
             btn.txt = entry
             btn.ID = i
@@ -284,8 +289,22 @@ def pyren_decode_i(inp):
         return inp.decode(sys.stdout.encoding, errors='ignore')
 
 def clearScreen():
-    sys.stdout.write(chr(27) + '[2J' + chr(27) + '[;H')
+    pass
+    #sys.stdout.write(chr(27) + '[2J' + chr(27) + '[;H')
 
+def get_message(ScmParam, msg):
+    if msg in list(ScmParam.keys()):
+        value = ScmParam[msg]
+    else:
+        value = msg
+    if value.isdigit() and value in list(mod_globals.language_dict.keys()):
+        value = pyren_encode(mod_globals.language_dict[value])
+    return value
+
+def get_message_by_id(id):
+    if id.isdigit() and id in list(mod_globals.language_dict.keys()):
+        value = pyren_encode(mod_globals.language_dict[id])
+    return value
 
 def hex_VIN_plus_CRC(VIN, plusCRC=True):
     VIN = VIN.upper()

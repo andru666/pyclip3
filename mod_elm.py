@@ -212,7 +212,10 @@ class Port:
                 exit()
             if mod_globals.opt_speed == 38400 and mod_globals.opt_rate != mod_globals.opt_speed:
                 self.check_elm()
-    
+
+    def getConnected(self):
+        self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
+
     def __del__(self):
         pass
         #if self.ka_timer:

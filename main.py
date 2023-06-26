@@ -29,14 +29,10 @@ from mod_zip import get_zip
 from mod_ecu_default import *
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
-from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
-from kivy.uix.textinput import TextInput
-from kivy.uix.popup import Popup
 from kivy import base
 import traceback, time, mod_globals
 
@@ -44,7 +40,7 @@ if mod_globals.fontSize:
     fs = mod_globals.fontSize
 
 __all__ = 'install_android'
-__version__ = '0.01.23'
+__version__ = '0.01.24'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -174,11 +170,11 @@ def my_excepthook(excType, excValue, tb):
     string = ''
     for m in message:
         string += m
-    error = TextInput(text=string)
+    error = MyTextInput(text=string)
     if mod_globals.os == 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
-    popup = Popup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
+    popup = MyPopup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
     popup.open()
     base.runTouchApp()
     exit(2)
@@ -230,54 +226,56 @@ class screenConfig(App):
             activity.setRequestedOrientation(AndroidActivityInfo.SCREEN_ORIENTATION_SENSOR)
 
     def make_box_switch(self, str1, active, callback = None):
-        label1 = MyLabel(text=str1, halign='left', size_hint=(1, None), height=fs*3)
-        sw = Switch(active=active, size_hint=(0.5, None), height=fs*3)
+        label = MyLabel(text=str1, halign='left',  size_hint=(0.65, None), bgcolor = (0.5, 0.5, 0, 1))
+        sw = Switch(active=active, size_hint=(0.35, None))
         if callback:
             sw.bind(active=callback)
         self.button[str1] = sw
-        label1.bind(size=label1.setter('text_size'))
-        glay = MyGridLayout(cols=2, height=fs*3.5, size_hint=(1, None), padding=fs/4, spacing=fs/4)
-        glay.add_widget(label1)
+        glay = MyGridLayout(cols=2)
+        sw.height = label.height
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(sw)
         return glay
 
     def make_opt_ecuid(self, callback = None):
         str1 = 'OPT ecuid'
-        active = mod_globals.opt_ecuid_on
-        label1 = MyLabel(text=str1, halign='left', size_hint=(1, None), height=fs*3)
+        label = MyLabel(text=str1, halign='left', size_hint=(0.3, None), bgcolor = (0.5, 0.5, 0, 1))
         if mod_globals.opt_ecu:
             iText = mod_globals.opt_ecu
         else:
             iText = ''
-        ti = TextInput(text=iText, padding=fs/5, font_size=fs*1.5, height=fs*3, multiline=False, size_hint_x=1.4)
+        ti = MyTextInput(text=iText, size_hint=(0.5, None), multiline=False)
         self.textInput[str1] = ti
-        label1.bind(size=label1.setter('text_size'))
-        sw = Switch(active=active, size_hint_x=0.5)
-        if callback:
-            sw.bind(active=callback)
+        sw = Switch(size_hint=(0.2, None))
         self.button[str1] = sw
-        glay = MyGridLayout(cols=3, height=fs*3.5, size_hint=(1, None), padding=fs/4, spacing=fs/4)
-        glay.add_widget(label1)
+        glay = MyGridLayout(cols=3)
+        ti.height = sw.height = label.height
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(sw)
         glay.add_widget(ti)
         return glay
 
     def make_input(self, str1, iText):
-        label1 = MyLabel(text=str1, halign='left', size_hint=(1, None), height=fs*3)
-        ti = TextInput(text=iText, halign='center', padding=fs/5, font_size=fs*1.5, height=fs*3, multiline=False)
+        label = MyLabel(text=str1, halign='left', bgcolor = (0.5, 0.5, 0, 1))
+        ti = MyTextInput(text=iText, multiline=False)
         self.textInput[str1] = ti
-        label1.bind(size=label1.setter('text_size'))
-        glay = MyGridLayout(cols=2, height=fs*3.5, size_hint=(1, None), padding=fs/4, spacing=fs/4)
-        glay.add_widget(label1)
+        ti.height = label.height
+        glay = MyGridLayout(cols=2)
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(ti)
         return glay
 
     def make_bt_device_entry(self):
         ports = get_devices()
-        label1 = MyLabel(text='ELM port', halign='left', size_hint=(0.6, None), height=fs*3)
-        self.bt_dropdown = DropDown(height=fs*2)
-        label1.bind(size=label1.setter('text_size'))
-        glay = MyGridLayout(cols=2, padding=(fs/4), height=(fs*3.5), size_hint=(1, None))
+        label = MyLabel(text='ELM port', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
+        self.bt_dropdown = DropDown()
+        glay = MyGridLayout(cols=2, size_hint=(1, None))
         btn = MyButton(text='WiFi (192.168.0.10:35000)')
         btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
         self.bt_dropdown.add_widget(btn)
@@ -288,14 +286,18 @@ class screenConfig(App):
         for name, address in porte:
             if mod_globals.opt_port == name:
                 mod_globals.opt_dev_address = address
-            btn = MyButton(text=name + '>' + address)
+            btn = MyButton(text=name + '>' + address, size_hint=(0.65, None))
             btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
             self.bt_dropdown.add_widget(btn)
-        self.mainbutton = MyButton(text='Select', height=fs*3)
+        self.mainbutton = MyButton(text='Select', size_hint=(0.65, None))
         self.mainbutton.bind(on_release=self.bt_dropdown.open)
         self.bt_dropdown.bind(on_select=lambda instance, x: setattr(self.mainbutton, 'text', x))
         self.bt_dropdown.select(mod_globals.opt_port)
-        glay.add_widget(label1)
+        if label.height < self.ecusbutton.height:
+            label.height = self.ecusbutton.height
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(self.mainbutton)
         return glay
     
@@ -306,52 +308,49 @@ class screenConfig(App):
 
     def make_savedEcus(self):
         ecus = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'savedEcus*.p')))
-        label1 = MyLabel(text='savedEcus', halign='left', size_hint=(1, None), height=fs*3)
-        self.ecus_dropdown = DropDown(height=fs*2)
-        label1.bind(size=label1.setter('text_size'))
-        glay = MyGridLayout(cols=2, height=fs*3.5, size_hint=(1, None), padding=fs/4, spacing=fs/4)
+        label = MyLabel(text='savedEcus', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
+        self.ecus_dropdown = DropDown()
+        glay = MyGridLayout(cols=2, size_hint=(1, None))
         for s_ecus in ecus:
             s_ecus = os.path.split(s_ecus)[1]
-            btn= MyButton(text=s_ecus, height=fs*3)
+            btn= MyButton(text=s_ecus)
             btn.bind(on_release=lambda btn: self.ecus_dropdown.select(btn.text))
             self.ecus_dropdown.add_widget(btn)
-        self.ecusbutton = MyButton(text='', height=fs*3)
+        self.ecusbutton = MyButton(text='', size_hint=(0.65, None))
         self.ecusbutton.bind(on_release=self.ecus_dropdown.open)
         self.ecus_dropdown.bind(on_select=lambda instance, x: setattr(self.ecusbutton, 'text', x))
-        glay.add_widget(label1)
+        if label.height < self.ecusbutton.height:
+            label.height = self.ecusbutton.height
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(self.ecusbutton)
         return glay
 
     def make_language_entry(self):
         langs = mod_zip.get_languages()
-        label1 = MyLabel(text='Language', halign='left', size_hint=(1, None), height=fs*3)
+        label = MyLabel(text='Language', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.lang_dropdown = DropDown()
-        label1.bind(size=label1.setter('text_size'))
-        glay = MyGridLayout(cols=2, height=fs*3.5, size_hint=(1, None), padding=fs/4, spacing=fs/4)
-        btn = MyButton(text='SELECT', height=fs*3)
+        glay = MyGridLayout(cols=2, size_hint=(1, None))
+        btn = MyButton(text='SELECT')
         btn.bind(on_release=lambda btn: self.lang_dropdown.select(btn.text))
         self.lang_dropdown.add_widget(btn)
         for lang in sorted(langs):
-            btn = MyButton(text=lang, height=fs*3)
+            btn = MyButton(text=lang)
             btn.bind(on_release=lambda btn: self.lang_dropdown.select(btn.text))
             self.lang_dropdown.add_widget(btn)
-        self.langbutton = MyButton(text='SELECT', height=fs*3)
+        self.langbutton = MyButton(text='SELECT', size_hint=(0.65, None))
         self.langbutton.bind(on_release=self.lang_dropdown.open)
         self.lang_dropdown.bind(on_select=lambda instance, x: self.changeLangButton(x))
         if mod_globals.opt_lang:
             self.lang_dropdown.select(mod_globals.opt_lang)
-        glay.add_widget(label1)
+        if label.height < self.ecusbutton.height:
+            label.height = self.ecusbutton.height
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
         glay.add_widget(self.langbutton)
         return glay
-
-    def MyPopup(self, txt):
-        layout = GridLayout(cols=1, padding=10, spacing=20, size_hint=(1, 1))
-        btn = MyButton(text='CLOSE', size_hint=(1, 0.5))
-        layout.add_widget(MyLabel(text=txt, font_size=fs*5, size_hint=(1, 1)))
-        layout.add_widget(btn)
-        popup = MyPopup(content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9))
-        popup.open()
-        btn.bind(on_press=popup.dismiss)
 
     def finish(self, instance):
         InfoPopup(1)
@@ -405,13 +404,13 @@ class screenConfig(App):
                 mod_globals.bt_dev = self.mainbutton.text
         self.settings.save()
         if not mod_globals.opt_port and not mod_globals.opt_demo:
-            self.MyPopup('Not select ELM!')
+            MyPopup(content=MyLabel(text='Not select ELM!', font_size=fs*5), close=True).open()
         elif mod_globals.opt_lang == 'SELECT':
-            self.MyPopup('Not select language!')
+            MyPopup(content=MyLabel(text='Not select language!', font_size=fs*5), close=True).open()
         elif not mod_globals.savedEcus and not mod_globals.opt_scan and not mod_globals.opt_ecuid_on and not os.path.exists(mod_globals.user_data_dir + '/' + mod_globals.savedEcus):
-            self.MyPopup('Not select savedEcus!')
+            MyPopup(content=MyLabel(text='Not select savedEcus!', font_size=fs*5), close=True).open()
         elif mod_globals.opt_ecuid_on and not mod_globals.opt_ecuid:
-            self.MyPopup('Not enter ECU!')
+            MyPopup(content=MyLabel(text='Not enter ECU!', font_size=fs*5), close=True).open()
         else:
             self.stop()
 
@@ -447,9 +446,9 @@ class screenConfig(App):
                 return permissionErrorLayout
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        pycl = MyLabel(text='PyClip3', height=fs*4, font_size=fs*3.8, size_hint=(1, None))
+        pycl = MyLabel(text='PyClip3', height=fs*2.7, font_size=fs*2.2, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs*0.9, height=fs*2, multiline=True, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs*0.8, height=fs*1, multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
@@ -458,12 +457,12 @@ class screenConfig(App):
         if self.archive == 'None':
             self.archive = 'NOT BASE'
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
-            popup = Popup(title='INFO', title_size=fs*1.5, title_align='center', content=Label(text=self.archive, font_size=fs*5), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
+            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=fs*5), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
             return popup
-        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=fs*0.9, height=fs*2, multiline=True, size_hint=(1, None)))
-        termbtn = Button(text='MACRO', height=fs*3.8, size_hint=(1, None), on_press=self.term)
-        check = Button(text='Check ELM327', height=fs*4, size_hint=(1, None), on_press=self.check_elm)
-        gobtn = Button(text='START', font_size=fs*3.5, height=fs*3.7, size_hint=(1, None), on_press=self.finish)
+        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=fs*0.8, height=fs*1, multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
+        termbtn = MyButton(text='MACRO', height=fs*2, size_hint=(1, None), on_press=self.term)
+        check = MyButton(text='Check ELM327', height=fs*4, size_hint=(1, None), on_press=self.check_elm)
+        gobtn = MyButton(text='START', height=fs*2.5, size_hint=(1, None), on_press=self.finish)
         layout.add_widget(gobtn)
         layout.add_widget(self.make_opt_ecuid())
         layout.add_widget(self.make_savedEcus())
@@ -481,9 +480,10 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('KWP Force SlowInit', mod_globals.opt_si))
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
-        layout.add_widget(Label(text='PyClip3 by andru666 22-06-2023', font_size=fs, height=fs, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=fs*0.5, height=fs*0.7, size_hint=(1, None)))
         self.lay = layout
-        root = ScrollView(size_hint=(1, 1))
+        root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
+         'center_y': 0.5})
         root.add_widget(layout)
         return root
 
@@ -552,8 +552,8 @@ def main():
 
             Check your ELM connection and try again.
         '''
-        lbltxt = Label(text=labelText, font_size=mod_globals.fontSize)
-        popup_load = Popup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
+        lbltxt = MyLabel(text=labelText, font_size=mod_globals.fontSize)
+        popup_load = MyPopup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
         exit(2)
@@ -587,8 +587,8 @@ def main():
         if mod_globals.opt_scan:
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
-    lbltxt = Label(text='Loading language', font_size=fs*2)
-    popup_load = Popup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
+    lbltxt = MyLabel(text='Loading language', font_size=fs*4, size_hint=(1, 1))
+    popup_load = MyPopup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
     popup_load.open()
     base.EventLoop.idle()
@@ -615,8 +615,8 @@ def main():
             pickle.dump(ecu, open(ecucashfile, 'wb'))
         ecu.initELM(elm)
         if mod_globals.opt_demo:
-            lbltxt = Label(text='Loading dump', font_size=fs*2)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
+            lbltxt = MyLabel(text='Loading dump', font_size=fs*4, size_hint=(1, 1))
+            popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
             base.EventLoop.idle()
@@ -627,8 +627,8 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
-            lbltxt = Label(text='Save dump', font_size=fs*2)
-            popup_init = Popup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
+            lbltxt = MyLabel(text='Save dump', font_size=fs*4, size_hint=(1, 1))
+            popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
             base.EventLoop.idle()

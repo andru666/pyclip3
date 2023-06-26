@@ -6,7 +6,6 @@ from kivy.app import App
 from kivy.base import EventLoop
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
@@ -19,7 +18,7 @@ from mod_ecu_scenario import playScenario
 from mod_ecu_screen import *
 from mod_ecu_service import *
 from mod_ecu_state import get_state
-from mod_utils import hex_VIN_plus_CRC, StringToIntToHex, ASCIITOHEX, MyTextInput
+from mod_utils import *
 
 fmn = 2
 bmn = 2.5
@@ -147,6 +146,12 @@ class MyLabelBlue(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'height' not in kwargs:
+            lines = len(self.text.split('\n'))
+            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            if lines < simb: lines = simb
+            if lines < 2: lines = lines * 2
+            self.height = lines * fs
 
     def on_size(self, *args):
         if not self.canvas:
@@ -164,6 +169,12 @@ class MyLabelGreen(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'height' not in kwargs:
+            lines = len(self.text.split('\n'))
+            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            if lines < simb: lines = simb
+            if lines < 2: lines = lines * 2
+            self.height = lines * fs
 
     def on_size(self, *args):
         if not self.canvas:
@@ -206,8 +217,8 @@ class kivyExecCommand(App):
         error = ''
         chosenParameter = self.chosenParameter
         self.popup.dismiss()
-        lbltxt = Label(text='Changing configuration...')
-        popup2 = Popup(title='Working', content=lbltxt, size=(400, 400), size_hint=(None, None))
+        lbltxt = MyLabel(text='Changing configuration...')
+        popup2 = MyPopup(title='Working', content=lbltxt)
         popup2.open()
         EventLoop.idle()
         responses = 'Response :\n'
@@ -257,17 +268,17 @@ class kivyExecCommand(App):
 
         popup2.dismiss()
         if error:
-            popup = Popup(title='ERROR', title_align='center', content=Label(text=error, font_size=fs), size=(400, 400), size_hint=(None, None))
+            popup = MyPopup(title='ERROR', title_align='center', close=True, content=MyLabel(text=error, font_size=fs*2, size_hint=(1, 1)))
         else:
-            popup = Popup(title='Done', title_align='center', content=Label(text=responses, font_size=fs), size=(400, 400), size_hint=(None, None))
+            popup = MyPopup(title='Done', title_align='center', close=True, content=MyLabel(text=responses, font_size=fs*2, size_hint=(1, 1)))
         popup.open()
 
     def exec_command(self, instance):
         self.chosenParameter = instance.paramid
         box = BoxLayout(orientation='vertical', padding=10)
-        self.popup = Popup(title='Proceed ?', title_size=30, title_align='center', content=box, size_hint=(0.7, 0.7), auto_dismiss=True)
-        box.add_widget(Button(text='ACCEPT', on_press=self.popup_validate, height=mod_globals.fontSize * bmn * 3, size_hint_y=None))
-        box.add_widget(Button(text='CANCEL', on_press=self.popup.dismiss, height=mod_globals.fontSize * bmn * 3, size_hint_y=None))
+        self.popup = MyPopup(title='Proceed ?', title_size=30, title_align='center', content=box, size_hint=(0.7, 0.7), auto_dismiss=True)
+        box.add_widget(MyButton(text='ACCEPT', size_hint=(1, 1), on_press=self.popup_validate))
+        box.add_widget(MyButton(text='CANCEL', size_hint=(1, 1), on_press=self.popup.dismiss))
         self.popup.open()
 
     def build_datarefs(self, layout):
@@ -340,7 +351,7 @@ class kivyExecCommand(App):
     def build(self):
         layout = GridLayout(cols=1, padding=5, spacing=(5, 5), size_hint=(1, None))
         layout.bind(minimum_height=layout.setter('height'))
-        titlelabel = Label(text=(self.path), size_hint=(1, None), halign='center', height=mod_globals.fontSize * fmn * 2)
+        titlelabel = MyLabel(text=(self.path), size_hint=(1, None), halign='center', height=mod_globals.fontSize * fmn * 2)
         layout.add_widget(titlelabel)
         if len(self.command.prerequisite) > 0:
             lines = len(self.command.prerequisite.split('\n'))
@@ -351,7 +362,7 @@ class kivyExecCommand(App):
                 lines = 7
             if lines > 20:
                 lines = 20
-            prelabel = MyTextInput(text=(self.command.prerequisite), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1, 0, 0, 1], background_color=[0, 0, 0, 1])
+            prelabel = MyTextInput(text=(self.command.prerequisite), multiline=True, readonly=True, foreground_color=[1, 0, 0, 1], background_color=[0, 0, 0, 1])
             layout.add_widget(prelabel)
         layout.add_widget(self.make_box('name', self.command.name))
         layout.add_widget(self.make_box('label', (self.command.label)))
@@ -375,36 +386,36 @@ class kivyExecCommand(App):
 
         for val, key in self.command.inputlist.items():
             btnname = '(%s) - %s' % (val, key)
-            configbtn = Button(text=btnname, height=80, size_hint=(1, None))
+            configbtn = MyButton(text=btnname)
             configbtn.bind(on_press=self.exec_command)
             configbtn.paramid = val
             layout.add_widget(configbtn)
 
         if has_scenario:
-            btn = Button(text='/!\\ SCENARIO NOT SUPPORTED YET /!\\', height=mod_globals.fontSize * bmn, size_hint=(1, None))
+            btn = MyButton(text='/!\\ SCENARIO NOT SUPPORTED YET /!\\')
             layout.add_widget(btn)
         if has_param and not self.command.inputlist and not has_scenario:
-            self.userInput = MyTextInput(multiline=False, size_hint=(1, None), background_color=(0.55,0.55,0.55,1))
-            hexBtn = Button(text='HEX', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
-            decBtn = Button(text='DEC', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
-            asciiBtn = Button(text='ASCII', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
-            vinBtn = Button(text='VIN', height=mod_globals.fontSize * bmn, size_hint=(1, None), on_press=lambda instance: self.changeButtonStyle(instance))
+            self.userInput = MyTextInput(multiline=False, background_color=(0.55,0.55,0.55,1))
+            hexBtn = MyButton(text='HEX', on_press=lambda instance: self.changeButtonStyle(instance))
+            decBtn = MyButton(text='DEC', on_press=lambda instance: self.changeButtonStyle(instance))
+            asciiBtn = MyButton(text='ASCII', on_press=lambda instance: self.changeButtonStyle(instance))
+            vinBtn = MyButton(text='VIN', on_press=lambda instance: self.changeButtonStyle(instance))
             self.typeButtons = [hexBtn,decBtn,asciiBtn,vinBtn] 
             layout.add_widget(hexBtn)
             layout.add_widget(decBtn)
             layout.add_widget(asciiBtn)
             layout.add_widget(vinBtn)
             layout.add_widget(self.userInput)
-            self.btn = Button(text='<EXECUTE>', height=mod_globals.fontSize * bmn, size_hint=(1, None), disabled = True)
+            self.btn = MyButton(text='<EXECUTE>', disabled = True)
             self.btn.paramid = ''
             self.btn.bind(on_press=self.exec_command)
             layout.add_widget(self.btn)
         if not has_param and not has_scenario:
-            btn = Button(text='<EXECUTE>', height=mod_globals.fontSize * bmn, size_hint=(1, None))
+            btn = MyButton(text='<EXECUTE>')
             btn.paramid = None
             btn.bind(on_press=self.exec_command)
             layout.add_widget(btn)
-        btn = Button(text='<CANCEL>', height=mod_globals.fontSize * bmn, size_hint=(1.0, None))
+        btn = MyButton(text='<CANCEL>')
         btn.bind(on_press=self.back)
         layout.add_widget(btn)
         root = ScrollView(size_hint=(1, 1), pos_hint={'center_x': 0.5,

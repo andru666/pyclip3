@@ -30,11 +30,9 @@ class Show_scen():
     def build(self, instance):
         layout_popup = GridLayout(cols=1, spacing=10, size_hint_y=None)
         layout_popup.bind(minimum_height=layout_popup.setter('height'))
-
         for i in range(0, 15):
             btn1 = Button(text=str(i), id=str(i))
             layout_popup.add_widget(btn1)
-
         root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
         layout_popup.add_widget(Button(text='CANCEL', on_press=self.stop(), size_hint=(1, None), height=80))
         root.add_widget(layout_popup)
@@ -55,7 +53,6 @@ class Scenarii(App):
         self.ecu = ecu
         self.ScmParam = {}
         self.ScmSet = {}
-
         super(Scenarii, self).__init__()
 
 
@@ -88,13 +85,9 @@ class Scenarii(App):
                     if p_value.isdigit() and p_value in list(mod_globals.language_dict.keys()):
                         p_value = mod_globals.language_dict[p_value]
                     lab = MyLabel(text="%-20s : %s" % (pyren_encode(p_name), pyren_encode(p_value)), height=fs*1.5,font_size=fs, halign= 'left')
-                    while len(lab.text)/fs < 2:
-                        lab.height += fs*1.5
                     layout_popup.add_widget(lab)
                 else:
                     lab = MyLabel(text=str(pyren_encode( line.strip().encode('utf-8', 'ignore').decode('utf-8'))), font_size=fs,  halign= 'left')
-                    while len(lab.text) + lab.height < lab.width:
-                        lab.height += fs
                     layout_popup.add_widget(lab)
         if self.command.scenario.startswith('scen'):
             name_scen_text = (self.command.scenario.split('#')[1].replace('&', '=').split('=')[1] +'_text.xml').lower()
@@ -112,8 +105,6 @@ class Scenarii(App):
                         if p_value.isdigit() and p_value in list(mod_globals.language_dict.keys()):
                             p_value = mod_globals.language_dict[p_value]
                         lab = MyLabel(text="%-20s : %s" % (pyren_encode(p_name), pyren_encode(p_value)), font_size=fs, halign= 'left')
-                        while len(lab.text) + lab.height < lab.width:
-                            lab.height += fs
                         layout_popup.add_widget(lab)
                     elif ma2:
                         p_name = ma2.group(1)
@@ -121,13 +112,9 @@ class Scenarii(App):
                         if p_value.isdigit() and p_value in list(mod_globals.language_dict.keys()):
                             p_value = mod_globals.language_dict[p_value]
                         lab = MyLabel(text="%-20s : %s" % (pyren_encode(p_name), pyren_encode(p_value)), font_size=fs, halign= 'left')
-                        while len(lab.text) + lab.height < lab.width:
-                            lab.height += fs
                         layout_popup.add_widget(lab)
                     else:
                         lab = MyLabel(text=str(pyren_encode( line.strip().encode('utf-8', 'ignore').decode('utf-8'))), font_size=fs,  halign= 'left')
-                        while len(lab.text) + lab.height < lab.width:
-                            lab.height += fs
                         layout_popup.add_widget(lab)
         layout_popup.add_widget(Button(text='CANCEL', on_press=self.stop, size_hint=(1, None), height=60))
         root = ScrollView(size_hint=(1, 1), size=(Window.width*0.9, Window.height*0.9))

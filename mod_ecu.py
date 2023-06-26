@@ -12,7 +12,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
@@ -136,12 +135,12 @@ favouriteScreen = ecu_own_screen('FAV')
 
 class MyLabelGreen(ButtonBehavior, Label):
     def __init__(self, **kwargs):
+        super(MyLabelGreen, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
             self.halign = 'center'
         if 'valign' not in kwargs:
             self.valign = 'middle'
-        super(MyLabelGreen, self).__init__(**kwargs)
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
@@ -149,15 +148,17 @@ class MyLabelGreen(ButtonBehavior, Label):
             Rectangle(pos=self.pos, size=self.size)
 
 class MyLabelBlue(ButtonBehavior, Label):
-
     def __init__(self, mfs = None, **kwargs):
         if 'param_name' in kwargs:
             self.param_name = kwargs['param_name']
             del kwargs ['param_name']
         super(MyLabelBlue, self).__init__(**kwargs)
-        self.text_size = self.size
-        self.bind(size=self.on_size)
+        self.bind(size=self.setter('text_size'))
         self.bind(text=self.on_text_changed)
+        if 'halign' not in kwargs:
+            self.halign = 'left'
+        if 'valign' not in kwargs:
+            self.valign = 'middle'
         self.clicked = False
 
     def on_size(self, widget, size):
@@ -249,7 +250,7 @@ class showDatarefGui(App):
     def make_box_params(self, parameter_name, val):
         fs = mod_globals.fontSize
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None), height=fs * 2.5)
-        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], halign='left', valign='top', size_hint_x=(self.blue_part_size), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
+        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], size_hint_x=(self.blue_part_size), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
         if len(label1.text)*2.5 > label1.width*self.blue_part_size:
             glay.height += fs
         label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, 1), font_size=fs)
@@ -343,7 +344,7 @@ class showDatarefGui(App):
         fs = mod_globals.fontSize
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
-        layout.add_widget(Label(text=header, font_size=fs, height=fs * bmn, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text=header, font_size=fs, size_hint=(1, None)))
         params = self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
@@ -351,11 +352,11 @@ class showDatarefGui(App):
             if len_str > len(max_str):
                 max_str = param
 
-        tmp_label = Label(text=max_str, font_size=fs)
+        tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
         for paramName, val in params.items():
             if val == 'Text':
-                layout.add_widget(Label(text=paramName, font_size=fs, height=fs * fmn, size_hint=(1, None)))
+                layout.add_widget(MyLabel(text=paramName))
             elif val == 'DTCText':
                 lines = len(paramName.split('\n'))
                 simb = len(paramName)
@@ -371,7 +372,7 @@ class showDatarefGui(App):
                 layout.add_widget(prelabel)
             else:
                 layout.add_widget(self.make_box_params(paramName, val))
-        quitbutton = MyButton(text='<BACK>', height=fs * bmn * 1.5, size_hint=(1, None), on_press=self.finish)
+        quitbutton = MyButton(text='<BACK>', size_hint=(1, None), on_press=self.finish)
         layout.add_widget(quitbutton)
         root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
