@@ -208,13 +208,9 @@ class Port:
                 self.hdr = serial.Serial(self.portName, baudrate=speed, timeout=portTimeout)
             except:
                 iterator = sorted(list(list_ports.comports()))
-                mod_globals.opt_demo = True
                 exit()
             if mod_globals.opt_speed == 38400 and mod_globals.opt_rate != mod_globals.opt_speed:
                 self.check_elm()
-
-    def getConnected(self):
-        self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
 
     def __del__(self):
         pass
@@ -222,9 +218,7 @@ class Port:
         #    self.ka_timer.cancel()
 
     def reinit(self):
-        '''
-        Need for wifi adapters with short connection timeout
-        '''
+
         if self.portType != 1: return
 
         if not hasattr(self, 'macaddr'):
@@ -237,53 +231,14 @@ class Port:
         self.write("AT\r")
         self.expect(">",1)
 
-    '''
-    def elm_at_KeepAlive(self):
-      
-      try:
-  
-          if not self.rwLock and time.time() > self.lastReadTime + self.atKeepAlive:
-        
-            self.kaLock = True
-            data = 'AT\r'
-            try:
-              if self.portType == 1:
-                self.hdr.sendall(data)
-              elif self.portType == 2:
-                self.droid.bluetoothWrite(data)
-              else:
-                self.hdr.write(data)
-        
-              tb = time.time()  # start time
-              tmpBuff = ""
-              while True:
-                if not mod_globals.opt_demo:
-                  byte = self.read()
-                else:
-                  byte = '>'
-            
-                if byte == '\r': byte = '\n'
-            
-                tmpBuff += byte
-                tc = time.time()
-                if '>' in tmpBuff:
-                  return
-                if(tc - tb) > 0.01:
-                  return
-            except:
-              pass
+    def closeConnection(self):
+        self.recv_stream.close()
+        self.send_stream.close()
+        self.socket.close()
 
-      finally:
-        self.lastReadTime = time.time()
-        self.kaLock = False
-        if self.ka_timer:
-          self.ka_timer.cancel()
-        if self.atKeepAlive > 0:
-          self.ka_timer = threading.Timer(self.atKeepAlive, self.elm_at_KeepAlive)
-          self.ka_timer.setDaemon(True)
-          self.ka_timer.start()
-    '''
-    
+    def getConnected(self):
+        self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
+
     def read(self):
         byte = ""
         try:
@@ -293,8 +248,8 @@ class Port:
                 except:
                     pass
             elif self.portType == 2:
-                if self.droid.bluetoothReadReady(self.btcid).result:
-                    byte = self.droid.bluetoothRead(1, self.btcid).result
+                if self.recv_stream.available():
+                    byte = chr(self.recv_stream.read())
             else:
                 inInputBuffer = self.hdr.inWaiting()
                 if inInputBuffer:
@@ -332,7 +287,9 @@ class Port:
                 rcv_bytes = self.hdr.sendall(data)
             return rcv_bytes
         elif self.portType == 2:
-            return self.droid.bluetoothWrite(data.decode("utf-8"), self.btcid)
+            self.send_stream.write(data)
+            self.send_stream.flush()
+            return len(data)
         else:
             return self.hdr.write(data)
     
