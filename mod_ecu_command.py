@@ -10,7 +10,6 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 from mod_ecu_identification import get_identification
 from mod_ecu_parameter import get_parameter
@@ -146,12 +145,16 @@ class MyLabelBlue(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs * 0.9,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = lines * fs
+            self.height = (lines * fs,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:
@@ -169,12 +172,16 @@ class MyLabelGreen(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs * 0.9,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = lines * fs
+            self.height = (lines * fs,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:
@@ -373,7 +380,7 @@ class kivyExecCommand(App):
         self.build_datarefs(layout)
         has_param = False
         if len(self.command.serviceID):
-            layout.add_widget(MyLabelGreen(text='Services ID', size_hint=(1, None), height=mod_globals.fontSize * fmn, halign='center'))
+            layout.add_widget(MyLabelGreen(text='Services ID', size_hint=(0.65, None), halign='center'))
             for si in self.command.serviceID:
                 service = self.ecu.Services[si]
                 if len(service.params) == 0:
@@ -381,7 +388,7 @@ class kivyExecCommand(App):
                 else:
                     has_param = True
                     txt = '[%s] %s <Params>' % (si, service.startReq)
-                svcidlbl = MyLabelBlue(text=txt, size_hint=(1, None), height=mod_globals.fontSize * fmn, font_size=mod_globals.fontSize, halign='center')
+                svcidlbl = MyLabelBlue(text=txt, size_hint=(0.35, None), halign='center')
                 layout.add_widget(svcidlbl)
 
         for val, key in self.command.inputlist.items():
@@ -535,7 +542,7 @@ class ecu_command:
         if 'Command\\' + self.name not in list(opt.keys()):
             return
         xmlstr = opt['Command\\' + self.name]
-        odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+        odom = xml.dom.minidom.parseString(xmlstr)
         odoc = odom.documentElement
         self.computation = ''
         self.serviceID = []

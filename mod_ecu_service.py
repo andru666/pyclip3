@@ -249,7 +249,7 @@ class ecu_services:
         for k in list(opt.keys()):
             if 'Service' in k:
                 xmlstr = opt[k]
-                odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+                odom = xml.dom.minidom.parseString(xmlstr)
                 odoc = odom.documentElement
                 service = ecu_service(odoc)
                 service_list[service.id] = service

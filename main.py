@@ -16,7 +16,7 @@ if platform != 'android':
     size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
     Window.size = (720,1280)
     while Window.size[1] > size[1]:
-        Window.size = Window.size[0]*0.8,Window.size[1]*0.7
+        Window.size = Window.size[0]*0.9,Window.size[1]*0.8
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_scan_ecus import ScanEcus
@@ -36,7 +36,7 @@ from kivy import base
 import traceback, time, mod_globals
 
 __all__ = 'install_android'
-__version__ = '0.01.26'
+__version__ = '0.01.27'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -273,6 +273,8 @@ class screenConfig(App):
         self.bt_dropdown = DropDown()
         glay = MyGridLayout(cols=2, size_hint=(1, None))
         btn = MyButton(text='WiFi (192.168.0.10:35000)')
+        btn.height = label.height*1.5
+        btn.font_size = label.font_size
         btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
         self.bt_dropdown.add_widget(btn)
         try:
@@ -283,14 +285,16 @@ class screenConfig(App):
             if mod_globals.opt_port == name:
                 mod_globals.opt_dev_address = address
             btn = MyButton(text=name + '>' + address, size_hint=(0.65, None))
+            btn.height = label.height*1.5
+            btn.font_size = label.font_size
             btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
             self.bt_dropdown.add_widget(btn)
         self.mainbutton = MyButton(text='Select', size_hint=(0.65, None))
+        self.mainbutton.height = label.height
+        self.mainbutton.font_size = label.font_size
         self.mainbutton.bind(on_release=self.bt_dropdown.open)
         self.bt_dropdown.bind(on_select=lambda instance, x: setattr(self.mainbutton, 'text', x))
         self.bt_dropdown.select(mod_globals.opt_port)
-        if label.height < self.ecusbutton.height:
-            label.height = self.ecusbutton.height
         glay.height = 1.2 * label.height
         glay.padding = glay.spacing = glay.height / 12
         glay.add_widget(label)
@@ -310,13 +314,15 @@ class screenConfig(App):
         for s_ecus in ecus:
             s_ecus = os.path.split(s_ecus)[1]
             btn= MyButton(text=s_ecus)
+            btn.height = label.height
+            btn.font_size = label.font_size
             btn.bind(on_release=lambda btn: self.ecus_dropdown.select(btn.text))
             self.ecus_dropdown.add_widget(btn)
         self.ecusbutton = MyButton(text='', size_hint=(0.65, None))
         self.ecusbutton.bind(on_release=self.ecus_dropdown.open)
         self.ecus_dropdown.bind(on_select=lambda instance, x: setattr(self.ecusbutton, 'text', x))
-        if label.height < self.ecusbutton.height:
-            label.height = self.ecusbutton.height
+        self.ecusbutton.height = label.height
+        self.ecusbutton.font_size = label.font_size
         glay.height = 1.2 * label.height
         glay.padding = glay.spacing = glay.height / 12
         glay.add_widget(label)
@@ -329,19 +335,23 @@ class screenConfig(App):
         self.lang_dropdown = DropDown()
         glay = MyGridLayout(cols=2, size_hint=(1, None))
         btn = MyButton(text='SELECT')
+        btn.height = label.height
+        btn.font_size = label.font_size
         btn.bind(on_release=lambda btn: self.lang_dropdown.select(btn.text))
         self.lang_dropdown.add_widget(btn)
         for lang in sorted(langs):
             btn = MyButton(text=lang)
+            btn.height = label.height
+            btn.font_size = label.font_size
             btn.bind(on_release=lambda btn: self.lang_dropdown.select(btn.text))
             self.lang_dropdown.add_widget(btn)
         self.langbutton = MyButton(text='SELECT', size_hint=(0.65, None))
+        self.langbutton.height = label.height
+        self.langbutton.font_size = label.font_size
         self.langbutton.bind(on_release=self.lang_dropdown.open)
         self.lang_dropdown.bind(on_select=lambda instance, x: self.changeLangButton(x))
         if mod_globals.opt_lang:
             self.lang_dropdown.select(mod_globals.opt_lang)
-        if label.height < self.ecusbutton.height:
-            label.height = self.ecusbutton.height
         glay.height = 1.2 * label.height
         glay.padding = glay.spacing = glay.height / 12
         glay.add_widget(label)
@@ -444,9 +454,9 @@ class screenConfig(App):
                 return permissionErrorLayout
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        pycl = MyLabel(text='PyClip3', height=fs*2.7, font_size=fs*2.2, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
+        pycl = MyLabel(text='PyClip3', height=fs*2.7, font_size=(fs*2.2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs*0.8, height=fs*1, multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=fs*0.7, height=fs*1, multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]

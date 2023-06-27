@@ -199,7 +199,7 @@ class ecu_mnemonic:
                 self.serviceID = ServiceID.getAttribute('name')
                 self.sids.append(self.serviceID)
                 srvxmlstr = opt['Service\\' + self.serviceID]
-                sdom = xml.dom.minidom.parseString(srvxmlstr.encode('utf-8'))
+                sdom = xml.dom.minidom.parseString(srvxmlstr)
                 sdoc = sdom.documentElement
                 self.delay = sdoc.getAttribute('delay')
                 if len(self.delay) == 0:
@@ -234,7 +234,7 @@ class ecu_mnemonics:
         for k in list(opt.keys()):
             if 'Mnemonic' in k:
                 xmlstr = opt[k]
-                odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+                odom = xml.dom.minidom.parseString(xmlstr)
                 odoc = odom.documentElement
                 mnemonic = ecu_mnemonic(odoc, opt)
                 mnemonic_list[mnemonic.name] = mnemonic

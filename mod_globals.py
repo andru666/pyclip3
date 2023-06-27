@@ -51,7 +51,7 @@ macro_dir = './macro/'
 log_dir = './logs/'
 dumps_dir = './dumps/'
 csv_dir = './csv/'
-fontSize = 30
+fontSize = 20
 screen_orient = False
 
 class Settings:

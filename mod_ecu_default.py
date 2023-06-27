@@ -77,8 +77,8 @@ def get_default_std_a(df, mn, se, elm, calc, getDTCmnemo):
             chr_val = calc.calculate(comp)
         else:
             chr_val = ''
-        if str(chr_val).encode('utf-8') in list(df[dtc].caracter.keys()):
-            interpretation = df[dtc].caracter[str(chr_val).encode('utf-8')]
+        if str(chr_val) in list(df[dtc].caracter.keys()):
+            interpretation = df[dtc].caracter[str(chr_val)]
         else:
             interpretation = ''
         description = df[dtc].label
@@ -175,8 +175,8 @@ def get_default_std_b(df, mn, se, elm, calc, getDTCmnemo):
             chr_val = calc.calculate(comp)
         else:
             chr_val = ''
-        if str(chr_val).encode('utf-8') in list(df[dtc].caracter.keys()):
-            interpretation = df[dtc].caracter[str(chr_val).encode('utf-8')]
+        if str(chr_val) in list(df[dtc].caracter.keys()):
+            interpretation = df[dtc].caracter[str(chr_val)]
         else:
             interpretation = ''
         description = df[dtc].label
@@ -261,8 +261,8 @@ def get_default_failflag(df, mn, se, elm, calc):
 
             tmp_interp = calc.calculate(interp)
             interpretation = ''
-            if str(tmp_interp).encode('utf-8') in list(df[dtc].caracter.keys()):
-                interpretation = df[dtc].caracter[str(tmp_interp).encode('utf-8')]
+            if str(tmp_interp) in list(df[dtc].caracter.keys()):
+                interpretation = df[dtc].caracter[str(tmp_interp)]
             else:
                 interpretation = ''
         description = df[dtc].label
@@ -383,7 +383,7 @@ class ecu_default:
                             self.caracter[ivalue] = itext
 
         xmlstr = opt[self.name]
-        odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+        odom = xml.dom.minidom.parseString(xmlstr)
         odoc = odom.documentElement
         tmp = odoc.getAttribute('codeDTC')
         if tmp != '':
@@ -441,7 +441,7 @@ class ecu_defaults:
         if Eraser:
             eraserCommandName = Eraser.getElementsByTagName('DataRef').item(0).getAttribute('name')
             xmlstr = opt['Command\\' + eraserCommandName]
-            odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+            odom = xml.dom.minidom.parseString(xmlstr)
             odoc = odom.documentElement
         xmlstr = ''
         if 'ExtractDBDTCCode' in list(opt.keys()):
@@ -449,7 +449,7 @@ class ecu_defaults:
         elif 'ExtractCode' in list(opt.keys()):
             xmlstr = opt['ExtractCode']
         if len(xmlstr) > 0 and (ecu_type == 'STD_A' or ecu_type == 'STD_B' or ecu_type == 'UDS'):
-            odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+            odom = xml.dom.minidom.parseString(xmlstr)
             odoc = odom.documentElement
             Mnemo = odom.getElementsByTagName('Mnemo').item(0)
             if Mnemo:

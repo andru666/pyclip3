@@ -139,8 +139,19 @@ class MyLabelGreen(ButtonBehavior, Label):
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
             self.halign = 'center'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.9,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'height' not in kwargs:
+            lines = len(self.text.split('\n'))
+            simb = ((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            if lines < simb: lines = simb
+            if lines == 0: lines = 1
+            self.height = (lines * fs,  'dp')
+        
     def on_size(self, *args):
         self.canvas.before.clear()
         with self.canvas.before:
@@ -148,6 +159,7 @@ class MyLabelGreen(ButtonBehavior, Label):
             Rectangle(pos=self.pos, size=self.size)
 
 class MyLabelBlue(ButtonBehavior, Label):
+    fs = mod_globals.fontSize
     def __init__(self, mfs = None, **kwargs):
         if 'param_name' in kwargs:
             self.param_name = kwargs['param_name']
@@ -155,14 +167,24 @@ class MyLabelBlue(ButtonBehavior, Label):
         super(MyLabelBlue, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         self.bind(text=self.on_text_changed)
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.9,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'halign' not in kwargs:
             self.halign = 'left'
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'height' not in kwargs:
+            lines = len(self.text.split('\n'))
+            simb = ((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            if lines < simb: lines = simb
+            if lines == 0: lines = 1
+            self.height = (lines * fs,  'dp')
         self.clicked = False
 
     def on_size(self, widget, size):
-        fs = mod_globals.fontSize
+        
         self.text_size = (size[0], None)
         self.texture_update()
         if self.size_hint_y is None and self.size_hint_x is not None:
@@ -249,11 +271,13 @@ class showDatarefGui(App):
 
     def make_box_params(self, parameter_name, val):
         fs = mod_globals.fontSize
-        glay = BoxLayout(orientation='horizontal', size_hint=(1, None), height=fs * 2.5)
-        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], size_hint_x=(self.blue_part_size), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
-        if len(label1.text)*2.5 > label1.width*self.blue_part_size:
-            glay.height += fs
-        label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, 1), font_size=fs)
+        glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], size_hint_x=(self.blue_part_size), on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
+        label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, 1))
+        if label1.height > label2.height:
+            glay.height = label1.height
+        else:
+            glay.height = label2.height
         glay.add_widget(label1)
         glay.add_widget(label2)
         self.labels[parameter_name] = label2
@@ -344,7 +368,7 @@ class showDatarefGui(App):
         fs = mod_globals.fontSize
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
-        layout.add_widget(MyLabel(text=header, font_size=fs, size_hint=(1, None)))
+        layout.add_widget(MyLabel(text=header))
         params = self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
@@ -455,7 +479,7 @@ class ECU():
             lbltxt.text = 'Loading Data ids'
             EventLoop.idle()
             xmlstr = dict['DataIds']
-            ddom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+            ddom = xml.dom.minidom.parseString(xmlstr)
             ddoc = ddom.documentElement
             di_class = ecu_dataids(self.DataIds, ddoc, dict, tran)
         EventLoop.window.remove_widget(popup_init)
@@ -887,9 +911,9 @@ class ECU():
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
             if self.Defaults[dtchex[:4]].datarefs:
-                cur_dtrf = [ecu_screen_dataref(0, "\n" + mod_globals.language_dict['300'] + "\n", 'Text')] + self.Defaults[dtchex[:4]].datarefs
+                cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
-                mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC + "\n"
+                mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
                 mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
             
             tmp_dtrf = helpString + mem_dtrf + cur_dtrf
@@ -932,12 +956,12 @@ class ECU():
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
             if self.Defaults[dtchex[:4]].datarefs:
-                cur_dtrf = [ecu_screen_dataref(0, "\n" + mod_globals.language_dict['300'] + "\n", 'Text')] + self.Defaults[dtchex[:4]].datarefs
+                cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
-                mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC + "\n"
+                mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
                 mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
             if self.ext_de:
-                ext_info_dtrf = [ecu_screen_dataref(0, "\n" + mod_globals.language_dict['1691'] + "\n", 'Text')] + self.ext_de
+                ext_info_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['1691'], 'Text')] + self.ext_de
             tmp_dtrf = helpString + mem_dtrf + cur_dtrf + ext_info_dtrf   
             self.show_datarefs(tmp_dtrf, path)
 
@@ -1429,7 +1453,7 @@ def main():
          c_max,
          c_unit,
          ddd)
-        cf.write(line.encode('utf-8'))
+        cf.write(line)
 
     memIt = []
     for i in sorted(States.keys()):
@@ -1465,7 +1489,7 @@ def main():
          c_max,
          c_unit,
          ddd)
-        cf.write(line.encode('utf-8'))
+        cf.write(line)
 
     cf.close()
     can250init = 'ATAL\\nATSH' + ddd + '\\nATCRA' + sss + '\\nATFCSH' + ddd + '\\nATFCSD300000\\nATFCSM1\\nATSP8\\n' + startDiagReq
@@ -1476,37 +1500,37 @@ def main():
     if mod_globals.os == 'android' and os.path.exists('/sdcard/.torque/vehicles'):
         profilename = '/sdcard/.torque/vehicles/' + str(int(time.time())) + '.tdv'
     prn = open(profilename, 'w')
-    prn.write('#This is an ECU profile generated by pyren\n'.encode('utf-8'))
-    prn.write('fuelType=0\n'.encode('utf-8'))
-    prn.write('obdAdjustNew=1.0\n'.encode('utf-8'))
-    prn.write('lastMPG=0.0\n'.encode('utf-8'))
-    prn.write('tankCapacity=295.5\n'.encode('utf-8'))
-    prn.write('volumetricEfficiency=85.0\n'.encode('utf-8'))
-    prn.write('weight=1400.0\n'.encode('utf-8'))
-    prn.write('odoMeter=0.0\n'.encode('utf-8'))
-    prn.write('adapterName=OBDII [00\\:00\\:00\\:00\\:00\\:0]\n'.encode('utf-8'))
-    prn.write('adapter=00\\:00\\:00\\:00\\:00\\:00\n'.encode('utf-8'))
-    prn.write('boostAdjust=0.0\n'.encode('utf-8'))
-    prn.write('mpgAdjust=1.0\n'.encode('utf-8'))
-    prn.write('fuelCost=0.18000000715255737\n'.encode('utf-8'))
-    prn.write('ownProfile=false\n'.encode('utf-8'))
-    prn.write('displacement=1.6\n'.encode('utf-8'))
-    prn.write('tankUsed=147.75\n'.encode('utf-8'))
-    prn.write('lastMPGCount=0\n'.encode('utf-8'))
-    prn.write('maxRpm=7000\n'.encode('utf-8'))
-    prn.write('fuelDistance=0.0\n'.encode('utf-8'))
-    prn.write('fuelUsed=0.0\n'.encode('utf-8'))
-    prn.write('alternateHeader=true\n'.encode('utf-8'))
-    prn.write(('name=PR_' + ecuid + '\n').encode('utf-8'))
+    prn.write('#This is an ECU profile generated by pyren\n')
+    prn.write('fuelType=0\n')
+    prn.write('obdAdjustNew=1.0\n')
+    prn.write('lastMPG=0.0\n')
+    prn.write('tankCapacity=295.5\n')
+    prn.write('volumetricEfficiency=85.0\n')
+    prn.write('weight=1400.0\n')
+    prn.write('odoMeter=0.0\n')
+    prn.write('adapterName=OBDII [00\\:00\\:00\\:00\\:00\\:0]\n')
+    prn.write('adapter=00\\:00\\:00\\:00\\:00\\:00\n')
+    prn.write('boostAdjust=0.0\n')
+    prn.write('mpgAdjust=1.0\n')
+    prn.write('fuelCost=0.18000000715255737\n')
+    prn.write('ownProfile=false\n')
+    prn.write('displacement=1.6\n')
+    prn.write('tankUsed=147.75\n')
+    prn.write('lastMPGCount=0\n')
+    prn.write('maxRpm=7000\n')
+    prn.write('fuelDistance=0.0\n')
+    prn.write('fuelUsed=0.0\n')
+    prn.write('alternateHeader=true\n')
+    prn.write(('name=PR_' + ecuid + '\n'))
     if len(candst) > 1:
-        prn.write(('customInit=' + can500init.replace('\\', '\\\\') + '\n').encode('utf-8'))
-        prn.write('preferredProtocol=7\n'.encode('utf-8'))
+        prn.write(('customInit=' + can500init.replace('\\', '\\\\') + '\n'))
+        prn.write('preferredProtocol=7\n')
     elif len(fastinit) > 1:
-        prn.write(('customInit=' + fast10init.replace('\\', '\\\\') + '\n').encode('utf-8'))
-        prn.write('preferredProtocol=6\n'.encode('utf-8'))
+        prn.write(('customInit=' + fast10init.replace('\\', '\\\\') + '\n'))
+        prn.write('preferredProtocol=6\n')
     else:
-        prn.write(('customInit=' + slow05init.replace('\\', '\\\\') + '\n').encode('utf-8'))
-        prn.write('preferredProtocol=5\n'.encode('utf-8'))
+        prn.write(('customInit=' + slow05init.replace('\\', '\\\\') + '\n'))
+        prn.write('preferredProtocol=5\n')
     prn.close()
 
 if __name__ == '__main__':

@@ -75,7 +75,7 @@ class ecu_identification:
                         self.helps.append(line + '\n')
 
         xmlstr = opt['Identification\\' + self.name]
-        odom = xml.dom.minidom.parseString(xmlstr.encode('utf-8'))
+        odom = xml.dom.minidom.parseString(xmlstr)
         odoc = odom.documentElement
         self.computation = ''
         Computation = odoc.getElementsByTagName('Computation')
