@@ -22,6 +22,7 @@ try:
     import webbrowser
 except:
     pass
+
 def InfoPopup(bas=None):
     fs = mod_globals.fontSize
     pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=fs*3, halign = 'center'))
@@ -45,7 +46,7 @@ class MyTextInput(TextInput):
             self.font_size = fs
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            simb = round((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if 2 < lines < 3: lines = lines * 1.5
             if lines < 2: lines = lines * 1.75
@@ -98,11 +99,7 @@ class MyButton(Button):
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
-            print(self.text)
-            print(len(self.text))
-            print(simb)
-            print(lines)
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if lines < 1.5: lines = 1.5
             if 1.5 < lines < 2: lines = 2
@@ -150,13 +147,13 @@ class MyLabel(Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs
+            self.font_size = fs*0.8
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            simb = round((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if lines == 0: lines = 1
-            if lines < 2: lines = 1.5
+            if lines <= 2: lines = 1.5
             self.height = lines * fs
         
     def on_size(self, *args):

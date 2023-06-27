@@ -14,10 +14,9 @@ if platform != 'android':
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
     from kivy.core.window import Window
     size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    Window.size = 720, 1280
+    Window.size = (720,1280)
     while Window.size[1] > size[1]:
-        Window.size = 720*0.75, 1280*0.75
-print(Window.size)
+        Window.size = Window.size[0]*0.8,Window.size[1]*0.7
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_scan_ecus import ScanEcus
@@ -37,7 +36,7 @@ from kivy import base
 import traceback, time, mod_globals
 
 __all__ = 'install_android'
-__version__ = '0.01.25'
+__version__ = '0.01.26'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -536,7 +535,7 @@ def main():
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
     kivyScreenConfig()
     elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    try:
+    """try:
         elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     except:
         labelText = '''
@@ -555,7 +554,7 @@ def main():
         popup_load = MyPopup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
-        exit(2)
+        exit(2)"""
     if mod_globals.opt_speed < mod_globals.opt_rate and not mod_globals.opt_demo:
         elm.port.soft_boudrate(mod_globals.opt_rate)
     se = ScanEcus(elm)
@@ -587,7 +586,7 @@ def main():
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
     fs = mod_globals.fontSize
-    lbltxt = MyLabel(text='Loading language', font_size=fs*4, size_hint=(1, 1))
+    lbltxt = MyLabel(text='Loading language', font_size=fs*3, size_hint=(1, 1))
     popup_load = MyPopup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
     popup_load.open()
@@ -615,7 +614,7 @@ def main():
             pickle.dump(ecu, open(ecucashfile, 'wb'))
         ecu.initELM(elm)
         if mod_globals.opt_demo:
-            lbltxt = MyLabel(text='Loading dump', font_size=fs*4, size_hint=(1, 1))
+            lbltxt = MyLabel(text='Loading dump', font_size=fs*3, size_hint=(1, 1))
             popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
@@ -627,7 +626,7 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
-            lbltxt = MyLabel(text='Save dump', font_size=fs*4, size_hint=(1, 1))
+            lbltxt = MyLabel(text='Save dump', font_size=fs*3, size_hint=(1, 1))
             popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
