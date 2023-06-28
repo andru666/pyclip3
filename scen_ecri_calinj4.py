@@ -1,51 +1,45 @@
-#Embedded file name: /build/PyCLIP/android/app/scen_ecri_codevin.py
-import os
-import sys
-import re
-import time
-import mod_globals
-import mod_utils
-import mod_ecu
-import mod_zip
+# -*- coding: utf-8 -*-
+import mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from kivy.graphics import Color, Rectangle
 
 class Scenarii(App):
-    
-    def __init__(self, command, data, ecu, elm):
-        DOMTree = mod_zip.get_xml_scenario(data)
+    global fs
+    fs = mod_globals.fontSize
+    def __init__(self, **kwargs):
+        self.elm = kwargs['elm']
+        self.command = kwargs['command']
+        self.ecu = kwargs['ecu']
+        DOMTree = mod_zip.get_xml_scenario(kwargs['data'])
         self.ScmRoom = DOMTree.documentElement
         ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
         ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
-        self.elm = elm
-        self.command = command
-        self.ecu = ecu
         self.ScmParam = {}
         self.ScmSet = {}
         for Param in ScmParams:
-            name = pyren_encode(Param.getAttribute('name'))
-            value = pyren_encode(Param.getAttribute('value'))
+            name = (Param.getAttribute('name'))
+            value = (Param.getAttribute('value'))
             self.ScmParam[name] = value
 
         for Set in ScmSets:
-            setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
+            setname = (mod_globals.language_dict[Set.getAttribute('name')])
             ScmParams = Set.getElementsByTagName('ScmParam')
             for Param in ScmParams:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
+                name = (Param.getAttribute('name'))
+                value = (Param.getAttribute('value'))
                 self.ScmSet[setname] = value
                 self.ScmParam[name] = value
         super(Scenarii, self).__init__()
 
     def build(self):
         notv = str('F'*int(self.ScmParam['nbCaractereCode']))
+        if notv == '0': notv = 'F'
         header = '[' + self.command.codeMR + '] ' + self.command.label
-        
+
         root = GridLayout(cols=1, spacing=5, size_hint=(1.0, None))
         root.bind(minimum_height=root.setter('height'))
         root.add_widget(MyLabel(text=header))
@@ -53,8 +47,8 @@ class Scenarii(App):
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'LabelSaisieCode'), bgcolor=(1, 0, 0, 0.8)))
         
         codemr1, label1, value1 = self.ecu.get_id(self.ScmParam['Ident1'], True)
-        values1 = '%s : %s' % (pyren_encode(codemr1), pyren_encode(value1))
-        root.add_widget(MyLabel(text=pyren_encode(label1), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
+        values1 = '%s : %s' % ((codemr1), (value1))
+        root.add_widget(MyLabel(text=(label1), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
         layout_current1 = BoxLayout(orientation='horizontal', size_hint=(1, None))
         lc1_1 = MyLabel(text=get_message(self.ScmParam, 'dat_TitreActuel'), size_hint=(0.4, None), bgcolor=(0, 0, 1, 0.3))
         lc2_1 = MyLabel(text=values1, size_hint=(0.6, None), bgcolor=(0, 1, 0, 0.3))
@@ -67,15 +61,15 @@ class Scenarii(App):
         layout_c1 = BoxLayout(orientation='horizontal',size_hint=(1, None))
         l_c1_1 = MyLabel(text=get_message(self.ScmParam, 'dat_TitreSouhaite'), size_hint=(0.4, None), bgcolor=(1, 0, 0, 0.3))
         layout_c1.add_widget(l_c1_1)
-        self.injec1 = TextInput(text=notv, multiline=False, size_hint=(0.6, None), halign = 'center', font_size=fs)
+        self.injec1 = TextInput(text=notv, multiline=False, size_hint=(0.6, None), halign = 'center')
         layout_c1.height = self.injec1.height = l_c1_1.height
         layout_c1.add_widget(self.injec1)
         root.add_widget(layout_current1)
         root.add_widget(layout_c1)
         
         codemr2, label2, value2 = self.ecu.get_id(self.ScmParam['Ident2'], True)
-        values2 = '%s : %s' % (pyren_encode(codemr2), pyren_encode(value2))
-        root.add_widget(MyLabel(text=pyren_encode(label2), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
+        values2 = '%s : %s' % ((codemr2), (value2))
+        root.add_widget(MyLabel(text=(label2), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
         layout_current2 = BoxLayout(orientation='horizontal',size_hint=(1, None))
         lc1_2 = MyLabel(text=get_message(self.ScmParam, 'dat_TitreActuel'), size_hint=(0.4, None), bgcolor=(0, 0, 1, 0.3))
         lc2_2 = MyLabel(text=values2, size_hint=(0.6, None), bgcolor=(0, 1, 0, 0.3))
@@ -95,8 +89,8 @@ class Scenarii(App):
         root.add_widget(layout_c2)
         
         codemr3, label3, value3 = self.ecu.get_id(self.ScmParam['Ident3'], True)
-        values3 = '%s : %s' % (pyren_encode(codemr3), pyren_encode(value3))
-        root.add_widget(MyLabel(text=pyren_encode(label3), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
+        values3 = '%s : %s' % ((codemr3), (value3))
+        root.add_widget(MyLabel(text=(label3), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
         layout_current3 = BoxLayout(orientation='horizontal',size_hint=(1, None))
         lc1_3 = MyLabel(text=get_message(self.ScmParam, 'dat_TitreActuel'), size_hint=(0.4, None), bgcolor=(0, 0, 1, 0.3))
         lc2_3 = MyLabel(text=values3, size_hint=(0.6, None), bgcolor=(0, 1, 0, 0.3))
@@ -116,8 +110,8 @@ class Scenarii(App):
         root.add_widget(layout_c3)
         
         codemr4, label4, value4 = self.ecu.get_id(self.ScmParam['Ident4'], True)
-        values4 = '%s : %s' % (pyren_encode(codemr4), pyren_encode(value4))
-        root.add_widget(MyLabel(text=pyren_encode(label4), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
+        values4 = '%s : %s' % ((codemr4), (value4))
+        root.add_widget(MyLabel(text=(label4), size_hint=(1, None), font_size=fs * 1.5, bgcolor=(0, 1, 1, 0.3)))
         layout_current4 = BoxLayout(orientation='horizontal',size_hint=(1, None))
         lc1_4 = MyLabel(text=get_message(self.ScmParam, 'dat_TitreActuel'), size_hint=(0.4, None), bgcolor=(0, 0, 1, 0.3))
         lc2_4 = MyLabel(text=values4, size_hint=(0.6, None), bgcolor=(0, 1, 0, 0.3))

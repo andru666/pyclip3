@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_default.py
+# -*- coding: utf-8 -*-
 from mod_ecu_mnemonic import *
 from mod_ecu_screen import *
 from mod_ecu_service import *

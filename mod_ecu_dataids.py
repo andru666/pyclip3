@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_dataids.py
+# -*- coding: utf-8 -*-
 from mod_ecu_service import ecu_mnemolocation
 from mod_utils import pyren_encode
 

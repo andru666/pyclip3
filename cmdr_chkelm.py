@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 try:
     from kivy_deps import sdl2, glew
 except:

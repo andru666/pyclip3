@@ -1,6 +1,5 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_utils.py
-import os
-import sys, atexit, subprocess, string, signal
+# -*- coding: utf-8 -*-
+import os, sys, atexit, subprocess, string, signal, glob
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -117,11 +116,13 @@ class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
         if 'spadding' in kwargs:
             del kwargs ['spadding']
-        super(MyGridLayout, self).__init__(**kwargs)
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']
+            del kwargs ['bgcolor']
         else:
             self.bgcolor =(1, 0, 0, 1)
+        super(MyGridLayout, self).__init__(**kwargs)
+        
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
     
@@ -153,15 +154,15 @@ class MyLabel(Label):
         if 'font_size' not in kwargs:
             self.font_size = (fs*0.8,  'dp')
         else:
-            fs = self.font_size
             self.font_size = (self.font_size,  'dp')
+        
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if lines == 0: lines = 1
             if lines <= 2: lines = 1.5
-            self.height = (lines * fs,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:

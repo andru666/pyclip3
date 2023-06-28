@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_globals.py
+# -*- coding: utf-8 -*-
 import os as sysos
 import pickle
 opt_debug = True

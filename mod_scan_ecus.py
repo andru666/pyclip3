@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_scan_ecus.py
+# -*- coding: utf-8 -*-
 import kivy.base as base
 try:
     from kivy_deps import sdl2, glew

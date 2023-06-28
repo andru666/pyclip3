@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_service.py
+# -*- coding: utf-8 -*-
 import sys
 import xml.dom.minidom
 from xml.dom.minidom import parse

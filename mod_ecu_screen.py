@@ -1,6 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_screen.py
-
-
+# -*- coding: utf-8 -*-
 class ecu_screen_dataref:
     name = ''
     type = ''

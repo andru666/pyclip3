@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_scenario.py
+# -*- coding: utf-8 -*-
 import re, os, mod_globals
 
 if mod_globals.os == 'android':

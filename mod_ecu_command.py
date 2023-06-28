@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_command.py
+# -*- coding: utf-8 -*-
 import string
 import xml.dom.minidom, mod_globals
 from xml.dom.minidom import parse
@@ -145,12 +145,16 @@ class MyLabelBlue(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.8,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = (lines * fs,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:
@@ -169,12 +173,16 @@ class MyLabelGreen(Label):
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.8,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = (len(self.text) * fs) / (Window.size[0] * self.size_hint[0])
+            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = (lines * fs,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:

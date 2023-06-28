@@ -12,14 +12,15 @@ if platform != 'android':
     Config.set('graphics', 'position', 'custom')
     Config.set('graphics', 'top',  20)
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
+import traceback, time, mod_globals
+
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
+from mod_zip import *
 from mod_scan_ecus import ScanEcus
 from mod_ecu import ECU
 from mod_ecu_mnemonic import *
-from mod_optfile import *
 from mod_utils import *
-from mod_zip import get_zip
 from mod_ecu_default import *
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
@@ -28,10 +29,9 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
-import traceback, time, mod_globals
-import androidhelper as android
+
 __all__ = 'install_android'
-__version__ = '0.01.33'
+__version__ = '0.01.34'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -266,7 +266,7 @@ class screenConfig(App):
         ports = get_devices()
         label = MyLabel(text='ELM port', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.bt_dropdown = DropDown()
-        glay = MyGridLayout(cols=2, size_hint=(1, None))
+        glay = MyGridLayout(cols=2)
         btn = MyButton(text='WiFi (192.168.0.10:35000)')
         btn.height = label.height*1.5
         btn.font_size = label.font_size
@@ -305,7 +305,7 @@ class screenConfig(App):
         ecus = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'savedEcus*.p')))
         label = MyLabel(text='savedEcus', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.ecus_dropdown = DropDown()
-        glay = MyGridLayout(cols=2, size_hint=(1, None))
+        glay = MyGridLayout(cols=2)
         for s_ecus in ecus:
             s_ecus = os.path.split(s_ecus)[1]
             btn= MyButton(text=s_ecus)
@@ -325,10 +325,10 @@ class screenConfig(App):
         return glay
 
     def make_language_entry(self):
-        langs = mod_zip.get_languages()
+        langs = get_languages()
         label = MyLabel(text='Language', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.lang_dropdown = DropDown()
-        glay = MyGridLayout(cols=2, size_hint=(1, None))
+        glay = MyGridLayout(cols=2)
         btn = MyButton(text='SELECT')
         btn.height = label.height
         btn.font_size = label.font_size
@@ -449,9 +449,9 @@ class screenConfig(App):
                 return permissionErrorLayout
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        pycl = MyLabel(text='PyClip3', height=(fs*3,  'dp'), font_size=(fs*2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
+        pycl = MyLabel(text='PyClip3', height=(fs*3,  'dp'), font_size=(fs*2,  'dp'), bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
@@ -462,10 +462,10 @@ class screenConfig(App):
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
             popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5,  'dp')), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
             return popup
-        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
-        termbtn = MyButton(text='MACRO', height=(fs*2,  'dp'), size_hint=(1, None), on_press=self.term)
-        check = MyButton(text='Check ELM327', height=(fs*4,  'dp'), size_hint=(1, None), on_press=self.check_elm)
-        gobtn = MyButton(text='START', height=(fs*2.5,  'dp'), size_hint=(1, None), on_press=self.finish)
+        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
+        termbtn = MyButton(text='MACRO', height=(fs*2,  'dp'), on_press=self.term)
+        check = MyButton(text='Check ELM327', height=(fs*4,  'dp'), on_press=self.check_elm)
+        gobtn = MyButton(text='START', height=(fs*2.5,  'dp'), on_press=self.finish)
         layout.add_widget(gobtn)
         layout.add_widget(self.make_opt_ecuid())
         layout.add_widget(self.make_savedEcus())
@@ -483,7 +483,7 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('KWP Force SlowInit', mod_globals.opt_si))
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=(fs*0.5,  'dp'), height=(fs*0.7,  'dp'), size_hint=(1, None)))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=(fs*0.5,  'dp'), height=(fs*0.7,  'dp')))
         self.lay = layout
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
@@ -597,7 +597,7 @@ def main():
     popup_load.open()
     base.EventLoop.idle()
     sys.stdout.flush()
-    lang = mod_zip.get_lang_dict(mod_globals.opt_lang)
+    lang = get_lang_dict(mod_globals.opt_lang)
     if lang:
         mod_globals.language_dict = lang
     base.EventLoop.window.remove_widget(popup_load)

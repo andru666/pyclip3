@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import mod_globals
 import sys
 import re
@@ -21,13 +21,6 @@ else:
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
     UUID = autoclass('java.util.UUID')
 
-try:
-    import androidhelper as android
-    mod_globals.os = 'android'
-except:
-    import android
-    mod_globals.os = 'android'
-    
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
 
@@ -207,15 +200,7 @@ class Port:
             self.hdr.setblocking(True)
         elif mod_globals.os == 'android':
             self.portType = 2
-            #self.getConnected()
-            self.droid = android.Android ()
-            try:
-                if MAC == None:
-                    self.btcid = self.droid.bluetoothConnect ('00001101-0000-1000-8000-00805F9B34FB').result
-                else:
-                    self.btcid = self.droid.bluetoothConnect (uuid='00001101-0000-1000-8000-00805F9B34FB', address=MAC).result
-            except:
-                pass
+            self.getConnected()
         else:
             self.portName = portName
             self.portType = 0
@@ -263,10 +248,8 @@ class Port:
                 except:
                     pass
             elif self.portType == 2:
-                if self.droid.bluetoothReadReady(self.btcid).result:
-                    byte = self.droid.bluetoothRead (1, self.btcid ).result
-                '''if self.recv_stream.available():
-                    byte = chr(self.recv_stream.read())'''
+                if self.recv_stream.available():
+                    byte = chr(self.recv_stream.read())
             else:
                 inInputBuffer = self.hdr.inWaiting()
                 if inInputBuffer:
@@ -304,10 +287,9 @@ class Port:
                 rcv_bytes = self.hdr.sendall(data)
             return rcv_bytes
         elif self.portType == 2:
-            return self.droid.bluetoothWrite (data.decode("utf-8"), self.btcid )
-            '''self.send_stream.write(data)
+            self.send_stream.write(data)
             self.send_stream.flush()
-            return len(data)'''
+            return len(data)
         else:
             return self.hdr.write(data)
     

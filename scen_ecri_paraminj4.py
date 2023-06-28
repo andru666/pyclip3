@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/scen_ecri_codevin.py
+# -*- coding: utf-8 -*-
 import time, re
 import mod_ecu_mnemonic, mod_globals, mod_zip
 from mod_utils import pyren_encode, clearScreen, ASCIITOHEX, hex_VIN_plus_CRC, isHex

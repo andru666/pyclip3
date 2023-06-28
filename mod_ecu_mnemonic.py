@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_mnemonic.py
+# -*- coding: utf-8 -*-
 import string
 import xml.dom.minidom
 from xml.dom.minidom import parse

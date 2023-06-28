@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_zip.py
+# -*- coding: utf-8 -*-
 import os
 import glob
 import pickle

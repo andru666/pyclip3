@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu.py
+# -*- coding: utf-8 -*-
 import sys
 import time
 import xml.dom.minidom
@@ -33,7 +33,6 @@ from mod_ecu_state import *
 from mod_elm import AllowedList
 from mod_elm import dnat
 from mod_elm import snat
-from mod_optfile import *
 from mod_ply import *
 from mod_utils import *
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
@@ -142,12 +141,17 @@ class MyLabelGreen(ButtonBehavior, Label):
             self.halign = 'center'
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.8,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
+        
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = ((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if lines == 0: lines = 1
-            self.height = (lines * fs,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'dp')
         
     def on_size(self, *args):
         self.canvas.before.clear()
@@ -167,14 +171,19 @@ class MyLabelBlue(ButtonBehavior, Label):
         self.bind(text=self.on_text_changed)
         if 'halign' not in kwargs:
             self.halign = 'left'
+        if 'font_size' not in kwargs:
+            self.font_size = (fs*0.8,  'dp')
+        else:
+            self.font_size = (self.font_size,  'dp')
+        
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = ((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if lines == 0: lines = 1
-            self.height = (lines * fs,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'dp')
         self.clicked = False
 
     def on_size(self, widget, size):

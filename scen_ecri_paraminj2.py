@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/scen_ecri_codevin.py
+# -*- coding: utf-8 -*-
 import os
 import sys
 import re

@@ -1,4 +1,4 @@
-#Embedded file name: /build/PyCLIP/android/app/mod_ecu_state.py
+# -*- coding: utf-8 -*-
 import xml.dom.minidom
 from xml.dom.minidom import parse
 import mod_globals
