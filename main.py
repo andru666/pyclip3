@@ -12,7 +12,10 @@ if platform != 'android':
     Config.set('graphics', 'position', 'custom')
     Config.set('graphics', 'top',  20)
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
-
+try:
+    import androidhelper as android
+except:
+    import android
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_scan_ecus import ScanEcus
