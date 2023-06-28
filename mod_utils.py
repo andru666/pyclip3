@@ -161,7 +161,7 @@ class MyLabel(Label):
             if lines == 0: lines = 1
             if lines <= 2: lines = 1.5
             self.height = (lines * fs,  'dp')
-        
+
     def on_size(self, *args):
         if not self.canvas:
             return

@@ -139,10 +139,6 @@ class MyLabelGreen(ButtonBehavior, Label):
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
             self.halign = 'center'
-        if 'font_size' not in kwargs:
-            self.font_size = (fs*0.9,  'dp')
-        else:
-            self.font_size = (self.font_size,  'dp')
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
@@ -167,10 +163,6 @@ class MyLabelBlue(ButtonBehavior, Label):
         super(MyLabelBlue, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         self.bind(text=self.on_text_changed)
-        if 'font_size' not in kwargs:
-            self.font_size = (fs*0.9,  'dp')
-        else:
-            self.font_size = (self.font_size,  'dp')
         if 'halign' not in kwargs:
             self.halign = 'left'
         if 'valign' not in kwargs:

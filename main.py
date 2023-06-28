@@ -12,11 +12,7 @@ if platform != 'android':
     Config.set('graphics', 'position', 'custom')
     Config.set('graphics', 'top',  20)
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
-    from kivy.core.window import Window
-    size = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    Window.size = (720,1280)
-    while Window.size[1] > size[1]:
-        Window.size = Window.size[0]*0.9,Window.size[1]*0.8
+
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_scan_ecus import ScanEcus
@@ -36,7 +32,7 @@ from kivy import base
 import traceback, time, mod_globals
 
 __all__ = 'install_android'
-__version__ = '0.01.29'
+__version__ = '0.01.30'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
