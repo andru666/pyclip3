@@ -23,7 +23,6 @@ from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 from kivy.core.window import Window
 
-fs =  mod_globals.fontSize
 
 class Show_scen():
 

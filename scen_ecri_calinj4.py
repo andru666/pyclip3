@@ -15,8 +15,6 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 
-fs =  mod_globals.fontSize
-
 class Scenarii(App):
     
     def __init__(self, command, data, ecu, elm):

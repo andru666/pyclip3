@@ -28,7 +28,6 @@ import xml.etree.cElementTree as et
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.clock import Clock
 
-fs =  mod_globals.fontSize
 class MyLabel(Label):
 
     def __init__(self, **kwargs):

@@ -21,7 +21,6 @@ from mod_utils import *
 
 fmn = 2
 bmn = 2.5
-fs = mod_globals.fontSize
 Window.softinput_mode = 'below_target'
 
 def runCommand(command, ecu, elm, param = '', cmdt = 'HEX'):
@@ -141,6 +140,7 @@ def packData(ecu, mnemo, dataid, data, value):
 class MyLabelBlue(Label):
 
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         super(MyLabelBlue, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
@@ -164,6 +164,7 @@ class MyLabelBlue(Label):
 class MyLabelGreen(Label):
 
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         super(MyLabelGreen, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         if 'valign' not in kwargs:
@@ -185,7 +186,6 @@ class MyLabelGreen(Label):
 
 
 class kivyExecCommand(App):
-
     def __init__(self, command, ecu, elm, path):
         self.command = command
         self.ecu = ecu
@@ -205,6 +205,10 @@ class kivyExecCommand(App):
         label1 = MyLabelBlue(text=str1, halign='left', valign='middle', size_hint=(0.35, 1))
         label2 = MyLabelGreen(text=str2, halign='center', valign='middle', size_hint=(0.65, 1))
         glay = GridLayout(cols=2, height=mod_globals.fontSize * fmn, size_hint=(1, None), spacing=(5, 5))
+        if label1.height > label2.height:
+            glay.height = label2.height = label1.height
+        else:
+            glay.height = label1.height = label2.height
         glay.add_widget(label1)
         glay.add_widget(label2)
         return glay
@@ -213,6 +217,7 @@ class kivyExecCommand(App):
         self.stop()
 
     def popup_validate(self, instance):
+        fs = mod_globals.fontSize
         error = ''
         chosenParameter = self.chosenParameter
         self.popup.dismiss()
@@ -372,7 +377,7 @@ class kivyExecCommand(App):
         self.build_datarefs(layout)
         has_param = False
         if len(self.command.serviceID):
-            layout.add_widget(MyLabelGreen(text='Services ID', size_hint=(0.65, None), halign='center'))
+            layout.add_widget(MyLabelGreen(text='Services ID', size_hint=(1, None), halign='center'))
             for si in self.command.serviceID:
                 service = self.ecu.Services[si]
                 if len(service.params) == 0:
@@ -380,7 +385,7 @@ class kivyExecCommand(App):
                 else:
                     has_param = True
                     txt = '[%s] %s <Params>' % (si, service.startReq)
-                svcidlbl = MyLabelBlue(text=txt, size_hint=(0.35, None), halign='center')
+                svcidlbl = MyLabelBlue(text=txt, size_hint=(1, None), halign='center')
                 layout.add_widget(svcidlbl)
 
         for val, key in self.command.inputlist.items():

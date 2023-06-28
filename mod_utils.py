@@ -153,6 +153,7 @@ class MyLabel(Label):
         if 'font_size' not in kwargs:
             self.font_size = (fs*0.8,  'dp')
         else:
+            fs = self.font_size
             self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))

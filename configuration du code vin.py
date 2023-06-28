@@ -11,16 +11,11 @@ from mod_utils import *
 from kivy.app import App
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
-from kivy.graphics import Color, Rectangle
 from kivy.core.window import Window
-
-fs =  mod_globals.fontSize
-
+fs = mod_globals.fontSize
 class Scenarii(App):
     
     def __init__(self, **kwargs):
@@ -80,27 +75,27 @@ class Scenarii(App):
     def write_vin(self, instance):
         vin = self.vin_input.text.upper()
         if not (len(vin) == 17 and 'I' not in vin and 'O' not in vin):
-            popup_w = MyPopup(title=self.get_message('text_33973'), content=Label(text=self.get_message('text_29121'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.width*0.7, Window.width*0.8), size_hint=(None, None))
+            popup_w = MyPopup(title=self.get_message('text_33973'), content=MyLabel(text=self.get_message('text_29121'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.size[0]*0.9, Window.size[1]*0.8), size_hint=(None, None))
             popup_w.open()
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
         self.ecu.run_cmd(self.ScmParam['pdd_VP-4-41'], vin_crc)
-        popup_w = MyPopup(title=self.get_message('text_9234'), content=Label(text=self.get_message('text_41453'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.width*0.7, Window.width*0.8), size_hint=(None, None))
+        popup_w = MyPopup(title=self.get_message('text_9234'), content=MyLabel(text=self.get_message('text_41453'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.size[0]*0.9, Window.size[1]*0.8), size_hint=(None, None))
         popup_w.open()
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
-        layout.add_widget(MyLabel(text=self.get_message('text_29120'), height=Window.width*0.4, bgcolor=(1, 0, 0, 0.3)))
+        layout.add_widget(MyLabel(text=self.get_message('text_29120'), height=Window.size[1]*0.4, bgcolor=(1, 0, 0, 0.3)))
         layout.add_widget(MyLabel(text=self.get_message('text_30338'), bgcolor=(1, 1, 1, 0.3)))
         layout_box = BoxLayout(orientation='horizontal', spacing=25, size_hint=(1, None))
         self.buttons_ok = MyButton(text=self.get_message('text_OK'), font_size=fs, size_hint=(1, None), height=fs*4, on_press=self.write_vin, on_release=lambda *args: self.popup.dismiss())
         layout_box.add_widget(self.buttons_ok)
         layout_box.add_widget(MyButton(text=self.get_message('text_NO'), font_size=fs, on_press=self.stop, size_hint=(1, None), height=fs*4))
         layout.add_widget(layout_box)
-        rootP = ScrollView(size_hint=(1, 1), size=(Window.width*0.9, Window.height*0.9))
+        rootP = ScrollView(size_hint=(1, 1), size=(Window.size[0]*0.9, Window.size[1]*0.9))
         rootP.add_widget(layout)
         status = self.get_message('text_33973')
-        self.popup = Popup(title=status, content=rootP, auto_dismiss=True, size=(Window.width*0.7, Window.width*0.8), size_hint=(1, None))
+        self.popup = MyPopup(title=status, content=rootP, auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(1, None))
         self.popup.open()
         return
 

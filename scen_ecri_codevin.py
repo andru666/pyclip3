@@ -19,7 +19,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 
-fs =  mod_globals.fontSize
 class MyLabel(Label):
 
     def __init__(self, **kwargs):

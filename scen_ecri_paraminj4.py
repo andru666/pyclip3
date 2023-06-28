@@ -21,8 +21,6 @@ from functools import partial
 import xml.dom.minidom
 import xml.etree.cElementTree as et
 
-fs =  mod_globals.fontSize
-
 class MyLabel(Label):
 
     def __init__(self, **kwargs):

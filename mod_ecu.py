@@ -135,6 +135,7 @@ favouriteScreen = ecu_own_screen('FAV')
 
 class MyLabelGreen(ButtonBehavior, Label):
     def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
         super(MyLabelGreen, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
         if 'halign' not in kwargs:
@@ -155,8 +156,9 @@ class MyLabelGreen(ButtonBehavior, Label):
             Rectangle(pos=self.pos, size=self.size)
 
 class MyLabelBlue(ButtonBehavior, Label):
-    fs = mod_globals.fontSize
+    
     def __init__(self, mfs = None, **kwargs):
+        fs = mod_globals.fontSize
         if 'param_name' in kwargs:
             self.param_name = kwargs['param_name']
             del kwargs ['param_name']
@@ -384,7 +386,7 @@ class showDatarefGui(App):
                     lines += 1
                 if fs >= 40:
                     lines += 1
-                prelabel = MyTextInput(text=pyren_encode(paramName), font_size=fs*0.9, size_hint=(1, None), multiline=True, height=fs * fmn * lines, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
+                prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
                 layout.add_widget(prelabel)
             else:
                 layout.add_widget(self.make_box_params(paramName, val))

@@ -32,7 +32,7 @@ from kivy import base
 import traceback, time, mod_globals
 
 __all__ = 'install_android'
-__version__ = '0.01.31'
+__version__ = '0.01.32'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':

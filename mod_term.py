@@ -22,12 +22,6 @@ from kivy.uix.filechooser import FileChooserListView
 from kivy.clock import Clock
 import sys, os, re, string, time, mod_globals, mod_elm, mod_utils, main
 
-if int(Window.size[1]) > int(Window.size[0]):
-    fs = int(Window.size[1])/(int(Window.size[0])/9)
-else:
-    fs = int(Window.size[0])/(int(Window.size[1])/9)
-fs = mod_globals.fontSize
-
 __all__ = 'install_android'
 
 macro = {}
