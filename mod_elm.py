@@ -263,7 +263,7 @@ class Port:
                 except:
                     pass
             elif self.portType == 2:
-                self.droid.bluetoothReadReady(self.btcid).result:
+                if self.droid.bluetoothReadReady(self.btcid).result:
                     byte = self.droid.bluetoothRead (1, self.btcid ).result
                 '''if self.recv_stream.available():
                     byte = chr(self.recv_stream.read())'''
