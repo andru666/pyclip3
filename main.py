@@ -451,6 +451,7 @@ class screenConfig(App):
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
         pycl = MyLabel(text='PyClip3', height=(fs*3,  'dp'), font_size=(fs*2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
+        pycl = MyLabel(text=str(Window.size), height=(fs*3,  'dp'), font_size=(fs*2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
         layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
