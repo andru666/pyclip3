@@ -36,7 +36,7 @@ from kivy import base
 import traceback, time, mod_globals
 
 __all__ = 'install_android'
-__version__ = '0.01.28'
+__version__ = '0.01.29'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -454,9 +454,9 @@ class screenConfig(App):
                 return permissionErrorLayout
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        pycl = MyLabel(text='PyClip3', height=(fs*2.7,  'dp'), font_size=(fs*2.2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
+        pycl = MyLabel(text='PyClip3', height=(fs*3,  'dp'), font_size=(fs*2,  'dp'), size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.7,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
@@ -467,7 +467,7 @@ class screenConfig(App):
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
             popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5,  'dp')), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
             return popup
-        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.8,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
+        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5,  'dp'), height=(fs,  'dp'), multiline=True, size_hint=(1, None), bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=(fs*2,  'dp'), size_hint=(1, None), on_press=self.term)
         check = MyButton(text='Check ELM327', height=(fs*4,  'dp'), size_hint=(1, None), on_press=self.check_elm)
         gobtn = MyButton(text='START', height=(fs*2.5,  'dp'), size_hint=(1, None), on_press=self.finish)

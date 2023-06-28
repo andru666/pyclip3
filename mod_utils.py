@@ -96,7 +96,7 @@ class MyButton(Button):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = (fs*1.2,  'dp')
+            self.font_size = (fs,  'dp')
         else:
             self.font_size = (self.font_size,  'dp')
         if 'valign' not in kwargs:
