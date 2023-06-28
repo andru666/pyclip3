@@ -217,7 +217,7 @@ class showDatarefGui(App):
 
     def __init__(self, ecu, datarefs, path):
         self.ecu = ecu
-        self.blue_part_size = 0.65
+        self.blue_part_size = 0.7
         self.datarefs = datarefs
         self.labels = {}
         self.needupdate = False
