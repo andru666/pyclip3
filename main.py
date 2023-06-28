@@ -29,7 +29,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
 import traceback, time, mod_globals
-
+import androidhelper as android
 __all__ = 'install_android'
 __version__ = '0.01.33'
 
