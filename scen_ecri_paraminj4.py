@@ -1,31 +1,28 @@
 # -*- coding: utf-8 -*-
-import mod_globals, mod_zip
+import re, time, mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from functools import partial
+from collections import OrderedDict
 import xml.dom.minidom
 import xml.etree.cElementTree as et
 
 class Scenarii(App):
-    
+    global fs
+    fs = mod_globals.fontSize
     def __init__(self, **kwargs):
-        
         self.elm = kwargs['elm']
         self.command = kwargs['command']
         self.ecu = kwargs['ecu']
-        self.data = kwargs['data']
-
-        DOMTree = mod_zip.get_xml_scenario(self.data)
+        DOMTree = mod_zip.get_xml_scenario(kwargs['data'])
         ScmRoom = DOMTree.documentElement
         ScmParams = ScmRoom.getElementsByTagName('ScmParam')
         ScmSets = ScmRoom.getElementsByTagName('ScmSet')
         self.ScmParam = OrderedDict()
         self.ScmSet = OrderedDict()
-        
         for Param in ScmParams:
             name = pyren_encode(Param.getAttribute('name'))
             value = pyren_encode(Param.getAttribute('value'))
@@ -41,24 +38,23 @@ class Scenarii(App):
                 scmParamsDict[name] = value
             self.ScmSet[setname]= scmParamsDict
         
-        super(Scenarii, self).__init__(**kwargs)
+        super(Scenarii, self).__init__()
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label
         root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         root.bind(minimum_height=root.setter('height'))
         root.add_widget(MyLabel(text=header))
-        root.add_widget(MyLabel(text=self.get_message('Title'), bgcolor=(1, 1, 0, 0.3), height=fs*3))
-        root.add_widget(MyLabel(text=self.get_message('Subtitle'), bgcolor=(1, 0.3, 0, 0.3), height=fs*3))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Title'), bgcolor=(1, 1, 0, 0.3)))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Subtitle'), bgcolor=(1, 0.3, 0, 0.3)))
         root.add_widget(self.info('Informations', 'InformationsContent'))
         root.add_widget(self.button_yes_no(False, self.resetValues))
-        root.add_widget(Button(text=self.get_message('6218'), on_press=self.stop, size_hint=(1, None), height=80))
-        rot = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        root.add_widget(MyButton(text=get_message(self.ScmParam, '6218'), on_press=self.stop))
+        rot = ScrollView(size_hint=(1, 1))
         rot.add_widget(root)
         return rot
     
     def valueReset(self, name, value):
-        
         if isHex(value):
             response = self.ecu.run_cmd(self.ScmSet['Commands'][name],value)
         else:
@@ -88,64 +84,45 @@ class Scenarii(App):
 
     def reset_Values(self,instance):
         self.popup.dismiss()
-        
-        self.lbltxt = Label(text=self.get_message('CommandInProgress'))
+        self.lbltxt = Label(text=get_message(self.ScmParam, 'CommandInProgress'))
         response = ''
-        popup = Popup(title='STATUS', auto_dismiss=True, content=self.lbltxt, size=(Window.size[0]*0.7, Window.size[1]*0.7), size_hint=(None, None))
+        popup = MyPopup(title='STATUS', content=self.lbltxt)
         popup.open()
         time.sleep(5)
         base.EventLoop.idle
         for name, value in self.ScmSet['CommandParameters'].items():
             response += self.valueReset(name, value)
         base.EventLoop.idle()
-        self.lbltxt.text = self.get_message('CommandFinished')
+        self.lbltxt.text = get_message(self.ScmParam, 'CommandFinished')
         self.lbltxt.text += ':\n'
         
         if "NR" in response:
-            self.lbltxt.text += self.get_message('EndScreenMessage4')
+            self.lbltxt.text += get_message(self.ScmParam, 'EndScreenMessage4')
         else:
-            self.lbltxt.text += self.get_message('EndScreenMessage3')   
-
-
+            self.lbltxt.text += get_message(self.ScmParam, 'EndScreenMessage3')   
 
     def resetValues(self, instance):
         if not mod_globals.opt_demo:
             makeDump()
-            
         layout = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
-        self.lbltxt = MyLabel(text=self.get_message('CommandInProgress'))
+        self.lbltxt = MyLabel(text=get_message(self.ScmParam, 'CommandInProgress'))
         layout.add_widget(self.lbltxt)
-        layout.add_widget(Button(text=self.get_message('1926'), on_press=self.reset_Values, size_hint=(1, 1), height=fs*2))
-        self.popup = Popup(title='STATUS', auto_dismiss=True, content=layout, size=(Window.size[0]*0.7, Window.size[1]*0.7), size_hint=(None, None))
+        layout.add_widget(MyButton(text=get_message(self.ScmParam, '1926'), on_press=self.reset_Values))
+        self.popup = MyPopup(title='STATUS', content=layout)
         self.popup.open()
          
         
     def button_yes_no(self, no=True, yes=None):
         layout = BoxLayout(orientation='vertical', spacing=15, size_hint=(1, 1))
-        if yes: layout.add_widget(Button(text=self.get_message('Yes'), on_press=yes, size_hint=(1, 1), height=fs*2))
-        if no: layout.add_widget(Button(text=self.get_message('No'), on_press=self.stop, size_hint=(1, 1), height=fs*2))
+        if yes: layout.add_widget(MyButton(text=get_message(self.ScmParam, 'Yes'), on_press=yes))
+        if no: layout.add_widget(MyButton(text=get_message(self.ScmParam, 'No'), on_press=self.stop))
         return layout
 
     def info(self, info, message):
-        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 2))
-        layout.add_widget(MyLabel(text=self.get_message(info), size_hint=(1, 1), bgcolor=(0.3, 0.3, 0, 0.3)))
-        layout.add_widget(MyLabel(text=self.get_message(message), size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
+        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, info), bgcolor=(0.3, 0.3, 0, 0.3)))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, message), bgcolor=(1, 0, 0, 0.3)))
         return layout
-    
-    def get_message(self, msg):
-        if msg in list(self.ScmParam.keys()):
-            value = self.ScmParam[msg]
-        else:
-            value = msg
-        if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[value])
-        return value
-
-    def get_message_by_id(self, id):
-        if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[id])
-        return value
-
 
 def run(elm, ecu, command, data):
     app = Scenarii(elm=elm, 

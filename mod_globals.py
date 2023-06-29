@@ -16,7 +16,7 @@ opt_lang = ''
 opt_car = ''
 opt_log = ''
 opt_ecuid_on = False
-opt_obdlink   = False
+opt_obdlink = False
 opt_demo = False
 opt_scan = False
 opt_csv = False
@@ -55,7 +55,6 @@ fontSize = 20
 screen_orient = False
 
 class Settings:
-    opt_ecuid_on = False
     opt_ecuid = ''
     savedEcus = ''
     opt_ecu = ''
@@ -74,7 +73,6 @@ class Settings:
 
     def __init__(self):
         global savedEcus
-        global opt_ecuid_on
         global opt_ecuid
         global opt_ecu
         global opt_lang
@@ -90,7 +88,6 @@ class Settings:
         global opt_dev_address
         self.load()
         opt_ecu = self.opt_ecu
-        opt_ecuid_on = self.opt_ecuid_on
         savedEcus = self.savedEcus
         opt_port = self.port
         opt_lang = self.lang

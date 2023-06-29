@@ -10,43 +10,6 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.clock import Clock
 
-class MyLabel(Label):
-
-    def __init__(self, **kwargs):
-        if 'bgcolor' in kwargs:
-            self.bgcolor = kwargs['bgcolor']
-        else:
-            self.bgcolor = (0, 0, 0, 0)
-        super(MyLabel, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        self.halign = 'center'
-        self.valign = 'middle'
-        if 'size_hint' not in kwargs:
-            self.size_hint = (1, None)
-        if 'height' not in kwargs:
-            fmn = 1.05
-            lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
-            if lines < simb: lines = simb
-            if lines < 7: lines = 5
-            if lines > 20: lines = 13
-            if 1 > simb: lines = 2
-            if fs > 20: 
-                lines = lines * 1.05
-                fmn = 1.5
-            self.height = fmn * lines * fs
-        
-        if 'font_size' not in kwargs:
-            self.font_size = fs
-    
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
-            Rectangle(pos=self.pos, size=self.size)
-
 class ScrMsg(Screen):
     pass
 

@@ -47,10 +47,12 @@ class MyTextInput(TextInput):
             self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            if lines < simb:
+                if (lines * 2) > simb: lines = simb + lines/2
+                else: lines = simb
             if 2 < lines < 3: lines = lines * 1.5
-            if lines < 2: lines = lines * 1.75
+            if lines < 2: lines = lines * 1.5
             self.height = lines * self.font_size
         self.padding = (self.font_size / self.height,  'dp')
 
@@ -105,15 +107,12 @@ class MyButton(Button):
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
             if lines < 1.5: lines = 1.5
             if 1.5 < lines < 2: lines = 2
-            if 2 < lines < 3: lines = 3
-            if self.font_size < fs:
-                self.height = (lines * fs * 2,  'dp')
-            else:
-                self.height = (lines * self.font_size * 2,  'dp')
+            #if 2 < lines < 3: lines = 3
+            self.height = (lines * self.font_size * 2,  'dp')
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
@@ -158,14 +157,13 @@ class MyLabel(Label):
             self.font_size = (fs*0.8,  'dp')
         else:
             self.font_size = (self.font_size,  'dp')
-        
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb
-            if lines == 0: lines = 1
-            if lines <= 2: lines = 1.5
-            self.height = (lines * self.font_size * 1.3,  'dp')
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            if lines < simb: lines = simb + 0.5
+            if lines <= 1.9: lines = 1.9
+            if 1.9 < lines <= 3: lines = 3
+            self.height = (lines * self.font_size,  'dp')
 
     def on_size(self, *args):
         if not self.canvas:

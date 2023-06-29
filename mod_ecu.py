@@ -15,7 +15,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
-from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.properties import NumericProperty
 from kivy.utils import platform
@@ -145,12 +144,12 @@ class MyLabelGreen(ButtonBehavior, Label):
             self.font_size = (fs*0.8,  'dp')
         else:
             self.font_size = (self.font_size,  'dp')
-        
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb
-            if lines == 0: lines = 1
+            if lines < simb: lines = simb + 1
+            if lines <= 1.9: lines = 1.9
+            if 1.9 < lines <= 3: lines = 3
             self.height = (lines * self.font_size * 1.3,  'dp')
         
     def on_size(self, *args):
@@ -181,8 +180,9 @@ class MyLabelBlue(ButtonBehavior, Label):
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb
-            if lines == 0: lines = 1
+            if lines < simb: lines = simb + 1
+            if lines <= 1.9: lines = 1.9
+            if 1.9 < lines <= 3: lines = 3
             self.height = (lines * self.font_size * 1.3,  'dp')
         self.clicked = False
 
@@ -410,6 +410,8 @@ class showDatarefGui(App):
 
 
 class ECU():
+    global fs
+    fs = mod_globals.fontSize
     getDTCmnemo = ''
     resetDTCcommand = ''
     screens = []
@@ -442,8 +444,9 @@ class ECU():
         modelid = self.ecudata['ModelId'].replace('XML', 'xml')
         mdom = mod_zip.get_xml_file(modelid)
         mdoc = mdom.documentElement
-        lbltxt = MyLabel(text='Loading languages')
-        popup_init = Popup(title='Initializing', content=lbltxt, size=(400, 400), size_hint=(None, None))
+        lbltxt = MyLabel(text='Loading languages', font_size=(fs * 1.5, 'dp'), size_hint=(1, 1))
+        popup_init = MyPopup(title='Initializing', content=lbltxt)
+        base.runTouchApp(embedded=True)
         popup_init.open()
         lbltxt.text = 'Loading screens'
         EventLoop.idle()
@@ -487,6 +490,7 @@ class ECU():
             di_class = ecu_dataids(self.DataIds, ddoc, dict, tran)
         EventLoop.window.remove_widget(popup_init)
         popup_init.dismiss()
+        base.stopTouchApp()
         EventLoop.window.canvas.clear()
 
     def initELM(self, elm):
@@ -1044,7 +1048,7 @@ class ECU():
                         l.name = 'VP : VIN programming'
                 if l.name == 'RZ':
                     if mod_globals.opt_lang == 'RU':
-                        l.name = 'RZ : Сбрасывает'
+                        l.name = 'RZ : СБРОСЫ'
                     else:
                         l.name = 'RZ : Resets'
                 if l.name == 'SC':

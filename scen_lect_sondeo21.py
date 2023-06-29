@@ -6,48 +6,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-
-
 import xml.dom.minidom
 import xml.etree.cElementTree as et
-
-class MyLabel(Label):
-
-    def __init__(self, **kwargs):
-        if 'bgcolor' in kwargs:
-            self.bgcolor = kwargs['bgcolor']
-        else:
-            self.bgcolor = (0, 0, 0, 0)
-        self.bind(size=self.setter('text_size'))
-        if 'halign' not in kwargs:
-            self.halign = 'center'
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'size_hint' not in kwargs:
-            self.size_hint = (1, None)
-        if 'height' not in kwargs:
-            fmn = 1.3
-            lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
-            if lines < simb: lines = simb
-            if lines < 7: lines = 7
-            if lines > 20: lines = 20
-            if fs > 20: 
-                lines = lines * 1.1
-                fmn = 1.7
-            self.height = fmn * lines * fs
-        if 'font_size' not in kwargs:
-            self.font_size = fs
-        super(MyLabel, self).__init__(**kwargs)
-    
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
-            Rectangle(pos=self.pos, size=self.size)
-
 
 class Scenario(App):
     

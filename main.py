@@ -31,7 +31,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.35'
+__version__ = '0.01.36'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -230,7 +230,7 @@ class screenConfig(App):
         glay.add_widget(sw)
         return glay
 
-    def make_opt_ecuid(self, callback = None):
+    def make_opt_ecuid(self,active, callback = None):
         str1 = 'OPT ecuid'
         label = MyLabel(text=str1, halign='left', size_hint=(0.3, None), bgcolor = (0.5, 0.5, 0, 1))
         if mod_globals.opt_ecu:
@@ -239,7 +239,9 @@ class screenConfig(App):
             iText = ''
         ti = MyTextInput(text=iText, size_hint=(0.5, None), multiline=False)
         self.textInput[str1] = ti
-        sw = Switch(size_hint=(0.2, None))
+        sw = Switch(active=active, size_hint=(0.2, None))
+        if callback:
+            sw.bind(active=callback)
         self.button[str1] = sw
         glay = MyGridLayout(cols=3)
         ti.height = sw.height = label.height
@@ -467,7 +469,7 @@ class screenConfig(App):
         check = MyButton(text='Check ELM327', height=(fs*4,  'dp'), on_press=self.check_elm)
         gobtn = MyButton(text='START', height=(fs*2.5,  'dp'), on_press=self.finish)
         layout.add_widget(gobtn)
-        layout.add_widget(self.make_opt_ecuid())
+        layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
         layout.add_widget(self.make_bt_device_entry())
         layout.add_widget(self.make_language_entry())
