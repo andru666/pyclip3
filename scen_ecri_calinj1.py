@@ -42,19 +42,14 @@ class Scenarii(App):
         root.add_widget(MyLabel(text=header))
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'TexteTitre'), bgcolor=(1, 1, 0, 0.3)))
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'LabelSaisieCode'), bgcolor=(1, 0, 0, 0.8)))
-        
         self.injec1, inj1 = self.inject_param('Injecteur1', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec2, inj2 = self.inject_param('Injecteur2', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec3, inj3 = self.inject_param('Injecteur3', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec4, inj4 = self.inject_param('Injecteur4', 'dat_TitreActuel', 'dat_TitreSouhaite')
-        
         root.add_widget(inj1)
         root.add_widget(inj2)
         root.add_widget(inj3)
         root.add_widget(inj4)
-        print(self.injec4)
-        
-        
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'ContenuMb'), bgcolor=(1, 0, 0, 0.8)))
         root.add_widget(MyButton(text=get_message(self.ScmParam, 'TexteTitre'), on_press=self.write_inj, size_hint=(1, None)))
         root.add_widget(MyButton(text=get_message(self.ScmParam, '6218'), on_press=self.stop, size_hint=(1, None)))

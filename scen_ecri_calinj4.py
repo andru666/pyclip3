@@ -36,10 +36,8 @@ class Scenarii(App):
         super(Scenarii, self).__init__()
 
     def build(self):
-        notv = str('F'*int(self.ScmParam['nbCaractereCode']))
-        if notv == '0': notv = 'F'
+        
         header = '[' + self.command.codeMR + '] ' + self.command.label
-
         root = GridLayout(cols=1, spacing=5, size_hint=(1.0, None))
         root.bind(minimum_height=root.setter('height'))
         root.add_widget(MyLabel(text=header))
@@ -134,6 +132,36 @@ class Scenarii(App):
         rot = ScrollView(size_hint=(1, 1))
         rot.add_widget(root)
         return rot
+
+    def inject_param(self, inj, tit1, tit2):
+        notv = str('F'*int(self.ScmParam['nbCaractereCode']))
+        if notv == '0': notv = 'F'
+        glay = MyGridLayout(cols=1, bgcolor =(0, 0, 0, 1))
+        codemr, label, value = self.ecu.get_id(self.ScmParam[inj], True)
+        values = '%s : %s' % ((codemr), (value))
+        lab = MyLabel(text=label, size_hint=(1, None), bgcolor=(0, 1, 1, 0.3))
+        glay.add_widget(lab)
+        glay.height = lab.height
+        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        lc1 = MyLabel(text=get_message(self.ScmParam, tit1), size_hint=(0.6, None), bgcolor=(0, 0, 1, 0.3))
+        lc2 = MyLabel(text=values, size_hint=(0.4, None), bgcolor=(0, 1, 0, 0.3))
+        if lc2.height > lc1.height:
+            layout_current.height = lc2.height
+        else:
+            layout_current.height = lc1.height
+        glay.height += layout_current.height
+        layout_current.add_widget(lc1)
+        layout_current.add_widget(lc2)
+        layout_c = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        l_c1 = MyLabel(text=get_message(self.ScmParam, tit2), size_hint=(0.6, None), bgcolor=(1, 0, 0, 0.3))
+        layout_c.add_widget(l_c1)
+        injec = MyTextInput(text=notv, multiline=False, size_hint=(0.4, None))
+        layout_c.height = injec.height = l_c1.height
+        glay.height += layout_c.height
+        layout_c.add_widget(injec)
+        glay.add_widget(layout_current)
+        glay.add_widget(layout_c)
+        return injec, glay
 
     def write_inj(self, instance):
         ch1 = self.injec1.text.upper()
