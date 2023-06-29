@@ -1,130 +1,89 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
-import re
-import time
-import mod_globals
-import mod_utils
-import mod_ecu
-import mod_zip
-from mod_utils import pyren_encode
-from mod_utils import clearScreen
-from mod_utils import hex_VIN_plus_CRC
+import mod_globals, mod_zip
+from mod_utils import *
 from kivy.app import App
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from kivy.graphics import Color, Rectangle
-
-class MyLabel(Label):
-
-    def __init__(self, **kwargs):
-        if 'bgcolor' in kwargs:
-            self.bgcolor = kwargs['bgcolor']
-        else:
-            self.bgcolor = (0, 0, 0, 0)
-        super(MyLabel, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        self.halign = 'center'
-        self.valign = 'middle'
-        if 'size_hint' not in kwargs:
-            self.size_hint = (1, None)
-        if 'height' not in kwargs:
-            fmn = 1.1
-            lines = len(self.text.split('\n'))
-            simb = len(self.text) / 60
-            if lines < simb: lines = simb
-            if lines < 7: lines = 7
-            if lines > 20: lines = 20
-            if 1 > simb: lines = 1.5
-            if fs > 20: 
-                lines = lines * 1.05
-                fmn = 1.5
-            self.height = fmn * lines * fs
-
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
-            Rectangle(pos=self.pos, size=self.size)
-
 
 class VinWrite(App):
-
+    global fs
+    fs = mod_globals.fontSize
     def __init__(self, **kwargs):
+        self.elm = kwargs['elm']
+        self.command = kwargs['command']
+        self.ecu = kwargs['ecu']
         DOMTree = mod_zip.get_xml_scenario(kwargs['data'])
         self.ScmRoom = DOMTree.documentElement
         ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
         ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
-        self.elm = kwargs['elm']
-        self.command = kwargs['command']
-        self.ecu = kwargs['ecu']
         self.ScmParam = {}
         self.ScmSet = {}
         for Param in ScmParams:
-            name = pyren_encode(Param.getAttribute('name'))
-            value = pyren_encode(Param.getAttribute('value'))
+            name = (Param.getAttribute('name'))
+            value = (Param.getAttribute('value'))
             self.ScmParam[name] = value
 
         for Set in ScmSets:
-            setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
+            setname = (mod_globals.language_dict[Set.getAttribute('name')])
             ScmParams = Set.getElementsByTagName('ScmParam')
             for Param in ScmParams:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
+                name = (Param.getAttribute('name'))
+                value = (Param.getAttribute('value'))
                 self.ScmSet[setname] = value
                 self.ScmParam[name] = value
-
-        super(VinWrite, self).__init__(**kwargs)
+        super(VinWrite, self).__init__()
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label
         codemr, label, value = self.ecu.get_id(self.ScmParam['identVIN'], True)
-        codemr = '%s : %s' % (pyren_encode(codemr), pyren_encode(label))
-        self.vin_input = TextInput(text='VF', multiline=False, size_hint=(1, None), height=40)
-        root = GridLayout(cols=1, spacing=6)
-        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None), height=50)
-        layout_current.add_widget(MyLabel(text=codemr, size_hint=(0.3, 1), bgcolor=(0, 0, 1, 0.3)))
-        layout_current.add_widget(MyLabel(text=value, size_hint=(0.7, 1), bgcolor=(0, 1, 0, 0.3)))
+        codemr = '%s : %s' % ((codemr), (label))
+        self.vin_input = MyTextInput(text='VF', multiline=False, font_size=fs*1.5)
+        root = GridLayout(cols=1, spacing=6, size_hint=(1, 1))
+        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        c = MyLabel(text=codemr, size_hint=(0.35, 1), bgcolor=(0, 0, 1, 0.3))
+        v = MyLabel(text=value, size_hint=(0.65, 1), bgcolor=(0, 1, 0, 0.3))
+        layout_current.add_widget(c)
+        layout_current.add_widget(v)
+        if c.height > v.height:
+            layout_current.height = c.height
+        else:
+            layout_current.height = v.height
         root.add_widget(MyLabel(text=header))
-        root.add_widget(MyLabel(text=self.get_message('TextTitre')))
-        root.add_widget(MyLabel(text=self.get_message('MessageBox3'), bgcolor=(1, 0, 0, 0.3)))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'TextTitre')))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'MessageBox3'), bgcolor=(1, 0, 0, 0.3)))
         root.add_widget(layout_current)
         root.add_widget(self.vin_input)
-        root.add_widget(Button(text='WRITE VIN', on_press=self.write_vin, size_hint=(1, None), height=80))
-        root.add_widget(Button(text=self.get_message('6218'), on_press=self.stop, size_hint=(1, None), height=80))
+        root.add_widget(MyButton(text=self.command.label, on_press=self.pupp))
+        root.add_widget(MyButton(text=get_message(self.ScmParam, '6218'), on_press=self.stop))
         return root
 
     def write_vin(self, instance):
         vin = self.vin_input.text.upper()
         if not (len(vin) == 17 and 'I' not in vin and 'O' not in vin):
-            popup = Popup(title='Status', content=Label(text='Invalid VIN'), auto_dismiss=True, size=(500, 500), size_hint=(None, None))
+            popup = MyPopup(title=get_message(self.ScmParam, 'MessageBoxERREUR'), content=Label(text=get_message(self.ScmParam, 'MessageBox2')), close=True)
             popup.open()
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
         self.ecu.run_cmd(self.ScmParam['ConfigurationName'], vin_crc)
-        popup = Popup(title='Status', content=Label(text='VIN CHANGED'), auto_dismiss=True, size=(500, 500), size_hint=(None, None))
+        popup = MyPopup(title=get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT'), content=Label(text=get_message(self.ScmParam, 'confFin_text')), close=True)
         popup.open()
 
-    def get_message(self, msg):
-        if msg in list(self.ScmParam.keys()):
-            value = self.ScmParam[msg]
-        else:
-            value = msg
-        if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[value])
-        return value
-
-    def get_message_by_id(self, id):
-        if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[id])
-        return value
-
+    def pupp(self, instance):
+        layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'MessageBox3'), bgcolor=(1, 0, 0, 0.3)))
+        layout_box = BoxLayout(orientation='horizontal', spacing=25, size_hint=(1, None))
+        self.buttons_ok = MyButton(text=get_message(self.ScmParam, 'Bouton1'), on_press=self.write_vin, on_release=lambda *args: self.popup.dismiss())
+        layout_box.add_widget(self.buttons_ok)
+        layout_box.add_widget(MyButton(text=get_message(self.ScmParam, 'Bouton2'), font_size=fs, on_press=self.stop))
+        layout.add_widget(layout_box)
+        rootP = ScrollView(size_hint=(1, 1), size=(Window.size[0]*0.9, Window.size[1]*0.9))
+        rootP.add_widget(layout)
+        status = get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT')
+        self.popup = MyPopup(title=status, content=rootP)
+        self.popup.open()
+        return
 
 def run(elm, ecu, command, data):
     app = VinWrite(elm=elm, ecu=ecu, command=command, data=data)

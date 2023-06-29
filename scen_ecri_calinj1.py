@@ -42,14 +42,17 @@ class Scenarii(App):
         root.add_widget(MyLabel(text=header))
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'TexteTitre'), bgcolor=(1, 1, 0, 0.3)))
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'LabelSaisieCode'), bgcolor=(1, 0, 0, 0.8)))
+        
         self.injec1, inj1 = self.inject_param('Injecteur1', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec2, inj2 = self.inject_param('Injecteur2', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec3, inj3 = self.inject_param('Injecteur3', 'dat_TitreActuel', 'dat_TitreSouhaite')
         self.injec4, inj4 = self.inject_param('Injecteur4', 'dat_TitreActuel', 'dat_TitreSouhaite')
+        
         root.add_widget(inj1)
         root.add_widget(inj2)
         root.add_widget(inj3)
         root.add_widget(inj4)
+        
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'ContenuMb'), bgcolor=(1, 0, 0, 0.8)))
         root.add_widget(MyButton(text=get_message(self.ScmParam, 'TexteTitre'), on_press=self.write_inj, size_hint=(1, None)))
         root.add_widget(MyButton(text=get_message(self.ScmParam, '6218'), on_press=self.stop, size_hint=(1, None)))
@@ -67,8 +70,8 @@ class Scenarii(App):
         glay.add_widget(lab)
         glay.height = lab.height
         layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        lc1 = MyLabel(text=get_message(self.ScmParam, tit1), size_hint=(0.6, None), bgcolor=(0, 0, 1, 0.3))
-        lc2 = MyLabel(text=values, size_hint=(0.4, None), bgcolor=(0, 1, 0, 0.3))
+        lc1 = MyLabel(text=get_message(self.ScmParam, tit1), size_hint=(0.4, None), bgcolor=(0, 0, 1, 0.3))
+        lc2 = MyLabel(text=values, size_hint=(0.6, None), bgcolor=(0, 1, 0, 0.3))
         if lc2.height > lc1.height:
             layout_current.height = lc2.height
         else:
@@ -77,9 +80,9 @@ class Scenarii(App):
         layout_current.add_widget(lc1)
         layout_current.add_widget(lc2)
         layout_c = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        l_c1 = MyLabel(text=get_message(self.ScmParam, tit2), size_hint=(0.6, None), bgcolor=(1, 0, 0, 0.3))
+        l_c1 = MyLabel(text=get_message(self.ScmParam, tit2), size_hint=(0.4, None), bgcolor=(1, 0, 0, 0.3))
         layout_c.add_widget(l_c1)
-        injec = MyTextInput(text=notv, multiline=False, size_hint=(0.4, None))
+        injec = MyTextInput(text=notv, multiline=False, size_hint=(0.6, None))
         layout_c.height = injec.height = l_c1.height
         glay.height += layout_c.height
         layout_c.add_widget(injec)
@@ -98,63 +101,63 @@ class Scenarii(App):
         nbCC = int(self.ScmParam['nbCaractereCode'])
         if nbCC !=6 and nbCC !=7 and nbCC !=16:
             ch = 'Error nbCaractereCode in scenario xml'
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
 
         isHEX = int(self.ScmParam['FormatHexadecimal'])
         if isHEX != 0 and isHEX != 1:
             ch = get_message(self.ScmParam, 'Error FormatHexadecimal in scenario xml')
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
 
         prmCHAR = self.ScmParam['PermittedCharacters']
         if len(prmCHAR) << 16 and len(prmCHAR) >> 33:
             ch = 'Error PermittedCharacters in scenario xml'
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         
         while not (all (c in prmCHAR for c in ch1.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         while not (all (c in prmCHAR for c in ch2.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre2')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         while not (all (c in prmCHAR for c in ch3.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre3')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         while not (all (c in prmCHAR for c in ch4.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre4')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         
         if not len(ch1)==nbCC:
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' '))
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         if not len(ch2)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre2') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         if not len(ch3)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre3') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         if not len(ch4)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre4') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         
@@ -164,41 +167,26 @@ class Scenarii(App):
             inj_code = ASCIITOHEX(chk.upper())
         else:
             ch = get_message(self.ScmParam, 'TexteErreurInit')
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         
         if isHEX == 1 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)):
             ch = 'Hexdata check failed.'
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         elif isHEX == 0 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)) :
             ch = 'ASCII check failed.'
-            popup = MyPopup(title=status, close=True, content=Label(text=ch, halign  = 'center'), auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
             popup.open()
             return None
         else:
             ch = get_message(self.ScmParam, 'CommandeTerminee')
             self.ecu.run_cmd(self.ScmParam['EcritureCodeInjecteur'], inj_code)
-            popup = MyPopup(title=get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), content=Label(text=ch, halign = 'center'), close=True, auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(None, None))
+            popup = MyPopup(title=get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), content=MyLabel(text=ch, font_size=fs*2, halign='center'), close=True)
             popup.open()
             return None
-
-    def get_message(self, msg):
-        if msg in list(self.ScmParam.keys()):
-            value = self.ScmParam[msg]
-        else:
-            value = msg
-        if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-            value = (mod_globals.language_dict[value])
-        return value
-
-    def get_message_by_id(self, id):
-        if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-            value = (mod_globals.language_dict[id])
-        return value
-
 
 def run(elm, ecu, command, data):
     app = Scenarii(elm=elm, ecu=ecu, command=command, data=data)

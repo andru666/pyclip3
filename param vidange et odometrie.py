@@ -1,23 +1,7 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
-import re
-import time
-import mod_globals
-import mod_utils
-from mod_ecu import *
-import mod_zip
-from kivy.base import EventLoop
-from kivy.uix.dropdown import DropDown
-from collections import OrderedDict
-from mod_utils import pyren_encode
-from mod_utils import clearScreen
-from mod_utils import ASCIITOHEX
+import mod_globals, mod_zip
+from mod_utils import *
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView

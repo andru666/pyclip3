@@ -11,7 +11,7 @@ if platform != 'android':
     user32 = ctypes.windll.user32
     Config.set('graphics', 'position', 'custom')
     Config.set('graphics', 'top',  20)
-    Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/5))
+    Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/4))
 import traceback, time, mod_globals
 
 from kivy.core.window import Window
@@ -31,7 +31,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.34'
+__version__ = '0.01.35'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':

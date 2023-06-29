@@ -1,24 +1,12 @@
 # -*- coding: utf-8 -*-
-import time, re
-import mod_ecu_mnemonic, mod_globals, mod_zip
-from mod_utils import pyren_encode, clearScreen, ASCIITOHEX, hex_VIN_plus_CRC, isHex
-from mod_ecu import *
-from collections import OrderedDict
-from functools import partial
+import mod_globals, mod_zip
+from mod_utils import *
 from kivy.app import App
-from kivy.base import EventLoop
-from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.label import Label
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.popup import Popup
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.textinput import TextInput
-from copy import deepcopy
+
 
 import xml.dom.minidom
 import xml.etree.cElementTree as et

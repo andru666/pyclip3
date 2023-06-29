@@ -35,8 +35,9 @@ def playScenario(command, ecu, elm):
             scen = __import__(scenarioName)
         scen.run(elm, ecu, command, scenarioData)
         return True
-    else:    
-        if True:
+    else:
+        print(scenarioName)
+        try:
             if scenarioName.endswith('_ecu'):
                 scen = __import__(scenarioName[:len(scenarioName)-4])
             elif scenarioName.endswith('_const'):
@@ -45,7 +46,7 @@ def playScenario(command, ecu, elm):
                 scen = __import__(scenarioName)
             scen.run(elm, ecu, command, scenarioData)
             return True
-        else:
+        except:
             scen = __import__('show_scen')
             scen.run(elm, ecu, command, scenarioData)
             return True

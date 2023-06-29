@@ -24,7 +24,7 @@ except:
 
 def InfoPopup(bas=None):
     fs = mod_globals.fontSize
-    pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=fs*3, halign = 'center'))
+    pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=(fs*3, 'dp'), halign = 'center'))
     if not bas:
         base.runTouchApp(embedded=True)
     pop.open()
@@ -47,11 +47,11 @@ class MyTextInput(TextInput):
             self.font_size = (self.font_size,  'dp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * fs) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if 2 < lines < 3: lines = lines * 1.5
             if lines < 2: lines = lines * 1.75
-            self.height = lines * fs
+            self.height = lines * self.font_size
         self.padding = (self.font_size / self.height,  'dp')
 
 class MyPopup(Popup):
@@ -66,17 +66,20 @@ class MyPopup(Popup):
         super(MyPopup, self).__init__(**kwargs)
         if 'title' not in kwargs:
             self.title='INFO'
+        if 'auto_dismiss' not in kwargs:
+            self.auto_dismiss=True
         if 'title_size' not in kwargs:
-            self.title_size=fs*1.5
+            self.title_size=(fs, 'dp')
         if 'content' not in kwargs:
             self.content=MyLabel(text='LOADING', size_hint = (1, 1))
         if 'title_align' not in kwargs:
             self.title_align='center'
-        if 'size' in kwargs:
+        if 'size_hint' not in kwargs:
             self.size_hint=(None, None)
+            self.size=(Window.size[0]*0.9, Window.size[1]*0.9)
         if self.close:
             layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
-            btn = MyButton(text='CLOSE', height=fs*5, on_press=self.dismiss, size_hint=(1, 0.3))
+            btn = MyButton(text='CLOSE', height=(fs*3, 'dp'), on_press=self.dismiss, size_hint=(1, 0.3))
             layout.add_widget(MyLabel(text=self.content.text, font_size=self.content.font_size, size_hint=(1, 1)))
             layout.add_widget(btn)
             self.content=layout
@@ -107,7 +110,7 @@ class MyButton(Button):
             if lines < 1.5: lines = 1.5
             if 1.5 < lines < 2: lines = 2
             if 2 < lines < 3: lines = 3
-            if self.font_size > fs:
+            if self.font_size < fs:
                 self.height = (lines * fs * 2,  'dp')
             else:
                 self.height = (lines * self.font_size * 2,  'dp')

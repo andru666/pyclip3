@@ -37,18 +37,18 @@ class Scenarii(App):
             ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
             ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
             for Param in ScmParams:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
+                name = (Param.getAttribute('name'))
+                value = (Param.getAttribute('value'))
                 self.ScmParam[name] = value
             for Set in ScmSets:
                 try:
-                    setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
+                    setname = (mod_globals.language_dict[Set.getAttribute('name')])
                 except:
                     pass
                 ScmParams = Set.getElementsByTagName('ScmParam')
                 for Param in ScmParams:
-                    name = pyren_encode(Param.getAttribute('name'))
-                    value = pyren_encode(Param.getAttribute('value'))
+                    name = (Param.getAttribute('name'))
+                    value = (Param.getAttribute('value'))
                     try:
                         self.ScmSet[setname] = value
                     except:
@@ -57,61 +57,53 @@ class Scenarii(App):
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label
-        root = GridLayout(cols=1, spacing=fs * 0.5)
+        root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         root.add_widget(MyLabel(text=header))
         codemr, label, value = self.ecu.get_id(self.ScmParam['pdd_ID-4-8'], True)
-        codemr = '%s : %s' % (pyren_encode(codemr), pyren_encode(label))
-        self.vin_input = MyTextInput(text='VF', multiline=False, size_hint=(1, None), height=40)
-        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None), height=50)
-        layout_current.add_widget(MyLabel(text=codemr, size_hint=(0.3, 1), bgcolor=(0, 0, 1, 0.3)))
-        layout_current.add_widget(MyLabel(text=value, size_hint=(0.7, 1), bgcolor=(0, 1, 0, 0.3)))
+        codemr = '%s : %s' % ((codemr), (label))
+        self.vin_input = MyTextInput(text='VF', font_size=fs*1.5, multiline=False)
+        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        c = MyLabel(text=codemr, size_hint=(0.35, 1), bgcolor=(0, 0, 1, 0.3))
+        v = MyLabel(text=value, size_hint=(0.65, 1), bgcolor=(0, 1, 0, 0.3))
+        layout_current.add_widget(c)
+        layout_current.add_widget(v)
+        if c.height > v.height:
+            layout_current.height = c.height
+        else:
+            layout_current.height = v.height
         root.add_widget(layout_current)
-        root.add_widget(MyLabel(text=self.get_message('text_33975'), bgcolor=(1, 1, 0, 0.3)))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_33975'), bgcolor=(1, 1, 0, 0.3)))
         root.add_widget(self.vin_input)
-        root.add_widget(MyButton(text=self.command.label, on_press=self.pupp, size_hint=(1, None), height=80))
-        root.add_widget(MyButton(text=self.get_message('text_CANCEL'), on_press=self.stop, size_hint=(1, None), height=80))
+        root.add_widget(MyButton(text=self.command.label, on_press=self.pupp))
+        root.add_widget(MyButton(text=get_message(self.ScmParam, 'text_CANCEL'), on_press=self.stop))
         return root
 
     def write_vin(self, instance):
         vin = self.vin_input.text.upper()
         if not (len(vin) == 17 and 'I' not in vin and 'O' not in vin):
-            popup_w = MyPopup(title=self.get_message('text_33973'), content=MyLabel(text=self.get_message('text_29121'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.size[0]*0.9, Window.size[1]*0.8), size_hint=(None, None))
+            popup_w = MyPopup(title=get_message(self.ScmParam, 'text_33973'), content=MyLabel(text=get_message(self.ScmParam, 'text_29121'), font_size=fs*1.5), close=True)
             popup_w.open()
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
         self.ecu.run_cmd(self.ScmParam['pdd_VP-4-41'], vin_crc)
-        popup_w = MyPopup(title=self.get_message('text_9234'), content=MyLabel(text=self.get_message('text_41453'), font_size=fs*1.5), close=True, auto_dismiss=True, size=(Window.size[0]*0.9, Window.size[1]*0.8), size_hint=(None, None))
+        popup_w = MyPopup(title=get_message(self.ScmParam, 'text_9234'), content=MyLabel(text=get_message(self.ScmParam, 'text_41453'), font_size=fs*1.5), close=True)
         popup_w.open()
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
-        layout.add_widget(MyLabel(text=self.get_message('text_29120'), height=Window.size[1]*0.4, bgcolor=(1, 0, 0, 0.3)))
-        layout.add_widget(MyLabel(text=self.get_message('text_30338'), bgcolor=(1, 1, 1, 0.3)))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_29120'), bgcolor=(1, 0, 0, 0.3)))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_30338'), bgcolor=(1, 1, 1, 0.3)))
         layout_box = BoxLayout(orientation='horizontal', spacing=25, size_hint=(1, None))
-        self.buttons_ok = MyButton(text=self.get_message('text_OK'), font_size=fs, size_hint=(1, None), height=fs*4, on_press=self.write_vin, on_release=lambda *args: self.popup.dismiss())
+        self.buttons_ok = MyButton(text=get_message(self.ScmParam, 'text_OK'), on_press=self.write_vin, on_release=lambda *args: self.popup.dismiss())
         layout_box.add_widget(self.buttons_ok)
-        layout_box.add_widget(MyButton(text=self.get_message('text_NO'), font_size=fs, on_press=self.stop, size_hint=(1, None), height=fs*4))
+        layout_box.add_widget(MyButton(text=get_message(self.ScmParam, 'text_NO'), font_size=fs, on_press=self.stop))
         layout.add_widget(layout_box)
         rootP = ScrollView(size_hint=(1, 1), size=(Window.size[0]*0.9, Window.size[1]*0.9))
         rootP.add_widget(layout)
-        status = self.get_message('text_33973')
-        self.popup = MyPopup(title=status, content=rootP, auto_dismiss=True, size=(Window.size[0]*0.8, Window.size[1]*0.8), size_hint=(1, None))
+        status = get_message(self.ScmParam, 'text_33973')
+        self.popup = MyPopup(title=status, content=rootP)
         self.popup.open()
         return
-
-    def get_message(self, msg):
-        if msg in list(self.ScmParam.keys()):
-            value = self.ScmParam[msg]
-        else:
-            value = msg
-        if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[value])
-        return value
-
-    def get_message_by_id(self, id):
-        if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[id])
-        return value
 
 def run(elm, ecu, command, data):
     app = Scenarii(elm=elm, ecu=ecu, command=command, data=data)
