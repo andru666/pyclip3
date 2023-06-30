@@ -81,7 +81,7 @@ class CHECK(App):
     def build(self):
         self.roots = GridLayout(cols=1, padding=fs*1.5, spacing=fs*1.5, size_hint=(1, None))
         self.roots.bind(minimum_height=self.roots.setter('height'))
-        self.roots.add_widget(Label(text='Check ELM327', font_size=(fs,  'dp'), bgcolor=(1, 1, 0, 0.3)))
+        self.roots.add_widget(Label(text='Check ELM327', font_size=(fs,  'sp'), bgcolor=(1, 1, 0, 0.3)))
         layout = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,'center_y': 0.5})
         layout.add_widget(self.roots)
     

@@ -146,15 +146,15 @@ class MyLabelBlue(Label):
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'font_size' not in kwargs:
-            self.font_size = (fs*0.8,  'dp')
+            self.font_size = (fs*0.8,  'sp')
         else:
-            self.font_size = (self.font_size,  'dp')
+            self.font_size = (self.font_size,  'sp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = (lines * self.font_size * 1.3,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'sp')
 
     def on_size(self, *args):
         if not self.canvas:
@@ -174,15 +174,15 @@ class MyLabelGreen(Label):
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'font_size' not in kwargs:
-            self.font_size = (fs*0.8,  'dp')
+            self.font_size = (fs*0.8,  'sp')
         else:
-            self.font_size = (self.font_size,  'dp')
+            self.font_size = (self.font_size,  'sp')
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 2
-            self.height = (lines * self.font_size * 1.3,  'dp')
+            self.height = (lines * self.font_size * 1.3,  'sp')
 
     def on_size(self, *args):
         if not self.canvas:

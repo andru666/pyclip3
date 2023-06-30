@@ -97,10 +97,10 @@ class MyApp(App):
 
         Clock.schedule_once(self.select_macro, 1)
         
-        self.label = MyLabel(text='', bgcolor=(1, 1, 0, 0.3), font_size=(fs,  'dp'), size_hint=(1, None), height=(fs*1.5,  'dp'))
+        self.label = MyLabel(text='', bgcolor=(1, 1, 0, 0.3), font_size=(fs,  'sp'), size_hint=(1, None), height=(fs*1.5,  'sp'))
         self.roots = GridLayout(cols=1, padding=fs*1.5, spacing=fs*1.5, size_hint=(1, None), size_hint_y=None)
         self.roots.bind(minimum_height=self.roots.setter('height'))
-        self.roots.add_widget(MyLabel(text='Running macro', font_size=(fs,  'dp'), bgcolor=(1, 1, 0, 0.3)))
+        self.roots.add_widget(MyLabel(text='Running macro', font_size=(fs,  'sp'), bgcolor=(1, 1, 0, 0.3)))
         self.roots.add_widget(self.label)
         layout = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,'center_y': 0.5})
         layout.add_widget(self.roots)
@@ -117,7 +117,7 @@ class MyApp(App):
         self.fichoo = FileChooserListView(path=self.dir_macro)
         root.add_widget(self.fichoo)
         root.add_widget(Button(text='Open', on_release=self.popp, size_hint=(1, None)))
-        self.popup_macro = Popup(title='SELECT macro', font_size=(fs,  'dp'), content=root, size=(600, 600), auto_dismiss=True)
+        self.popup_macro = Popup(title='SELECT macro', font_size=(fs,  'sp'), content=root, size=(600, 600), auto_dismiss=True)
         self.popup_macro.open()
 
     def popp(self, instance):
@@ -138,7 +138,7 @@ class MyApp(App):
                 file_macro = str(self.fichoo.selection[0].rsplit('/', 1)[1])
         except:
             self.MaLabel('Not select macro')
-            self.roots.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'dp'), on_release=self.exits))
+            self.roots.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'sp'), on_release=self.exits))
             return 
         self.label.text = str('File macro select: ' + file_macro)
         mod_globals.opt_log = file_macro.replace('.cmd', '.txt')
@@ -161,7 +161,7 @@ class MyApp(App):
             '''
             lbltxt = Label(text=labelText, font_size=mod_globals.fontSize)
             root.add_widget(lbltxt)
-            root.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'dp'), on_release=self.exits))
+            root.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'sp'), on_release=self.exits))
             popup_load = Popup(title='ELM connection error', content=root, size=(800, 800), auto_dismiss=True)
             popup_load.open()
             base.runTouchApp()
@@ -238,7 +238,7 @@ class MyApp(App):
                             cmd_ref = c_str
                             break
                     c_str += 1
-        self.roots.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'dp'), on_release=self.exits))
+        self.roots.add_widget(Button(text='CLOSE', size_hint=(1, None), height=(fs*5,  'sp'), on_release=self.exits))
         
     def open_pop(self, instance):
         lbltxt = MyLabel(text=instance)
