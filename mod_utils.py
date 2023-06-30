@@ -109,7 +109,7 @@ class MyButton(Button):
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
             if lines < 2: lines = 2.5
-            self.height = lines * self.font_size
+            self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
 
