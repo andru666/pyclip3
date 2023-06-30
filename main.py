@@ -13,7 +13,6 @@ if platform != 'android':
     Config.set('graphics', 'top',  20)
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/4))
 import traceback, time, mod_globals
-
 from kivy.core.window import Window
 from mod_elm import ELM, get_devices
 from mod_zip import *
@@ -25,10 +24,12 @@ from mod_ecu_default import *
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
 from kivy.uix.scrollview import ScrollView
+import kivy.metrics
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
+print(kivy.metrics.Metrics.dpi)
 
 __all__ = 'install_android'
 __version__ = '0.01.36'
@@ -408,13 +409,13 @@ class screenConfig(App):
         self.settings.save()
         fs = mod_globals.fontSize
         if not mod_globals.opt_port and not mod_globals.opt_demo:
-            MyPopup(content=MyLabel(text='Not select ELM!', font_size=(fs*3,  'sp')), close=True).open()
+            MyPopup(content=MyLabel(text='Not select ELM!', font_size=(fs*3)), close=True).open()
         elif mod_globals.opt_lang == 'SELECT':
-            MyPopup(content=MyLabel(text='Not select language!', font_size=(fs*3,  'sp')), close=True).open()
+            MyPopup(content=MyLabel(text='Not select language!', font_size=(fs*3)), close=True).open()
         elif not mod_globals.savedEcus and not mod_globals.opt_scan and not mod_globals.opt_ecuid_on and not os.path.exists(mod_globals.user_data_dir + '/' + mod_globals.savedEcus):
-            MyPopup(content=MyLabel(text='Not select savedEcus!', font_size=(fs*3,  'sp')), close=True).open()
+            MyPopup(content=MyLabel(text='Not select savedEcus!', font_size=(fs*3)), close=True).open()
         elif mod_globals.opt_ecuid_on and not mod_globals.opt_ecuid:
-            MyPopup(content=MyLabel(text='Not enter ECU!', font_size=(fs*3,  'sp')), close=True).open()
+            MyPopup(content=MyLabel(text='Not enter ECU!', font_size=(fs*3)), close=True).open()
         else:
             self.stop()
 
@@ -431,29 +432,29 @@ class screenConfig(App):
         if mod_globals.os == 'android':
             permissionIsGranted = True
             permissionErrorLayout = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
-            permissionErrorLayout.add_widget(MyLabel(text='Permission not granted', font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
+            permissionErrorLayout.add_widget(MyLabel(text='Permission not granted', font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
             for perm in permissions:
                 if (check_permission(perm) == False):
                     permissionIsGranted = False
-                    permissionErrorLayout.add_widget(MyLabel(text=perm + ':' +str(check_permission(perm)), font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
+                    permissionErrorLayout.add_widget(MyLabel(text=perm + ':' +str(check_permission(perm)), font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
             if api_version > 29:
                 if (Environment.isExternalStorageManager() == False):
-                    permissionErrorLayout.add_widget(MyLabel(text='FILES_ACCESS_PERMISSION : False', font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
+                    permissionErrorLayout.add_widget(MyLabel(text='FILES_ACCESS_PERMISSION : False', font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
                     permissionIsGranted = False
             if api_version == 29:
                 if (Environment.isExternalStorageLegacy() == False):
-                    permissionErrorLayout.add_widget(MyLabel(text='LegacyExternalStorage : False', font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
+                    permissionErrorLayout.add_widget(MyLabel(text='LegacyExternalStorage : False', font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
                     permissionIsGranted = False
-            permissionErrorLayout.add_widget(MyLabel(text='Android api: ' + str(api_version), font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
-            permissionErrorLayout.add_widget(MyLabel(text='Version: ' + str(__version__), font_size=(fs*0.9,  'sp'), height=(fs*1.4,  'sp'), multiline=True, size_hint=(1, 1)))
+            permissionErrorLayout.add_widget(MyLabel(text='Android api: ' + str(api_version), font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
+            permissionErrorLayout.add_widget(MyLabel(text='Version: ' + str(__version__), font_size=(fs*0.9), height=(fs*1.4), multiline=True, size_hint=(1, 1)))
             permissionErrorLayout.add_widget(MyButton(text='Click to exit and check permissions!!!', valign = 'middle', halign = 'center', size_hint=(1, 1), font_size=fs*1.5, height=fs*3, on_press=exit))
             if (permissionIsGranted == False):
                 return permissionErrorLayout
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
-        pycl = MyLabel(text='PyClip3', height=(fs*3,  'sp'), font_size=(fs*2,  'sp'), bgcolor = (0.5, 0.5, 0, 1))
+        pycl = MyLabel(text='PyClip3', height=(fs*3), font_size=fs*2, bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
-        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5,  'sp'), height=(fs,  'sp'), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
+        layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
             self.archive = str(mod_globals.db_archive_file).rpartition('/')[2]
@@ -462,12 +463,12 @@ class screenConfig(App):
         if self.archive == 'None':
             self.archive = 'NOT BASE'
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
-            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5,  'sp')), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
+            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5)), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
             return popup
-        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5,  'sp'), height=(fs,  'sp'), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
-        termbtn = MyButton(text='MACRO', height=(fs*2,  'sp'), on_press=self.term)
-        check = MyButton(text='Check ELM327', height=(fs*4,  'sp'), on_press=self.check_elm)
-        gobtn = MyButton(text='START', height=(fs*2.5,  'sp'), on_press=self.finish)
+        layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
+        termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
+        check = MyButton(text='Check ELM327', height=(fs*4), on_press=self.check_elm)
+        gobtn = MyButton(text='START', height=(fs*2.5), on_press=self.finish)
         layout.add_widget(gobtn)
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
@@ -485,7 +486,7 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('KWP Force SlowInit', mod_globals.opt_si))
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=(fs*0.5,  'sp'), height=(fs*0.7,  'sp')))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=(fs*0.5), height=(fs*0.7)))
         self.lay = layout
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
@@ -593,7 +594,7 @@ def main():
             se.chooseModel(mod_globals.opt_car)
         se.scanAllEcus()
     fs = mod_globals.fontSize
-    lbltxt = MyLabel(text='Loading language', font_size=(fs*2,  'sp'), size_hint=(1, 1))
+    lbltxt = MyLabel(text='Loading language', font_size=fs*2, size_hint=(1, 1))
     popup_load = MyPopup(title='Status', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
     base.runTouchApp(embedded=True)
     popup_load.open()
@@ -621,7 +622,7 @@ def main():
             pickle.dump(ecu, open(ecucashfile, 'wb'))
         ecu.initELM(elm)
         if mod_globals.opt_demo:
-            lbltxt = MyLabel(text='Loading dump', font_size=(fs*2,  'sp'), size_hint=(1, 1))
+            lbltxt = MyLabel(text='Loading dump', font_size=fs*2, size_hint=(1, 1))
             popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()
@@ -633,7 +634,7 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
-            lbltxt = MyLabel(text='Save dump', font_size=(fs*2,  'sp'), size_hint=(1, 1))
+            lbltxt = MyLabel(text='Save dump', font_size=fs*2, size_hint=(1, 1))
             popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
             base.runTouchApp(embedded=True)
             popup_init.open()

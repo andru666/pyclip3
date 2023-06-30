@@ -141,16 +141,16 @@ class MyLabelGreen(ButtonBehavior, Label):
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'font_size' not in kwargs:
-            self.font_size = (fs*0.8,  'sp')
-        else:
-            self.font_size = (self.font_size,  'sp')
+            self.font_size = fs*0.8
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb + 1
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
-            self.height = (lines * self.font_size * 1.3,  'sp')
+            self.height = lines * self.font_size * 1.3
+        self.height = kivy.metrics.dp(self.height)
+        self.font_size = kivy.metrics.dp(self.font_size)
         
     def on_size(self, *args):
         self.canvas.before.clear()
@@ -171,10 +171,7 @@ class MyLabelBlue(ButtonBehavior, Label):
         if 'halign' not in kwargs:
             self.halign = 'left'
         if 'font_size' not in kwargs:
-            self.font_size = (fs*0.8,  'sp')
-        else:
-            self.font_size = (self.font_size,  'sp')
-        
+            self.font_size = fs*0.8
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
@@ -183,7 +180,9 @@ class MyLabelBlue(ButtonBehavior, Label):
             if lines < simb: lines = simb + 1
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
-            self.height = (lines * self.font_size * 1.3,  'sp')
+            self.height = lines * self.font_size * 1.3
+        self.height = kivy.metrics.dp(self.height)
+        self.font_size = kivy.metrics.dp(self.font_size)
         self.clicked = False
 
     def on_size(self, widget, size):
@@ -444,7 +443,7 @@ class ECU():
         modelid = self.ecudata['ModelId'].replace('XML', 'xml')
         mdom = mod_zip.get_xml_file(modelid)
         mdoc = mdom.documentElement
-        lbltxt = MyLabel(text='Loading languages', font_size=(fs * 1.5, 'sp'), size_hint=(1, 1))
+        lbltxt = MyLabel(text='Loading languages', font_size=fs * 1.5, size_hint=(1, 1))
         popup_init = MyPopup(title='Initializing', content=lbltxt)
         base.runTouchApp(embedded=True)
         popup_init.open()
