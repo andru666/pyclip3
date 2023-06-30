@@ -29,10 +29,9 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
-print(kivy.metrics.Metrics.dpi)
 
 __all__ = 'install_android'
-__version__ = '0.01.36'
+__version__ = '0.01.37'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':

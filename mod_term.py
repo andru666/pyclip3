@@ -138,7 +138,7 @@ class MyApp(App):
                 file_macro = str(self.fichoo.selection[0].rsplit('/', 1)[1])
         except:
             self.MaLabel('Not select macro')
-            self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=(s*5, on_release=self.exits))
+            self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*5, on_release=self.exits))
             return 
         self.label.text = str('File macro select: ' + file_macro)
         mod_globals.opt_log = file_macro.replace('.cmd', '.txt')
