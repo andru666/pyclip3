@@ -122,7 +122,7 @@ if mod_globals.os == 'android':
     mod_globals.csv_dir = user_datadir + '/csv/'
     import sys
     mod_globals.scen_dir = user_datadir + '/pyren/scen/'
-    sys.path.append(scen_dir)
+    sys.path.append(mod_globals.scen_dir)
 
 elif mod_globals.os == 'nt':
     import pip
