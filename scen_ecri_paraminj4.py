@@ -9,7 +9,7 @@ from kivy.uix.textinput import TextInput
 from collections import OrderedDict
 import xml.dom.minidom
 import xml.etree.cElementTree as et
-не работает
+#не работает
 class Scenarii(App):
     global fs
     fs = mod_globals.fontSize
