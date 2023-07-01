@@ -11,7 +11,7 @@ from xml.dom.minidom import parse
 from collections import OrderedDict
 import xml.dom.minidom
 import pickle
-from mod_utils import Choice, ChoiceLong, pyren_encode, DBG, MyPopup
+from mod_utils import *
 import mod_zip
 import mod_elm as m_elm
 import mod_globals
@@ -257,7 +257,7 @@ class ScanEcus():
             self.scanAllEcus()
         if len(self.detectedEcus) == 0:
             label = Label(text='No ECU detected\n nothing to do')
-            popup = Popup(title='Problem', content=label, size=(400, 300), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
+            popup = Popup(title='Problem', content=label, size=(400, 300), size_hint=(None, None), on_dismiss=exit)
             popup.open()
             base.runTouchApp()
             exit(2)

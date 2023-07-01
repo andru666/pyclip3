@@ -34,6 +34,20 @@ def InfoPopup(bas=None):
     if not bas:
         base.stopTouchApp()
 
+def MyPopup_close(title='', cont=True, lang=True):
+    fs = mod_globals.fontSize
+    layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
+    if not lang:
+        t = 'CLOSE'
+    else:
+        t = get_message_by_id('16831')
+    btn = MyButton(text=t, size_hint=(1, None), font_size=fs*2)
+    layout.add_widget(cont)
+    layout.add_widget(btn)
+    pop = MyPopup(title=title, content=layout)
+    pop.open()
+    btn.bind(on_press=pop.dismiss)
+
 class MyTextInput(TextInput):
     def __init__(self, **kwargs):
         fs = mod_globals.fontSize
@@ -61,11 +75,6 @@ class MyPopup(Popup):
     close = ''
     def __init__(self, **kwargs):
         fs = mod_globals.fontSize
-        if 'close' in kwargs:
-            self.close = kwargs['close']
-            del kwargs ['close']
-        else:
-            self.close = False
         super(MyPopup, self).__init__(**kwargs)
         if 'title' not in kwargs:
             self.title='INFO'
@@ -80,12 +89,6 @@ class MyPopup(Popup):
         if 'size_hint' not in kwargs:
             self.size_hint=(None, None)
             self.size=(Window.size[0]*0.9, Window.size[1]*0.9)
-        if self.close:
-            layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
-            btn = MyButton(text='CLOSE', height=fs*3, on_press=self.dismiss, size_hint=(1, 0.3))
-            layout.add_widget(MyLabel(text=self.content.text, font_size=self.content.font_size, size_hint=(1, 1)))
-            layout.add_widget(btn)
-            self.content=layout
 
 class MyButton(Button):
     def __init__(self, **kwargs):
@@ -108,6 +111,7 @@ class MyButton(Button):
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
+            if 2 < lines < 3: lines = 3
             if lines < 2: lines = 2.5
             self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
@@ -311,13 +315,13 @@ def get_message(ScmParam, msg):
     else:
         value = msg
     if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-        value = pyren_encode(mod_globals.language_dict[value])
+        value = (mod_globals.language_dict[value])
     return value
 
 def get_message_by_id(id):
     if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-        value = pyren_encode(mod_globals.language_dict[id])
-    return value
+        value = (mod_globals.language_dict[id])
+        return value
 
 def hex_VIN_plus_CRC(VIN, plusCRC=True):
     VIN = VIN.upper()

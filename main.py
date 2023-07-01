@@ -31,7 +31,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.37'
+__version__ = '0.01.38'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -165,7 +165,7 @@ def my_excepthook(excType, excValue, tb):
     if mod_globals.os == 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
-    popup = MyPopup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), auto_dismiss=True, on_dismiss=exit)
+    popup = MyPopup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), on_dismiss=exit)
     popup.open()
     base.runTouchApp()
     exit(2)
@@ -232,12 +232,12 @@ class screenConfig(App):
 
     def make_opt_ecuid(self,active, callback = None):
         str1 = 'OPT ecuid'
-        label = MyLabel(text=str1, halign='left', size_hint=(0.3, None), bgcolor = (0.5, 0.5, 0, 1))
+        label = MyLabel(text=str1, halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         if mod_globals.opt_ecu:
             iText = mod_globals.opt_ecu
         else:
             iText = ''
-        ti = MyTextInput(text=iText, size_hint=(0.5, None), multiline=False)
+        ti = MyTextInput(text=iText, size_hint=(0.45, None), multiline=False)
         self.textInput[str1] = ti
         sw = Switch(active=active, size_hint=(0.2, None))
         if callback:
@@ -406,15 +406,18 @@ class screenConfig(App):
                     mod_globals.opt_dev_address = bt_device[-1]
                 mod_globals.bt_dev = self.mainbutton.text
         self.settings.save()
+        lang = get_lang_dict(mod_globals.opt_lang)
+        if lang:
+            mod_globals.language_dict = lang
         fs = mod_globals.fontSize
         if not mod_globals.opt_port and not mod_globals.opt_demo:
-            MyPopup(content=MyLabel(text='Not select ELM!', font_size=(fs*3)), close=True).open()
+            MyPopup_close(cont=MyLabel(text='Not select ELM!', font_size=(fs*3), size_hint = (1, 0.7)))
         elif mod_globals.opt_lang == 'SELECT':
-            MyPopup(content=MyLabel(text='Not select language!', font_size=(fs*3)), close=True).open()
+            MyPopup_close(cont=MyLabel(text='Not select language!', font_size=(fs*3), size_hint = (1, 0.7)), lang=False)
         elif not mod_globals.savedEcus and not mod_globals.opt_scan and not mod_globals.opt_ecuid_on and not os.path.exists(mod_globals.user_data_dir + '/' + mod_globals.savedEcus):
-            MyPopup(content=MyLabel(text='Not select savedEcus!', font_size=(fs*3)), close=True).open()
+            MyPopup_close(cont=MyLabel(text='Not select savedEcus!', font_size=(fs*3), size_hint = (1, 0.7)))
         elif mod_globals.opt_ecuid_on and not mod_globals.opt_ecuid:
-            MyPopup(content=MyLabel(text='Not enter ECU!', font_size=(fs*3)), close=True).open()
+            MyPopup_close(cont=MyLabel(text='Not enter ECU!', font_size=(fs*3), size_hint = (1, 0.7)))
         else:
             self.stop()
 
@@ -462,7 +465,7 @@ class screenConfig(App):
         if self.archive == 'None':
             self.archive = 'NOT BASE'
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
-            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5)), size=(Window.size[0], Window.size[1]), size_hint=(None, None), auto_dismiss=True)
+            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5)), size=(Window.size[0], Window.size[1]), size_hint=(None, None))
             return popup
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
@@ -558,7 +561,7 @@ def main():
             Check your ELM connection and try again.
         '''
         lbltxt = MyLabel(text=labelText, font_size=mod_globals.fontSize)
-        popup_load = MyPopup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), auto_dismiss=True, on_dismiss=exit)
+        popup_load = MyPopup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
         exit(2)"""
@@ -599,9 +602,6 @@ def main():
     popup_load.open()
     base.EventLoop.idle()
     sys.stdout.flush()
-    lang = get_lang_dict(mod_globals.opt_lang)
-    if lang:
-        mod_globals.language_dict = lang
     base.EventLoop.window.remove_widget(popup_load)
     popup_load.dismiss()
     base.stopTouchApp()

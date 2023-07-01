@@ -9,7 +9,7 @@ from kivy.uix.textinput import TextInput
 from collections import OrderedDict
 import xml.dom.minidom
 import xml.etree.cElementTree as et
-
+не работает
 class Scenarii(App):
     global fs
     fs = mod_globals.fontSize
@@ -42,13 +42,13 @@ class Scenarii(App):
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label
-        root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
+        root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, None))
         root.bind(minimum_height=root.setter('height'))
         root.add_widget(MyLabel(text=header))
-        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Title'), bgcolor=(1, 1, 0, 0.3)))
-        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Subtitle'), bgcolor=(1, 0.3, 0, 0.3)))
-        root.add_widget(self.info('Informations', 'InformationsContent'))
-        root.add_widget(self.button_yes_no(False, self.resetValues))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Title'), font_size=fs, bgcolor=(1, 1, 0, 0.3)))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'Subtitle'), font_size=fs*1.5, bgcolor=(1, 0.3, 0, 0.3)))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'InformationsContent'), font_size=fs*2, bgcolor=(1, 0, 0, 0.3)))
+        root.add_widget(MyButton(text=get_message(self.ScmParam, 'Yes'), on_press=self.resetValues))
         root.add_widget(MyButton(text=get_message(self.ScmParam, '6218'), on_press=self.stop))
         rot = ScrollView(size_hint=(1, 1))
         rot.add_widget(root)
@@ -86,8 +86,8 @@ class Scenarii(App):
         self.popup.dismiss()
         self.lbltxt = Label(text=get_message(self.ScmParam, 'CommandInProgress'))
         response = ''
-        popup = MyPopup(title='STATUS', content=self.lbltxt)
-        popup.open()
+        #popup = MyPopup(title=get_message(self.ScmParam, 'Informations'), content=self.lbltxt)
+        #popup.open()
         time.sleep(5)
         base.EventLoop.idle
         for name, value in self.ScmSet['CommandParameters'].items():
@@ -108,20 +108,13 @@ class Scenarii(App):
         self.lbltxt = MyLabel(text=get_message(self.ScmParam, 'CommandInProgress'))
         layout.add_widget(self.lbltxt)
         layout.add_widget(MyButton(text=get_message(self.ScmParam, '1926'), on_press=self.reset_Values))
-        self.popup = MyPopup(title='STATUS', content=layout)
+        self.popup = MyPopup(title=get_message(self.ScmParam, 'Informations'), content=layout)
         self.popup.open()
-         
-        
-    def button_yes_no(self, no=True, yes=None):
-        layout = BoxLayout(orientation='vertical', spacing=15, size_hint=(1, 1))
-        if yes: layout.add_widget(MyButton(text=get_message(self.ScmParam, 'Yes'), on_press=yes))
-        if no: layout.add_widget(MyButton(text=get_message(self.ScmParam, 'No'), on_press=self.stop))
-        return layout
 
     def info(self, info, message):
-        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        layout.add_widget(MyLabel(text=get_message(self.ScmParam, info), bgcolor=(0.3, 0.3, 0, 0.3)))
-        layout.add_widget(MyLabel(text=get_message(self.ScmParam, message), bgcolor=(1, 0, 0, 0.3)))
+        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, None))
+        layout.add_widget()
+        layout.add_widget()
         return layout
 
 def run(elm, ecu, command, data):

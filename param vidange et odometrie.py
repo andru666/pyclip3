@@ -278,7 +278,7 @@ class Scenarii(App):
         layout_popup.add_widget(MyLabel(text=pyren_encode(self.get_message('804'))+' - '+pyren_encode(self.phase), size_hint=(1, 0.2), bgcolor=(1, 1, 0, 0.3)))
         layout_popup.add_widget(MyLabel(text=pyren_encode(self.get_message('23819'))+' :\n '+pyren_encode(self.result), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
         layout_popup.add_widget(Button(text=self.get_message('1053'), on_press=self.finish, size_hint=(1, None), height=80))
-        popup = Popup(title=self.get_message('TextCommandFinished'), auto_dismiss=True, content=layout_popup, size=(500, 500), size_hint=(None, None))
+        popup = Popup(title=self.get_message('TextCommandFinished'), content=layout_popup, size=(500, 500), size_hint=(None, None))
         self.need_update = False
         popup.open()
 

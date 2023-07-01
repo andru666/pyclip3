@@ -232,7 +232,7 @@ class kivyExecCommand(App):
         popup2 = MyPopup(title='Working', content=lbltxt)
         popup2.open()
         EventLoop.idle()
-        responses = 'Response :\n'
+        responses = get_message_by_id('775') + ' :\n'
         i = 0
         for si in self.command.serviceID:
             service = self.ecu.Services[si]
@@ -279,17 +279,16 @@ class kivyExecCommand(App):
 
         popup2.dismiss()
         if error:
-            popup = MyPopup(title='ERROR', title_align='center', close=True, content=MyLabel(text=error, font_size=fs*2, size_hint=(1, 1)))
+            MyPopup_close(get_message_by_id('8017'), MyLabel(text=error, font_size=fs*2, size_hint=(1, 1)))
         else:
-            popup = MyPopup(title='Done', title_align='center', close=True, content=MyLabel(text=responses, font_size=fs*2, size_hint=(1, 1)))
-        popup.open()
+            MyPopup_close(get_message_by_id('19532'), MyLabel(text=responses, font_size=fs*2, size_hint=(1, 1)))
 
     def exec_command(self, instance):
         self.chosenParameter = instance.paramid
         box = BoxLayout(orientation='vertical', padding=10)
-        self.popup = MyPopup(title='Proceed ?', title_size=30, title_align='center', content=box, size_hint=(0.7, 0.7), auto_dismiss=True)
-        box.add_widget(MyButton(text='ACCEPT', size_hint=(1, 1), on_press=self.popup_validate))
-        box.add_widget(MyButton(text='CANCEL', size_hint=(1, 1), on_press=self.popup.dismiss))
+        self.popup = MyPopup(title=get_message_by_id('4405') + ' ?', title_size=30, title_align='center', content=box, size_hint=(0.7, 0.7))
+        box.add_widget(MyButton(text=get_message_by_id('227'), size_hint=(1, 1), on_press=self.popup_validate))
+        box.add_widget(MyButton(text=get_message_by_id('1053'), size_hint=(1, 1), on_press=self.popup.dismiss))
         self.popup.open()
 
     def build_datarefs(self, layout):
@@ -375,9 +374,9 @@ class kivyExecCommand(App):
                 lines = 20
             prelabel = MyTextInput(text=(self.command.prerequisite), multiline=True, readonly=True, foreground_color=[1, 0, 0, 1], background_color=[0, 0, 0, 1])
             layout.add_widget(prelabel)
-        layout.add_widget(self.make_box('name', self.command.name))
+        layout.add_widget(self.make_box(get_message_by_id('983'), self.command.name))
         layout.add_widget(self.make_box('label', (self.command.label)))
-        layout.add_widget(self.make_box('scenario', self.command.scenario))
+        layout.add_widget(self.make_box(get_message_by_id('4415'), self.command.scenario))
         has_scenario = False
         if self.command.scenario:
             has_scenario = True

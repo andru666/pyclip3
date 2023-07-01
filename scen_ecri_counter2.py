@@ -73,18 +73,15 @@ class Scenarii(App):
             for sid in fap_command_sids:
                 if len(self.ecu.Services[sid].params):
                     if (len(self.ecu.Services[sid].startReq + paramsToSend)/2 != params_to_send_length):
-                        ch = missing_data_message + "\n\nPress ENTER to exit"
-                        popup = MyPopup(title='STATUS', content=MyLabel(text=ch, font_size=fs*1.5, size_hint=(1, 1)), close=True)
-                        popup.open()
+                        ch = missing_data_message + "\n\nPress to exit"
+                        MyPopup_close(get_message_by_id('804'), MyLabel(text=ch, font_size=fs*1.5, size_hint=(1, 1)))
                         return
         response = self.ecu.run_cmd(self.ScmParam['Cmde1'], paramsToSend)
         if 'NR' in response:
             ch = get_message(self.ScmParam, 'CommandImpossible')
         else:
             ch = get_message(self.ScmParam, 'CommandFinished')
-        
-        popup = MyPopup(title='STATUS', content=MyLabel(text=ch, font_size=fs*1.5, size_hint=(1, 1)), close=True)
-        popup.open()
+        MyPopup_close(get_message_by_id('804'), MyLabel(text=ch, font_size=fs*1.5, size_hint=(1, 1)))
 
 def run(elm, ecu, command, data):
     app = Scenarii(elm=elm, 

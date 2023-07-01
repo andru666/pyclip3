@@ -81,13 +81,11 @@ class Scenarii(App):
     def write_vin(self, instance):
         vin = self.vin_input.text.upper()
         if not (len(vin) == 17 and 'I' not in vin and 'O' not in vin):
-            popup_w = MyPopup(title=get_message(self.ScmParam, 'text_33973'), content=MyLabel(text=get_message(self.ScmParam, 'text_29121'), font_size=fs*1.5), close=True)
-            popup_w.open()
+            MyPopup_close(get_message(self.ScmParam, 'text_33973'), MyLabel(text=get_message(self.ScmParam, 'text_29121'), size_hint=(1, 1), font_size=fs*1.5))
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
         self.ecu.run_cmd(self.ScmParam['pdd_VP-4-41'], vin_crc)
-        popup_w = MyPopup(title=get_message(self.ScmParam, 'text_9234'), content=MyLabel(text=get_message(self.ScmParam, 'text_41453'), font_size=fs*1.5), close=True)
-        popup_w.open()
+        MyPopup_close(get_message(self.ScmParam, 'text_9234'), MyLabel(text=get_message(self.ScmParam, 'text_41453'), size_hint=(1, 1), font_size=fs*1.5))
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))

@@ -207,7 +207,7 @@ class Scenario(App):
         else: S2 = Window.size[1]*S2
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
         root.add_widget(message)
-        self.popup_O = Popup(title=title, content=root, auto_dismiss=True, size=(S1, S2), size_hint=(None, None))
+        self.popup_O = Popup(title=title, content=root, size=(S1, S2), size_hint=(None, None))
         self.popup_O.open()
 
     def make_box_params(self, parameter_name, value):

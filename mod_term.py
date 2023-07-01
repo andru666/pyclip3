@@ -117,7 +117,7 @@ class MyApp(App):
         self.fichoo = FileChooserListView(path=self.dir_macro)
         root.add_widget(self.fichoo)
         root.add_widget(Button(text='Open', on_release=self.popp, size_hint=(1, None)))
-        self.popup_macro = Popup(title='SELECT macro', font_size=fs, content=root, size=(600, 600), auto_dismiss=True)
+        self.popup_macro = Popup(title='SELECT macro', font_size=fs, content=root, size=(600, 600))
         self.popup_macro.open()
 
     def popp(self, instance):
@@ -162,7 +162,7 @@ class MyApp(App):
             lbltxt = Label(text=labelText, font_size=mod_globals.fontSize)
             root.add_widget(lbltxt)
             root.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*5, on_release=self.exits))
-            popup_load = Popup(title='ELM connection error', content=root, size=(800, 800), auto_dismiss=True)
+            popup_load = Popup(title='ELM connection error', content=root, size=(800, 800))
             popup_load.open()
             base.runTouchApp()
             return
@@ -208,7 +208,7 @@ class MyApp(App):
             if auto_macro in list(macro.keys()):
                 self.play_macro(auto_macro, self.elm)
             else:
-                self.popup = Popup(title='ERROR', content=MyLabel(text=str('Error: unknown macro name: ' + auto_macro)), size=(400, 400), size_hint=(None, None), auto_dismiss=True)
+                self.popup = Popup(title='ERROR', content=MyLabel(text=str('Error: unknown macro name: ' + auto_macro)), size=(400, 400), size_hint=(None, None))
                 self.popup.open()
 
         while self.macros:
@@ -242,7 +242,7 @@ class MyApp(App):
         
     def open_pop(self, instance):
         lbltxt = MyLabel(text=instance)
-        popup_load = Popup(title='ELM connection error', content=lbltxt, size=(800, 800), auto_dismiss=True)
+        popup_load = Popup(title='ELM connection error', content=lbltxt, size=(800, 800))
         popup_load.open()
     
     def init_macro(self):

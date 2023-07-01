@@ -26,7 +26,8 @@ def playScenario(command, ecu, elm):
         ecuNumberIndex = ecuNumberPattern.search(scenarioData)
         scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))].lower()
         scenarioData = 'ecudata/'+scenarioData.lower()
-    if scenarioName == 'scen_ecri_paraminj4':
+    print(scenarioName)
+    if scenarioName == 'du code vin':
         if scenarioName.endswith('_ecu'):
             scen = __import__(scenarioName[:len(scenarioName)-4])
         elif scenarioName.endswith('_const'):
@@ -36,7 +37,7 @@ def playScenario(command, ecu, elm):
         scen.run(elm, ecu, command, scenarioData)
         return True
     else:    
-        try:
+        if True:
             if scenarioName.endswith('_ecu'):
                 scen = __import__(scenarioName[:len(scenarioName)-4])
             elif scenarioName.endswith('_const'):
@@ -45,7 +46,7 @@ def playScenario(command, ecu, elm):
                 scen = __import__(scenarioName)
             scen.run(elm, ecu, command, scenarioData)
             return True
-        except:
+        else:
             scen = __import__('show_scen')
             scen.run(elm, ecu, command, scenarioData)
             return True

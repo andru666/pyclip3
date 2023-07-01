@@ -220,7 +220,7 @@ class Scenarii(App):
         layout_popup.add_widget(MyLabel(text=(self.get_message_by_id('804'))+' - '+(self.phase), size_hint=(1, 0.2), bgcolor=(1, 1, 0, 0.3)))
         layout_popup.add_widget(MyLabel(text=(self.get_message_by_id('23819'))+' :\n '+(self.result), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
         layout_popup.add_widget(Button(text=self.get_message_by_id('1053'), on_press=self.finish, size_hint=(1, None), height=80))
-        popup = Popup(title=self.get_message('TextCommandFinished'), auto_dismiss=True, content=layout_popup, size=(500, 500), size_hint=(None, None))
+        popup = Popup(title=self.get_message('TextCommandFinished'), content=layout_popup, size=(500, 500), size_hint=(None, None))
 
         popup.open()
 

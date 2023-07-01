@@ -320,7 +320,7 @@ class Scenario(App):
         
         if "ERROR" in paramToSend:
             lbltxt.text = "Data downloading went wrong. Aborting."
-            popup = Popup(title=self.CLIP, auto_dismiss=True, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+            popup = Popup(title=self.CLIP, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
             popup.open()
             return
         
@@ -329,7 +329,7 @@ class Scenario(App):
         else:
             lbltxt.text += self.get_message('Message31')
         layout.add_widget(lbltxt)
-        popup = Popup(title=self.CLIP, auto_dismiss=True, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+        popup = Popup(title=self.CLIP, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
         popup.open()
 
     def afterEcuChange(self, instance):
@@ -362,7 +362,7 @@ class Scenario(App):
             layout.add_widget(self.mileage)
             self.AECbutton = Button(text=self.get_message('1926'), id='0', on_press=self.afterEcuChange, size_hint=(1, None), height=fs*4)
         layout.add_widget(self.AECbutton)
-        self.popup_afterEcuChange = Popup(title=(self.Buttons[button]), auto_dismiss=True, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
+        self.popup_afterEcuChange = Popup(title=(self.Buttons[button]), content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
         self.popup_afterEcuChange.open()
         
     def set_GlowPlugsType(self, instance):
@@ -375,7 +375,7 @@ class Scenario(App):
         command, paramToSend = self.getValuesFromEcu(params)
         if "ERROR" in paramToSend:
             lbltxt.text = "Data downloading went wrong. Aborting."
-            popup = Popup(title=self.CLIP, auto_dismiss=True, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+            popup = Popup(title=self.CLIP, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
             popup.open()
             return
         
@@ -387,7 +387,7 @@ class Scenario(App):
         else:
             lbltxt.text += self.get_message('Message31')
         layout.add_widget(lbltxt)
-        popup = Popup(title=self.CLIP, auto_dismiss=True, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+        popup = Popup(title=self.CLIP, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
         popup.open()
         
 
@@ -408,7 +408,7 @@ class Scenario(App):
         layout.add_widget(layout_box)
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
         root.add_widget(layout)
-        self.popup_setGlowPlugsType = Popup(title=(self.Buttons[self.functions[7][1]]), auto_dismiss=True, content=root, size=Window.size, size_hint=(None, None))
+        self.popup_setGlowPlugsType = Popup(title=(self.Buttons[self.functions[7][1]]), content=root, size=Window.size, size_hint=(None, None))
         self.popup_setGlowPlugsType.open()    
 
     def reset_Values(self, instance):
@@ -422,7 +422,7 @@ class Scenario(App):
         command, paramToSend = self.getValuesFromEcu(params)
         if "ERROR" in paramToSend:
             lbltxt.text = "Data downloading went wrong. Aborting."
-            popup = Popup(title=self.CLIP, auto_dismiss=True, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+            popup = Popup(title=self.CLIP, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
             popup.open()
             return
         lbltxt.text = self.get_message('CommandFinishedMessage')
@@ -436,7 +436,7 @@ class Scenario(App):
         else:
             lbltxt.text += self.get_message('Message31')
         layout.add_widget(lbltxt)
-        popup = Popup(title=self.CLIP, auto_dismiss=True, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+        popup = Popup(title=self.CLIP, content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
         popup.open()
 
     def resetValues(self, instance):
@@ -476,13 +476,13 @@ class Scenario(App):
         layout.add_widget(layout_box)
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
         root.add_widget(layout)
-        self.popup_resetValues = Popup(title=(self.Buttons[button]), auto_dismiss=True, content=root, size=Window.size, size_hint=(None, None))
+        self.popup_resetValues = Popup(title=(self.Buttons[button]), content=root, size=Window.size, size_hint=(None, None))
         self.popup_resetValues.open()
 
     def resetInjetorsData(self, instance):
         response = ''
         lbltxt = Label(text=self.get_message('CommandInProgressMessage'))
-        popup = Popup(title=self.CLIP, auto_dismiss=True, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
+        popup = Popup(title=self.CLIP, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.5), size_hint=(None, None))
         popup.open()
         EventLoop.idle()
         response = self.ecu.run_cmd(self.functions[1][1][instance.id])

@@ -5,7 +5,6 @@ from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
 
 class Scenarii(App):
     global fs
@@ -101,64 +100,53 @@ class Scenarii(App):
         nbCC = int(self.ScmParam['nbCaractereCode'])
         if nbCC !=6 and nbCC !=7 and nbCC !=16:
             ch = 'Error nbCaractereCode in scenario xml'
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
 
         isHEX = int(self.ScmParam['FormatHexadecimal'])
         if isHEX != 0 and isHEX != 1:
             ch = get_message(self.ScmParam, 'Error FormatHexadecimal in scenario xml')
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
 
         prmCHAR = self.ScmParam['PermittedCharacters']
         if len(prmCHAR) << 16 and len(prmCHAR) >> 33:
             ch = 'Error PermittedCharacters in scenario xml'
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         while not (all (c in prmCHAR for c in ch1.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch2.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre2')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch3.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre3')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch4.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre4')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if not len(ch1)==nbCC:
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' '))
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch2)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre2') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch3)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre3') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch4)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre4') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if isHEX == 1:
@@ -167,25 +155,21 @@ class Scenarii(App):
             inj_code = ASCIITOHEX(chk.upper())
         else:
             ch = get_message(self.ScmParam, 'TexteErreurInit')
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if isHEX == 1 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)):
             ch = 'Hexdata check failed.'
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         elif isHEX == 0 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)) :
             ch = 'ASCII check failed.'
-            popup = MyPopup(title=status, close=True, content=MyLabel(text=ch, font_size=fs*1.5, halign='center'))
-            popup.open()
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         else:
             ch = get_message(self.ScmParam, 'CommandeTerminee')
             self.ecu.run_cmd(self.ScmParam['EcritureCodeInjecteur'], inj_code)
-            popup = MyPopup(title=get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), content=MyLabel(text=ch, font_size=fs*2, halign='center'), close=True)
-            popup.open()
+            MyPopup_close(get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), MyLabel(text=ch, size_hint=(1, 1), font_size=fs*1.5, halign='center'))
             return None
 
 def run(elm, ecu, command, data):

@@ -62,13 +62,11 @@ class VinWrite(App):
     def write_vin(self, instance):
         vin = self.vin_input.text.upper()
         if not (len(vin) == 17 and 'I' not in vin and 'O' not in vin):
-            popup = MyPopup(title=get_message(self.ScmParam, 'MessageBoxERREUR'), content=Label(text=get_message(self.ScmParam, 'MessageBox2')), close=True)
-            popup.open()
+            MyPopup_close(get_message(self.ScmParam, 'MessageBoxERREUR'), MyLabel(text=get_message(self.ScmParam, 'MessageBox2'), size_hint=(1, 1), font_size=fs*2))
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
         self.ecu.run_cmd(self.ScmParam['ConfigurationName'], vin_crc)
-        popup = MyPopup(title=get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT'), content=Label(text=get_message(self.ScmParam, 'confFin_text')), close=True)
-        popup.open()
+        MyPopup_close(get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT'), MyLabel(text=get_message(self.ScmParam, 'confFin_text'), size_hint=(1, 1), font_size=fs*2))
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
