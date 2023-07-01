@@ -14,13 +14,6 @@ if platform != 'android':
     Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/4))
 import traceback, time, mod_globals
 from kivy.core.window import Window
-from mod_elm import ELM, get_devices
-from mod_zip import *
-from mod_scan_ecus import ScanEcus
-from mod_ecu import ECU
-from mod_ecu_mnemonic import *
-from mod_utils import *
-from mod_ecu_default import *
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
 from kivy.uix.scrollview import ScrollView
@@ -151,6 +144,13 @@ else:
         from serial.tools import list_ports
     except:
         pass
+from mod_elm import ELM, get_devices
+from mod_zip import *
+from mod_scan_ecus import ScanEcus
+from mod_ecu import ECU
+from mod_ecu_mnemonic import *
+from mod_utils import *
+from mod_ecu_default import *
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 argv_glob = sys.argv
