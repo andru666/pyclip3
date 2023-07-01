@@ -24,7 +24,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.38'
+__version__ = '0.01.39'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -465,7 +465,7 @@ class screenConfig(App):
         if self.archive == 'None':
             self.archive = 'NOT BASE'
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
-            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5)), size=(Window.size[0], Window.size[1]), size_hint=(None, None))
+            popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5), size_hint=(1, 1)), size_hint=(1, 1))
             return popup
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)

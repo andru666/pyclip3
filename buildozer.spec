@@ -7,7 +7,7 @@ title = PyClip3
 package.name = PyClip3
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = org.pyddt
+package.domain = org
 
 # (str) Source code where the main.py live
 source.dir = .
