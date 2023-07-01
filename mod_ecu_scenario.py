@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
 import re, os, mod_globals
 
-if mod_globals.os == 'android':
-    from jnius import autoclass
-    Environment = autoclass('android.os.Environment')
-    import sys
-    scen_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/scen/'
-    if not os.path.exists(scen_dir):
-        os.makedirs(scen_dir)
-    sys.path.append(scen_dir)
-
 def playScenario(command, ecu, elm):
     services = ecu.Services
     scenarioName, scenarioData = command.scenario.split('#')

@@ -43,6 +43,7 @@ os = ''
 language_dict = {}
 bt_dev = ''
 ecu_root = ''
+scen_dir = './'
 user_data_dir = './'
 db_archive_file = 'None'
 cache_dir = './cache/'

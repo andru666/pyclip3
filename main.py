@@ -24,7 +24,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.39'
+__version__ = '0.01.40'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -120,6 +120,9 @@ if mod_globals.os == 'android':
     mod_globals.dumps_dir = user_datadir + '/dumps/'
     mod_globals.macro_dir = user_datadir + '/macro/'
     mod_globals.csv_dir = user_datadir + '/csv/'
+    import sys
+    mod_globals.scen_dir = user_datadir + '/pyren/scen/'
+    sys.path.append(scen_dir)
 
 elif mod_globals.os == 'nt':
     import pip
@@ -537,6 +540,9 @@ def main():
         os.makedirs(mod_globals.csv_dir)
     if not os.path.exists(mod_globals.macro_dir):
         os.makedirs(mod_globals.macro_dir)
+    if not os.path.exists(mod_globals.scen_dir):
+        os.makedirs(mod_globals.scen_dir)
+    
     import glob
     zip_macro = sorted(glob.glob(os.path.join('./', 'macro.zip')), reverse=True)
     if len(zip_macro):
