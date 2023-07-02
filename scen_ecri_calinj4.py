@@ -100,53 +100,53 @@ class Scenarii(App):
         nbCC = int(self.ScmParam['nbCaractereCode'])
         if nbCC !=6 and nbCC !=7 and nbCC !=16:
             ch = 'Error nbCaractereCode in scenario xml'
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
 
         isHEX = int(self.ScmParam['FormatHexadecimal'])
         if isHEX != 0 and isHEX != 1:
             ch = get_message(self.ScmParam, 'Error FormatHexadecimal in scenario xml')
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
 
         prmCHAR = self.ScmParam['PermittedCharacters']
         if len(prmCHAR) << 16 and len(prmCHAR) >> 33:
             ch = 'Error PermittedCharacters in scenario xml'
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         while not (all (c in prmCHAR for c in ch1.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch2.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre2')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch3.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre3')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         while not (all (c in prmCHAR for c in ch4.upper())):
             ch = str(get_message(self.ScmParam, 'dat_Cylindre4')) + ' :\n' + str(get_message(self.ScmParam, 'SymbolsErrorCode'))
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if not len(ch1)==nbCC:
             ch = str(get_message(self.ScmParam, 'dat_Cylindre1')) + ' :\n' + str(get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' '))
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch2)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre2') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch3)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre3') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         if not len(ch4)==nbCC:
             ch = get_message(self.ScmParam, 'dat_Cylindre4') + ' :\n' +  get_message(self.ScmParam, 'TexteErreurCode').replace('\n', ' ')
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if isHEX == 0:
@@ -163,16 +163,16 @@ class Scenarii(App):
             inj_code = ASCIITOHEX(chk.upper())
         else:
             ch = get_message_by_id('23545')
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         
         if isHEX == 1 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)):
             ch = 'Hexdata check failed.'
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         elif isHEX == 0 and not (all (c in prmCHAR for c in chk.upper()) and (len(chk) == nbCC * 4)) :
             ch = 'ASCII check failed.'
-            MyPopup_close(status, MyLabel(text=ch, font_size=fs*1.5, halign='center'))
+            MyPopup_close(status, MyLabel(text=ch, size_hint=(1, 1), font_size=fs, halign='center'))
             return None
         else:
             ch = get_message(self.ScmParam, 'CommandeTerminee')
@@ -180,7 +180,7 @@ class Scenarii(App):
             self.ecu.run_cmd(self.ScmParam['Cmde2'], inj_code2)
             self.ecu.run_cmd(self.ScmParam['Cmde3'], inj_code3)
             self.ecu.run_cmd(self.ScmParam['Cmde4'], inj_code4)
-            MyPopup_close(get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), MyLabel(text=ch, font_size=fs*2, halign = 'center'))
+            MyPopup_close(get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), MyLabel(text=ch, size_hint=(1, 1), font_size=fs*1.5, halign = 'center'))
             return None
 
 def run(elm, ecu, command, data):

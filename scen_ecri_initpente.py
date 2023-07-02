@@ -60,10 +60,10 @@ class Scenarii(App):
         codemr, label, value, unit = self.ecu.get_pr(self.ScmParam['ParametreInclinaison'], True)
         key = '%s - %s' % (codemr, label)
         value = '%s %s' % (value, unit)
-        layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
-        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        lb1 = MyLabel(text=key, font_size=fs, size_hint=(0.6, None), bgcolor=(0, 0, 1, 0.3))
-        lb2 = MyLabel(text=value, font_size=fs, size_hint=(0.4, None), bgcolor=(0, 1, 0, 0.3))
+        layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, 1))
+        layout_current = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        lb1 = MyLabel(text=key, font_size=fs, size_hint=(0.6, 1), bgcolor=(0, 0, 1, 0.3))
+        lb2 = MyLabel(text=value, font_size=fs, size_hint=(0.4, 1), bgcolor=(0, 1, 0, 0.3))
         if lb1.height > lb2.height:
             layout_current.height = lb2.height = lb1.height
         else:

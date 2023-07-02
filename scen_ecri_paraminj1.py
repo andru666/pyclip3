@@ -66,7 +66,6 @@ class Scenario(App):
             self.vdiagExists = True
             if "Ncalib" in list(self.ScmParam.keys()):
                 self.ncalibExists = True
-        
         for vDiag in self.droot:
             if vDiag.attrib["name"] == "VDiag":
                 if len(list(vDiag.keys())) == 1:
@@ -97,7 +96,7 @@ class Scenario(App):
                                 startReq = self.ecu.Services[sid].startReq
                                 break
                         self.commands[param.attrib["name"]] = {"command": param.attrib["value"], "startReq": startReq}
-            
+        
         if self.vdiagExists:
             if not self.ncalibExists:
                 vdiag = ''
@@ -110,22 +109,22 @@ class Scenario(App):
                         vdiag = name[-2:]
                         buttons[name[:-2]] = self.ScmParam[name]
                     if vdiag:
-                        if name.endswith("MyButton" + vdiag):
+                        if name.endswith("Button" + vdiag):
                             buttons[name[:-2]] = self.ScmParam[name]
                 self.ecusList.append(ecus(vdiag, '', buttons))
         else:
             buttons = OrderedDict()
             found = False
             for name in list(self.ScmParam.keys()):
-                    if name == "InjectorsButton":
+                if name == "InjectorsButton":
+                    buttons[name] = self.ScmParam[name]
+                    found = True
+                if found:
+                    if name.endswith("Button"):
                         buttons[name] = self.ScmParam[name]
-                        found = True
-                    if found:
-                        if name.endswith("MyButton"):
-                            buttons[name] = self.ScmParam[name]
-                        else:
-                            found = False
-                            break
+                    else:
+                        found = False
+                        break
             self.ecusList.append(ecus('', '', buttons))
         
         if self.vdiagExists:
@@ -149,13 +148,12 @@ class Scenario(App):
                         break 
         else:
             self.correctEcu = self.ecusList[0]
-
         if not self.correctEcu and mod_globals.opt_demo:
             self.correctEcu = self.ecusList[0]
-        
         if self.vdiagExists:
             if not self.correctEcu:
-                ch = input('Unknown diagnostic version. Press ENTER to exit')
+                ch = 'Unknown diagnostic version. Press ENTER to exit'
+                MyPopup_close(cont=MyLabel(text=ch, size_hint=(1, 1)))
                 return
         
         self.identsList = OrderedDict()
@@ -212,7 +210,7 @@ class Scenario(App):
         self.sm = ScreenManager(size_hint=(1, 1))
         scr1 = ScrMsg(name='SCR1')
         self.sm.add_widget(scr1)
-        layout1 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
+        layout1 = GridLayout(cols=1, spacing=5, size_hint=(1, None))
         layout1.add_widget(self.info('Informations', 'Message1'))
         
         id_bt = 1
@@ -221,21 +219,23 @@ class Scenario(App):
             if bt == 'InjectorsButton':
                 if str(self.correctEcu.buttons[bt]) == 'true':
                     self.Buttons[1] = get_message(self.ScmParam, 'Injectors')
-                    layout1.add_widget(MyButton(text=self.Buttons[1], on_press=lambda *args: self.button_screen('SCR_INJ'), size_hint=(1, 1)))
+                    layout1.add_widget(MyButton(text=self.Buttons[1], on_press=lambda *args: self.button_screen('SCR_INJ'), size_hint=(1, None)))
             if bt == 'EGRValveButton':
                 if str(self.correctEcu.buttons[bt]) == 'true':
                     self.Buttons[2] = get_message(self.ScmParam, 'EGR_VALVE')
-                    layout1.add_widget(MyButton(text=self.Buttons[2], id=str(id_bt), on_press=self.resetValues, size_hint=(1, 1)))
+                    layout1.add_widget(MyButton(text=self.Buttons[2], id=str(id_bt), on_press=self.resetValues, size_hint=(1, None)))
             if bt == 'InletFlapButton':
                 if str(self.correctEcu.buttons[bt]) == 'true':
                     self.Buttons[3] = get_message(self.ScmParam, 'INLET_FLAP')
-                    layout1.add_widget(MyButton(text=self.Buttons[3], id=str(id_bt), on_press=self.resetValues, size_hint=(1, 1)))
-            if bt.startswith("MyButton"):
+                    layout1.add_widget(MyButton(text=self.Buttons[3], id=str(id_bt), on_press=self.resetValues, size_hint=(1, None)))
+            if bt.startswith("Button"):
                 if str(self.correctEcu.buttons[bt]) == 'true':
                     self.Buttons[int(bt.strip('MyButton'))] = get_message(self.ScmParam, bt[:-6] + "Text")
-                    layout1.add_widget(MyButton(text=self.Buttons[int(bt.strip('MyButton'))],id=str(id_bt), on_press=self.resetValues, size_hint=(1, 1)))
+                    layout1.add_widget(MyButton(text=self.Buttons[int(bt.strip('MyButton'))],id=str(id_bt), on_press=self.resetValues, size_hint=(1, None)))
             id_bt += 1
-        scr1.add_widget(layout1)
+        rot1 = ScrollView(size_hint=(1, 1))
+        rot1.add_widget(layout1)
+        scr1.add_widget(rot1)
         scr2 = ScrMsg(name='SCR_INJ')
         layout2 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
         layout2.add_widget(self.info('Informations', 'Message21'))
@@ -252,7 +252,7 @@ class Scenario(App):
         layout.add_widget(self.sm)
         root.add_widget(layout)
         root.add_widget(MyButton(text=get_message(self.ScmParam, '1053'), on_press=self.stop, size_hint=(1, None)))
-        rot = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
+        rot = ScrollView(size_hint=(1, 1))
         rot.add_widget(root)
         return rot
 
@@ -314,7 +314,7 @@ class Scenario(App):
             return commandToRun, paramToSend
 
     def info(self, info, message):
-        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 2))
+        layout = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, None))
         layout.add_widget(MyLabel(text=get_message(self.ScmParam, info), size_hint=(1, 0.3), bgcolor=(0.3, 0.3, 0, 0.3)))
         layout.add_widget(MyLabel(text=get_message(self.ScmParam, message), size_hint=(1, 0.7), bgcolor=(1, 0, 0, 0.3)))
         return layout
@@ -362,20 +362,18 @@ class Scenario(App):
                 params[paramkey] = hexval
         command, paramToSend = self.getValuesFromEcu(params)
         response = self.ecu.run_cmd(command,paramToSend)
-        lbltxt.text = get_message(self.ScmParam, 'CommandFinishedMessage')
-        lbltxt.text += ':\n'
         
         if "ERROR" in paramToSend:
             lbltxt.text = "Data downloading went wrong. Aborting."
             MyPopup_close(self.CLIP, lbltxt)
             return
         
-        if "NR" in response:
-            lbltxt.text += get_message(self.ScmParam, 'MessageNACK')
+        if "NR" in response or "WRONG" in response:
+            lbltxt.text = get_message_by_id('570')
         else:
-            lbltxt.text += get_message(self.ScmParam, 'Message31')
+            lbltxt.text = get_message(self.ScmParam, 'Message31')
         layout.add_widget(lbltxt)
-        MyPopup_close(self.CLIP, layout)
+        MyPopup_close(get_message(self.ScmParam, 'CommandFinishedMessage'), layout)
 
     def afterEcuChange(self, instance):
         self.popup_resetValues.dismiss()
@@ -424,14 +422,12 @@ class Scenario(App):
             return
         
         response = self.ecu.run_cmd(command,paramToSend)
-        lbltxt.text = get_message(self.ScmParam, 'CommandFinishedMessage')
-        lbltxt.text += ':\n'
-        if "NR" in response:
-            lbltxt.text += get_message(self.ScmParam, 'MessageNACK')
+        if "NR" in response or "WRONG" in response:
+            lbltxt.text = get_message_by_id('570')
         else:
-            lbltxt.text += get_message(self.ScmParam, 'Message31')
+            lbltxt.text = get_message(self.ScmParam, 'Message31')
         layout.add_widget(lbltxt)
-        MyPopup_close(self.CLIP, layout)
+        MyPopup_close(get_message(self.ScmParam, 'CommandFinishedMessage'), layout)
 
     def setGlowPlugsType(self, instance):
         self.popup_resetValues.dismiss()
@@ -470,30 +466,31 @@ class Scenario(App):
         params = self.getValuesToChange(title)
         layout = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         lbltxt = MyLabel(text=get_message(self.ScmParam, 'CommandInProgressMessage'), font_size=fs*1.5, size_hint=(1, 1))
+        base.EventLoop.idle()
         command, paramToSend = self.getValuesFromEcu(params)
+        base.EventLoop.idle()
         if "ERROR" in paramToSend:
             lbltxt.text = "Data downloading went wrong. Aborting."
             MyPopup_close(self.CLIP, lbltxt)
             return
-        lbltxt.text = get_message(self.ScmParam, 'CommandFinishedMessage')
-        lbltxt.text += ':\n'
+        base.EventLoop.idle()
         if command:
             response = self.ecu.run_cmd(command,paramToSend)
         else:
             response = self.ecu.run_cmd(defaultCommand)
-        if "NR" in response:
-            lbltxt.text += get_message(self.ScmParam, 'MessageNACK')
+        base.EventLoop.idle()
+        if "NR" in response or "WRONG" in response:
+            lbltxt.text = get_message_by_id('570')
         else:
-            lbltxt.text += get_message(self.ScmParam, 'Message31')
+            lbltxt.text = get_message(self.ScmParam, 'Message31')
         layout.add_widget(lbltxt)
-        MyPopup_close(self.CLIP, layout)
+        MyPopup_close(get_message(self.ScmParam, 'CommandFinishedMessage'), layout)
 
     def resetValues(self, instance):
         key = int(instance.id)
         paramToSend = ""
         commandTakesParams = True
         button = self.functions[key][1]
-        
         layout = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         lbltxt = MyLabel(text='', size_hint=(1, 1))
         if key == 2 or key == 7 or key == 3:
@@ -505,11 +502,12 @@ class Scenario(App):
             lbltxt.text += get_message(self.ScmParam, 'Message25')
         if key == 8:
             layout.add_widget(self.info('Informations', 'Message282'))
+            lbltxt.text += get_message(self.ScmParam, 'Message281')
         if key == 7:
             layout.add_widget(self.info('Informations', 'Message27'))
         if key == 6:
             layout.add_widget(self.info('Informations', 'Message262'))
-            lbltxt.text += get_message(self.ScmParam, 'Message281')
+            lbltxt.text += get_message(self.ScmParam, 'Message261')
         if lbltxt.text != '': layout.add_widget(lbltxt)
         layout_box = BoxLayout(orientation='horizontal', spacing=5, size_hint=(1, 1))
         res_button = MyButton(text=get_message(self.ScmParam, 'Yes'), id=str(key), size_hint=(1, 1))
@@ -520,30 +518,26 @@ class Scenario(App):
             res_button.bind(on_press=self.setGlowPlugsType)
         else:
             res_button.bind(on_press=self.reset_Values)
-        layout_box.add_widget(MyButton(text=get_message(self.ScmParam, 'No'), on_press=self.stop, size_hint=(1, 1)))
+        NoBut = MyButton(text=get_message(self.ScmParam, 'No'), size_hint=(1, 1))
+        layout_box.add_widget(NoBut)
         layout.add_widget(layout_box)
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5, 'center_y': 0.5})
         root.add_widget(layout)
-        self.popup_resetValues = MyPopup_close(self.Buttons[button], root)
+        self.popup_resetValues = MyPopup(title=self.Buttons[button], content=root)
+        self.popup_resetValues.open()
+        NoBut.bind(on_press=self.popup_resetValues.dismiss)
 
     def resetInjetorsData(self, instance):
-        layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
-        btn = MyButton(text='CLOSE', height=fs*3, size_hint=(1, 0.3))
         lbltxt = MyLabel(text=get_message(self.ScmParam, 'CommandInProgressMessage'), font_size=fs*1.5, size_hint=(1, 1))
-        layout.add_widget(lbltxt)
-        layout.add_widget(btn)
-        popup = MyPopup(title=self.CLIP, content=layout)
-        popup.open()
-        btn.bind(on_press=popup.dismiss)
+        MyPopup_close(get_message(self.ScmParam, 'CommandFinishedMessage'), lbltxt)
         base.EventLoop.idle()
         response = self.ecu.run_cmd(self.functions[1][1][instance.id])
+        base.EventLoop.idle()
         lbltxt.font_size=fs
-        lbltxt.text = get_message(self.ScmParam, 'CommandFinishedMessage')
-        lbltxt.text += ':\n'
         if "NR" in response or "WRONG" in response:
-            lbltxt.text += get_message(self.ScmParam, 'Message41')
+            lbltxt.text = get_message_by_id('570')
         else:
-            lbltxt.text += get_message(self.ScmParam, 'Message31')
+            lbltxt.text = get_message(self.ScmParam, 'Message31')
         
 def run(elm, ecu, command, data):
     app = Scenario(elm=elm, 

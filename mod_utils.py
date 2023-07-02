@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, atexit, subprocess, string, signal, glob
+import os, sys, atexit, subprocess, string, signal, glob, math
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -34,10 +34,10 @@ def InfoPopup(bas=None):
     if not bas:
         base.stopTouchApp()
 
-def MyPopup_close(title='', cont=True, lang=True):
+def MyPopup_close(title='', cont=True, l=True):
     fs = mod_globals.fontSize
     layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
-    if not lang:
+    if not l:
         t = 'CLOSE'
     else:
         t = get_message_by_id('16831')
@@ -60,7 +60,7 @@ class MyTextInput(TextInput):
             self.font_size = fs*0.9
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb:
                 if (lines * 2) > simb: lines = simb + lines/2
                 else: lines = simb
@@ -109,10 +109,10 @@ class MyButton(Button):
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb
             if 2 < lines < 3: lines = 3
-            if lines < 2: lines = 2.5
+            if lines <= 2: lines = 2.5
             self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
@@ -160,7 +160,7 @@ class MyLabel(Label):
             self.font_size = fs*0.8
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
             if lines < simb: lines = simb + 0.5
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
