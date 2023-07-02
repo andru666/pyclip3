@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, atexit, subprocess, string, signal, glob, math
+import os, sys, atexit, subprocess, string, signal, glob
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -60,13 +60,21 @@ class MyTextInput(TextInput):
             self.font_size = fs*0.9
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            print((self.text))
+            print(len(self.text))
+            print(self.font_size)
+            print(Window.size[0])
+            print(self.size_hint[0])
+            print(lines)
+            print(simb)
             if lines < simb:
                 if (lines * 2) > simb: lines = simb + lines/2
                 else: lines = simb
             if 2 < lines < 3: lines = lines * 1.5
             if lines < 2: lines = lines * 1.5
-            self.height = lines * self.font_size
+            print(lines)
+            self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.padding = str(self.font_size / self.height) + 'sp'
@@ -109,10 +117,10 @@ class MyButton(Button):
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
             if 2 < lines < 3: lines = 3
-            if lines <= 2: lines = 2.5
+            if lines < 2: lines = 2.5
             self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
@@ -160,11 +168,11 @@ class MyLabel(Label):
             self.font_size = fs*0.8
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = math.ceil((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb + 0.5
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size
+            self.height = lines * self.font_size * 1.1
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
 
