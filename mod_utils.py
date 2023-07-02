@@ -74,7 +74,7 @@ class MyTextInput(TextInput):
             if 2 < lines < 3: lines = lines * 1.5
             if lines < 2: lines = lines * 1.5
             print(lines)
-            self.height = lines * self.font_size * 1.1
+            self.height = lines * self.font_size * 1.5
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.padding = str(self.font_size / self.height) + 'sp'
