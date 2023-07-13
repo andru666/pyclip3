@@ -2,22 +2,21 @@
 import mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
-from kivy.graphics import Color, Rectangle
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from collections import OrderedDict
 from kivy.clock import Clock
 
 class ScrMsg(Screen):
     pass
 
 class Scenarii(App):
-    
     count = 0
-
+    global fs
+    fs = mod_globals.fontSize
     def __init__(self, **kwargs):
+        self.elm = kwargs['elm']
+        self.command = kwargs['command']
+        self.ecu = kwargs['ecu']
+        self.data = kwargs['data']
         
         self.status_event = None
         self.clock_event = None
@@ -26,87 +25,53 @@ class Scenarii(App):
         self.need_update = False
         self.start_regen = False
         self.begin_time = 0
-        self.blue_part_size = 0.75
-        self.data = kwargs['data']
         DOMTree = mod_zip.get_xml_scenario(self.data)
         self.ScmRoom = DOMTree.documentElement
         ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
         ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
-        self.elm = kwargs['elm']
-        self.command = kwargs['command']
-        self.ecu = kwargs['ecu']
         self.ScmParam = {}
         self.ScmSet = {}
         self.labels = {}
         self.paramsLabels = OrderedDict()
         
         for Param in ScmParams:
-            name = pyren_encode(Param.getAttribute('name'))
-            value = pyren_encode(Param.getAttribute('value'))
+            name = (Param.getAttribute('name'))
+            value = (Param.getAttribute('value'))
             self.ScmParam[name] = value
         
         for Set in ScmSets:
-            try:
-                setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
-            except:
-                pass
-            ScmParams = Set.getElementsByTagName('ScmParam')
-            for Param in ScmParams:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
-                try:
-                    self.ScmSet[setname] = value
-                except:
-                    pass
-                self.ScmParam[name] = value
+            if len(Set.attributes) >= 1:
+                setname = Set.getAttribute('name')
+                ScmParams = Set.getElementsByTagName('ScmParam')
+                scmParamsDict = OrderedDict()
+                for Param in ScmParams:
+                    name = Param.getAttribute('name')
+                    value = Param.getAttribute('value')
+                    scmParamsDict[name] = value
+                self.ScmSet[setname] = scmParamsDict
+            else:
+                print(11)
         if self.data.startswith('ecudata'):
             ScmRoom2 = mod_zip.get_xml_scenario(self.data.split('_')[0].replace('ecudata', 'scendata') +'_text.xml').documentElement
             ScmParams2 = ScmRoom2.getElementsByTagName('ScmParam')
             ScmSets2 = ScmRoom2.getElementsByTagName('ScmSet')
             for Param in ScmParams2:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
+                name = (Param.getAttribute('name'))
+                value = (Param.getAttribute('value'))
                 self.ScmParam[name] = value
             for Set in ScmSets2:
-                try:
-                    setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
-                except:
-                    pass
-                ScmParams = Set.getElementsByTagName('ScmParam')
-                for Param in ScmParams:
-                    name = pyren_encode(Param.getAttribute('name'))
-                    value = pyren_encode(Param.getAttribute('value'))
-                    try:
-                        self.ScmSet[setname] = value
-                    except:
-                        pass
-                    self.ScmParam[name] = value
-        super(Scenarii, self).__init__(**kwargs)
-        Window.bind(on_keyboard=self.key_handler)
-
-    def key_handler(self, window, keycode1, keycode2, text, modifiers):
-        global resizeFont
-        if resizeFont:
-            return True
-        if keycode1 == 45 and mod_globals.fontSize > 10:
-            mod_globals.fontSize = mod_globals.fontSize - 1
-            resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
-            self.need_update = False
-            self.running = False
-            self.stop()
-            return True
-        if keycode1 == 61 and mod_globals.fontSize < 40:
-            mod_globals.fontSize = mod_globals.fontSize + 1
-            resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
-            self.need_update = False
-            self.running = False
-            self.stop()
-            return True
-        return 
+                if len(Set.attributes) >= 1:
+                    setname = Set.getAttribute('name')
+                    ScmParams = Set.getElementsByTagName('ScmParam')
+                    scmParamsDict = OrderedDict()
+                    for Param in ScmParams:
+                        name = Param.getAttribute('name')
+                        value = Param.getAttribute('value')
+                        scmParamsDict[name] = value
+                    self.ScmSet[setname] = scmParamsDict
+                else:
+                    print(11)
+        super(Scenarii, self).__init__()
 
     def button_screen(self, dat, start=None):
         if start == 1:
@@ -123,7 +88,7 @@ class Scenarii(App):
 
         root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         root.add_widget(MyLabel(text=header))
-        root.add_widget(MyLabel(text=self.get_message('text_48202')))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48202')))
 
         self.layout2 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
         
@@ -137,24 +102,24 @@ class Scenarii(App):
         self.scr2 = ScrMsg(name='Scr2')
         self.sm.add_widget(self.scr2)
         layout_current2 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        layout_current2.add_widget(MyLabel(text=self.get_message('text_47870'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
+        layout_current2.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_47870'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
         dropdown1 = DropDown(size_hint=(1, None), height=fs * 2)
         for index in ['text_29533', 'text_31334', 'text_30979']:
-            btn1 = Button(text=self.get_message(index), size_hint_y = None, height = fs*2)
+            btn1 = Button(text=get_message(self.ScmParam, index), size_hint_y = None, height = fs*2)
             btn1.bind(on_release = lambda btn1: dropdown1.select(btn1.text))
             dropdown1.add_widget(btn1)
-        mainbutton1 = Button(text =self.get_message('text_47870'), size_hint =(1, None), height=fs * 2.5)
+        mainbutton1 = Button(text =get_message(self.ScmParam, 'text_47870'), size_hint =(1, None), height=fs * 2.5)
         mainbutton1.bind(on_release = dropdown1.open)
         dropdown1.bind(on_select = lambda instance, x: setattr(mainbutton1, 'text', x))
         layout_current2.add_widget(mainbutton1)
-        layout_current2.add_widget(MyLabel(text=self.get_message('text_48142'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
+        layout_current2.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48142'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
         
         dropdown2 = DropDown(size_hint=(1, None), height=fs * 2)
         for index in ['text_32076', 'text_32077']:
-            btn2 = Button(text=self.get_message(index), size_hint_y = None, height = fs*2)
+            btn2 = Button(text=get_message(self.ScmParam, index), size_hint_y = None, height = fs*2)
             btn2.bind(on_release = lambda btn2: dropdown2.select(btn2.text))
             dropdown2.add_widget(btn2)
-        mainbutton2 = Button(text =self.get_message('text_48142'), size_hint =(1, None), height=fs * 2.5)
+        mainbutton2 = Button(text =get_message(self.ScmParam, 'text_48142'), size_hint =(1, None), height=fs * 2.5)
         mainbutton2.bind(on_release = dropdown2.open)
         dropdown2.bind(on_select = lambda instance, x: setattr(mainbutton2, 'text', x))
         layout_current2.add_widget(mainbutton2)
@@ -184,7 +149,7 @@ class Scenarii(App):
         self.sm.add_widget(self.scr6)
         params = self.get_ecu_values()
         self.status = params[self.ScmParam['State1']]
-        if self.status != pyren_encode(self.get_message('TOURNANT')):
+        if self.status != (get_message(self.ScmParam, 'TOURNANT')):
             self.sceen6 = self.sceen('Scr6Msg7', 'Scr7Msg8', 'Informations', 'Scr5Msg6', 2)
         else:
             self.sceen6 = self.sceen('Scr6Msg7', 'Scr7Msg8', 'Informations', 'Scr5Msg6', 1)
@@ -193,9 +158,9 @@ class Scenarii(App):
         self.scr7 = ScrMsg(name='Scr7Msg8')
         self.sm.add_widget(self.scr7)
         
-        if self.status != pyren_encode(self.get_message('TOURNANT')):
+        if self.status != (get_message(self.ScmParam, 'TOURNANT')):
             layout_current7 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-            layout_current7.add_widget(MyLabel(text=self.get_message('MsgBox_Message'), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
+            layout_current7.add_widget(MyLabel(text=get_message(self.ScmParam, 'MsgBox_Message'), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
             layout_current7.add_widget(self.make_box_params('State1'))
             layout_current7.add_widget(self.make_box_params('Param6'))
             layout_current7.add_widget(self.make_box_params('Param7'))
@@ -208,7 +173,7 @@ class Scenarii(App):
             
         self.layout2.add_widget(self.sm)
         root.add_widget(self.layout2)
-        root.add_widget(Button(text=self.get_message('1053'), on_press=self.finish, size_hint=(1, None), height=80))
+        root.add_widget(Button(text=get_message(self.ScmParam, '1053'), on_press=self.finish, size_hint=(1, None), height=80))
         root_s = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root_s.add_widget(root)
@@ -224,7 +189,7 @@ class Scenarii(App):
         layout_current7 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
         self.phase, self.pfe = self.regen_status()
         hours, minutes, seconds = self.timer()
-        layout_current7.add_widget(MyLabel(text=self.get_message('TextCommandInProgress'), bgcolor=(0, 1, 1, 0.3)))
+        layout_current7.add_widget(MyLabel(text=get_message(self.ScmParam, 'TextCommandInProgress'), bgcolor=(0, 1, 1, 0.3)))
         self.label_time = MyLabel(text='', bgcolor=(1, 1, 0, 0.3))
         layout_current7.add_widget(self.label_time)
         layout_current7.add_widget(self.phase_status())
@@ -239,7 +204,7 @@ class Scenarii(App):
         layout_current7.add_widget(self.make_box_params('State2'))
         layout_current7.add_widget(self.make_box_params('State3'))
         layout_current7.add_widget(self.make_box_params('State4'))
-        self.button_stop = Button(text=self.get_message('939'), on_press=self.stop_regen, size_hint=(1, None), height=80)
+        self.button_stop = Button(text=get_message(self.ScmParam, '939'), on_press=self.stop_regen, size_hint=(1, None), height=80)
         layout_current7.add_widget(self.button_stop)
         return layout_current7
     
@@ -249,7 +214,7 @@ class Scenarii(App):
             return
         hours, minutes, seconds = self.timer()
         try:
-            self.label_time.text = self.get_message('57936')+'   -   %02d:%02d:%02d' % (hours, minutes, seconds)
+            self.label_time.text = get_message(self.ScmParam, '57936')+'   -   %02d:%02d:%02d' % (hours, minutes, seconds)
         except:
             pass
         self.timer_event = Clock.schedule_once(self.update_timer, 1)
@@ -272,13 +237,13 @@ class Scenarii(App):
     
         responce = self.ecu.run_cmd(self.ScmParam['Cmde2'])
         params = self.get_ecu_values()
-        self.rescode = pyren_encode(params[self.ScmParam['State3']])
-        self.result = pyren_encode(mod_globals.language_dict[self.ScmSet[self.rescode]])
+        self.rescode = (params[self.ScmParam['State3']])
+        self.result = (mod_globals.language_dict[self.ScmSet[self.rescode]])
         layout_popup = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        layout_popup.add_widget(MyLabel(text=pyren_encode(self.get_message('804'))+' - '+pyren_encode(self.phase), size_hint=(1, 0.2), bgcolor=(1, 1, 0, 0.3)))
-        layout_popup.add_widget(MyLabel(text=pyren_encode(self.get_message('23819'))+' :\n '+pyren_encode(self.result), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
-        layout_popup.add_widget(Button(text=self.get_message('1053'), on_press=self.finish, size_hint=(1, None), height=80))
-        popup = Popup(title=self.get_message('TextCommandFinished'), content=layout_popup, size=(500, 500), size_hint=(None, None))
+        layout_popup.add_widget(MyLabel(text=(get_message(self.ScmParam, '804'))+' - '+(self.phase), size_hint=(1, 0.2), bgcolor=(1, 1, 0, 0.3)))
+        layout_popup.add_widget(MyLabel(text=(get_message(self.ScmParam, '23819'))+' :\n '+(self.result), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
+        layout_popup.add_widget(Button(text=get_message(self.ScmParam, '1053'), on_press=self.finish, size_hint=(1, None), height=80))
+        popup = Popup(title=get_message(self.ScmParam, 'TextCommandFinished'), content=layout_popup, size=(500, 500), size_hint=(None, None))
         self.need_update = False
         popup.open()
 
@@ -288,32 +253,32 @@ class Scenarii(App):
         self.ecu.elm.clear_cache()
         self.phase, self.pfe = self.regen_status()
         try:
-            self.labels['phase_status'].text = self.get_message('804')+' - '+pyren_encode(self.phase)
+            self.labels['phase_status'].text = get_message(self.ScmParam, '804')+' - '+(self.phase)
         except:
             pass
         self.status_event = Clock.schedule_once(self.update_status, 0.1)
 
     def regen_status(self, name = False, no_formatting = False):
         params = self.get_ecu_values()
-        self.etat = pyren_encode(params[self.ScmParam['State2']])
+        self.etat = (params[self.ScmParam['State2']])
         self.pfe = 0
-        if self.etat == self.get_message('ETAT1'):
-            self.phase = self.get_message('Phase1')
+        if self.etat == get_message(self.ScmParam, 'ETAT1'):
+            self.phase = get_message(self.ScmParam, 'Phase1')
             self.pfe = 0
-        elif self.etat == self.get_message('ETAT2'): 
-            self.phase = self.get_message('Phase2')
+        elif self.etat == get_message(self.ScmParam, 'ETAT2'): 
+            self.phase = get_message(self.ScmParam, 'Phase2')
             self.pfe = 0
-        elif self.etat == self.get_message('ETAT3'): 
-            self.phase = self.get_message('Phase3')
+        elif self.etat == get_message(self.ScmParam, 'ETAT3'): 
+            self.phase = get_message(self.ScmParam, 'Phase3')
             self.pfe = 0
-        elif self.etat == self.get_message('ETAT4'): 
-            self.phase = self.get_message('Phase4')
+        elif self.etat == get_message(self.ScmParam, 'ETAT4'): 
+            self.phase = get_message(self.ScmParam, 'Phase4')
             self.pfe = 0
-        elif self.etat == self.get_message('ETAT5'): 
-            self.phase = self.get_message('Phase5')
+        elif self.etat == get_message(self.ScmParam, 'ETAT5'): 
+            self.phase = get_message(self.ScmParam, 'Phase5')
             self.pfe = 1
-        elif self.etat == self.get_message('ETAT6'): 
-            self.phase = self.get_message('Phase6')
+        elif self.etat == get_message(self.ScmParam, 'ETAT6'): 
+            self.phase = get_message(self.ScmParam, 'Phase6')
             self.pfe = 2
         else:  
             self.phase = self.etat
@@ -323,23 +288,23 @@ class Scenarii(App):
         
         layout_current = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
         if informations:
-            layout_current.add_widget(MyLabel(text=self.get_message(informations), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
-        layout_current.add_widget(MyLabel(text=self.get_message(screen), size_hint=(1, 0.7), bgcolor=(0, 1, 1, 0.3)))
+            layout_current.add_widget(MyLabel(text=get_message(self.ScmParam, informations), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
+        layout_current.add_widget(MyLabel(text=get_message(self.ScmParam, screen), size_hint=(1, 0.7), bgcolor=(0, 1, 1, 0.3)))
         if btn1 or btn2:
             layout = BoxLayout(orientation='horizontal', spacing=5, size_hint=(1, 0.2))
         if btn1:
-            nbtn1 = Button(text=self.get_message('6218'))
+            nbtn1 = Button(text=get_message(self.ScmParam, '6218'))
             nbtn1.bind(on_press=lambda *args: self.button_screen(btn1))
             layout.add_widget(nbtn1)
         if btn2:
             if start == 1:
-                nbtn2 = Button(text=self.get_message('29116'))
+                nbtn2 = Button(text=get_message(self.ScmParam, '29116'))
                 nbtn2.bind(on_press=lambda *args: self.button_screen(btn2, 1))
             elif start == 2:
-                nbtn2 = Button(text=self.get_message('29116'))
+                nbtn2 = Button(text=get_message(self.ScmParam, '29116'))
                 nbtn2.bind(on_press=lambda *args: self.button_screen(btn2, 2))
             else:
-                nbtn2 = Button(text=self.get_message('6219'))
+                nbtn2 = Button(text=get_message(self.ScmParam, '6219'))
                 nbtn2.bind(on_press=lambda *args: self.button_screen(btn2))
             layout.add_widget(nbtn2)
         if btn1 or btn2:
@@ -383,30 +348,19 @@ class Scenarii(App):
         self.clock_event = Clock.schedule_once(self.update_values, 0.1)
     
     def make_box_params(self, parameter_name):
-        
         params = self.get_ecu_values()
-        glay = BoxLayout(orientation='horizontal', size_hint=(1, None), height=fs * 2.0)
-        self.label1 = MyLabelGreen(text=self.paramsLabels[self.ScmParam[parameter_name]], halign='left', valign='top', size_hint=(self.blue_part_size, None), font_size=fs, on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
-        self.label2 = MyLabelBlue(text=params[self.ScmParam[parameter_name]], halign='right', valign='top', size_hint=(1 - self.blue_part_size, 1), font_size=fs)
-        glay.add_widget(self.label1)
-        glay.add_widget(self.label2)
-        self.labels[self.ScmParam[parameter_name]] = self.label2
+        glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        label1 = MyLabelBlue(text=self.paramsLabels[self.ScmParam[parameter_name]], halign='left', size_hint=(.65, 1), param_name=parameter_name)
+        label2 = MyLabelGreen(text=params[self.ScmParam[parameter_name]], halign='right', size_hint=(.35, 1), font_size=fs)
+        if label1.height > label2.height:
+            glay.height = label1.height
+        else:
+            glay.height = label2.height
+        glay.add_widget(label1)
+        glay.add_widget(label2)
+        self.labels[self.ScmParam[parameter_name]] = label2
         return glay
 
-    def get_message(self, msg):
-        if msg in list(self.ScmParam.keys()):
-            value = self.ScmParam[msg]
-        else:
-            value = msg
-        if value.isdigit() and value in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[value])
-        return value
-
-    def get_message_by_id(self, id):
-        if id.isdigit() and id in list(mod_globals.language_dict.keys()):
-            value = pyren_encode(mod_globals.language_dict[id])
-        return value
-    
     def finish(self, instance):
         self.need_update = False
         self.running = False

@@ -24,7 +24,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.41'
+__version__ = '0.01.42'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -188,7 +188,8 @@ def set_orientation_portrait():
         activity.setRequestedOrientation(AndroidActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
 class screenConfig(App):
-
+    global fs
+    fs = mod_globals.fontSize
     def __init__(self):
         self.button = {}
         self.textInput = {}
@@ -234,13 +235,14 @@ class screenConfig(App):
         return glay
 
     def make_opt_ecuid(self,active, callback = None):
+        global fs
         str1 = 'OPT ecuid'
         label = MyLabel(text=str1, halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         if mod_globals.opt_ecu:
             iText = mod_globals.opt_ecu
         else:
             iText = ''
-        ti = MyTextInput(text=iText, size_hint=(0.45, None), multiline=False)
+        ti = MyTextInput(text=iText, font_size=fs, size_hint=(0.45, None), multiline=False)
         self.textInput[str1] = ti
         sw = Switch(active=active, size_hint=(0.2, None))
         if callback:
@@ -256,8 +258,9 @@ class screenConfig(App):
         return glay
 
     def make_input(self, str1, iText):
+        global fs
         label = MyLabel(text=str1, halign='left', bgcolor = (0.5, 0.5, 0, 1))
-        ti = MyTextInput(text=iText, multiline=False)
+        ti = MyTextInput(text=iText, font_size=fs, multiline=False)
         self.textInput[str1] = ti
         ti.height = label.height
         glay = MyGridLayout(cols=2)
@@ -392,7 +395,7 @@ class screenConfig(App):
         mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
         if self.mainbutton.text:
-            if 'com1' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
+            if 'com0' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '127.0.0.1:35000'
             elif 'wifi' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '192.168.0.10:35000'
@@ -433,7 +436,6 @@ class screenConfig(App):
             mod_globals.screen_orient = False
 
     def build(self):
-        fs = mod_globals.fontSize
         if mod_globals.os == 'android':
             permissionIsGranted = True
             permissionErrorLayout = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
@@ -549,6 +551,7 @@ def main():
         import zipfile
         with zipfile.ZipFile(zip_macro[0], 'r') as zip_file:
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
+    mod_globals.Settings()
     kivyScreenConfig()
     elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     """try:

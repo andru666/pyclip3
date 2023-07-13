@@ -4,17 +4,16 @@ import sys
 import re
 import time
 import mod_globals
-import mod_utils
 import mod_ecu
 import mod_zip
 from mod_utils import *
 from kivy.app import App
-from kivy.uix.popup import Popup
-from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.core.window import Window
+from collections import OrderedDict
+
 fs = mod_globals.fontSize
 class Scenarii(App):
     
@@ -41,19 +40,18 @@ class Scenarii(App):
                 value = (Param.getAttribute('value'))
                 self.ScmParam[name] = value
             for Set in ScmSets:
-                try:
-                    setname = (mod_globals.language_dict[Set.getAttribute('name')])
-                except:
-                    pass
-                ScmParams = Set.getElementsByTagName('ScmParam')
-                for Param in ScmParams:
-                    name = (Param.getAttribute('name'))
-                    value = (Param.getAttribute('value'))
-                    try:
-                        self.ScmSet[setname] = value
-                    except:
-                        pass
-                    self.ScmParam[name] = value
+                if len(Set.attributes) >= 1:
+                    setname = Set.getAttribute('name')
+                    ScmParams = Set.getElementsByTagName('ScmParam')
+                    scmParamsDict = OrderedDict()
+                    for Param in ScmParams:
+                        name = Param.getAttribute('name')
+                        value = Param.getAttribute('value')
+                        scmParamsDict[name] = value
+                    self.ScmSet[setname] = scmParamsDict
+                else:
+                    print(len(Set.attributes))
+                    print(11)
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label

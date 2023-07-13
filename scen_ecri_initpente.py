@@ -2,10 +2,7 @@
 import mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.textinput import TextInput
+from collections import OrderedDict
 
 class Scenarii(App):
     global fs
@@ -21,23 +18,21 @@ class Scenarii(App):
         self.ScmParam = {}
         self.ScmSet = {}
         for Param in ScmParams:
-            name = pyren_encode(Param.getAttribute('name'))
-            value = pyren_encode(Param.getAttribute('value'))
+            name = (Param.getAttribute('name'))
+            value = (Param.getAttribute('value'))
             self.ScmParam[name] = value
         for Set in ScmSets:
-            try:
-                setname = pyren_encode(mod_globals.language_dict[Set.getAttribute('name')])
-            except:
-                pass
-            ScmParams = Set.getElementsByTagName('ScmParam')
-            for Param in ScmParams:
-                name = pyren_encode(Param.getAttribute('name'))
-                value = pyren_encode(Param.getAttribute('value'))
-                try:
-                    self.ScmSet[setname] = value
-                except:
-                    pass
-                self.ScmParam[name] = value
+            if len(Set.attributes) >= 1:
+                setname = Set.getAttribute('name')
+                ScmParams = Set.getElementsByTagName('ScmParam')
+                scmParamsDict = OrderedDict()
+                for Param in ScmParams:
+                    name = Param.getAttribute('name')
+                    value = Param.getAttribute('value')
+                    scmParamsDict[name] = value
+                self.ScmSet[setname] = scmParamsDict
+            else:
+                print(11)
         super(Scenarii, self).__init__()
 
     def build(self):

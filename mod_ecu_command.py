@@ -136,62 +136,6 @@ def packData(ecu, mnemo, dataid, data, value):
     data = data[0:sb * 2] + value + data[(sb + bytes) * 2:]
     return data
 
-
-class MyLabelBlue(Label):
-
-    def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
-        super(MyLabelBlue, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
-        if 'height' not in kwargs:
-            lines = len(self.text.split('\n'))
-            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
-            if lines < simb: lines = simb
-            if lines < 2: lines = lines * 2
-            self.height = lines * self.font_size * 1.3
-        self.height = kivy.metrics.dp(self.height)
-        self.font_size = kivy.metrics.dp(self.font_size)
-
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0, 0, 1, 0.25)
-            Rectangle(pos=self.pos, size=self.size)
-
-
-class MyLabelGreen(Label):
-
-    def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
-        super(MyLabelGreen, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
-        if 'height' not in kwargs:
-            lines = len(self.text.split('\n'))
-            simb = (len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0])
-            if lines < simb: lines = simb
-            if lines < 2: lines = lines * 2
-            self.height = lines * self.font_size * 1.3
-        self.height = kivy.metrics.dp(self.height)
-        self.font_size = kivy.metrics.dp(self.font_size)
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0, 1, 0, 0.25)
-            Rectangle(pos=self.pos, size=self.size)
-
-
 class kivyExecCommand(App):
     def __init__(self, command, ecu, elm, path):
         self.command = command

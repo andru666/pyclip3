@@ -259,7 +259,6 @@ class Port:
                         byte = self.hdr.read(1)
         except:
             pass
-        
         if type(byte) == str:
             byte = byte.encode()
 
@@ -303,7 +302,6 @@ class Port:
                     byte = self.read()
                 else:
                     byte = '>'
-                
                 if '\r' in byte: byte = byte.replace('\r', '\n')
                 self.buff += byte
                 tc = time.time()
@@ -857,7 +855,7 @@ class ELM:
         
         # send cmd
         rsp = self.cmd(req, int(serviceDelay))
-
+        
         # parse responce
         res = ""
         if self.currentprotocol != "can":
@@ -892,7 +890,6 @@ class ELM:
 
     # noinspection PyUnboundLocalVariable
     def cmd(self, command, serviceDelay=0):
-        
         command = command.upper()
 
         # check if command not supported
@@ -977,7 +974,6 @@ class ELM:
             
             if no_negative_wait_response:
                 break
-                
         # If dev mode then switch back from Development Session
         if devmode:
             
@@ -1398,7 +1394,6 @@ class ELM:
                 return "WRONG RESPONSE"
 
     def send_can_cfc0(self, command):
-        
         command = command.strip().replace(' ', '').upper()
 
         if len(command) == 0:
@@ -1523,21 +1518,50 @@ class ELM:
                 
                 frsp = self.send_raw(raw_command[Fc])
                 Fc = Fc + 1
-        if len(responses) != 1:
-            return "WRONG RESPONSE"
+        
         
         result = ""
         noErrors = True
+        PC = False
         cFrame = 0  # frame counter
         nBytes = 0  # number bytes in response
         nFrames = 0  # numer frames in response
-        
-        if responses[0][:1] == '0':  # single frame(sf)
+        if mod_globals.opt_port == '127.0.0.1:35000':
+            if len(responses) == 1:
+                PC = True
+                result = responses[0]
+                rspLen = nBytes = len(responses[0])//2
+            if len(responses) > 1:
+                PC = True
+                nBytes = int(responses[0][1:4], 16)
+                rspLen = nBytes
+                nBytes = nBytes - 6
+                nFrames = 1 + nBytes//7 + bool(nBytes%7)
+                cFrame = 1    
+                
+                for s in responses:
+                    if s[0] == '1':
+                        result += s[4:16]
+                        continue
+                    
+                    if all(c in string.hexdigits for c in s):  # some data
+                        if s[:1] == '2':  # consecutive frames(cf)
+                            cFrame += 1
+                            result += s[2:16]
+                        continue
+            elif len(responses) != 1:
+                return "WRONG RESPONSE"
+        elif len(responses) != 1:
+            return "WRONG RESPONSE"
+
+        if PC:
+            pass
+        elif responses[0][:1] == '0':  # single frame(sf)
             nBytes = int(responses[0][1:2], 16)
             rspLen = nBytes
             nFrames = 1
             result = responses[0][2:2 + nBytes * 2]
-        
+
         elif responses[0][:1] == '1':  # first frame(ff)
             nBytes = int(responses[0][1:4], 16)
             rspLen = nBytes
@@ -1612,11 +1636,8 @@ class ELM:
             self.lf.write(">[" + log_tmstr() + "]" + command + "\n")
             self.lf.flush()
         
-        # send command
         if not mod_globals.opt_demo:
-            self.port.write(str(command + "\r").encode("utf-8"))  # send command
-        
-        # receive and parse responce
+            self.port.write(str(command + "\r").encode("utf-8"))
         while True:
             tc = time.time()
             if mod_globals.opt_demo:
@@ -1633,7 +1654,6 @@ class ELM:
             elif self.lf != 0:
                 self.lf.write("<[" + log_tmstr() + "]" + self.buff + "(shifted)" + command + "\n")
                 self.lf.flush()
-        
         # count errors
         if "?" in self.buff:
             self.error_question += 1
@@ -1658,7 +1678,6 @@ class ELM:
             # tm = str(time.time())
             self.lf.write("<[" + str(round(roundtrip, 3)) + "]" + self.buff + "\n")
             self.lf.flush()
-        
         return self.buff
     
     def close_protocol(self):

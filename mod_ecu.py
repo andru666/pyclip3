@@ -12,7 +12,6 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
@@ -26,7 +25,6 @@ from mod_ecu_default import *
 from mod_ecu_identification import *
 from mod_ecu_mnemonic import *
 from mod_ecu_parameter import *
-from mod_ecu_screen import *
 from mod_ecu_service import *
 from mod_ecu_state import *
 from mod_elm import AllowedList
@@ -35,8 +33,6 @@ from mod_elm import snat
 from mod_ply import *
 from mod_utils import *
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
-fmn = 2
-bmn = 2.5
 F2A = {'01': '7A',
  '02': '01',
  '03': '51',
@@ -129,99 +125,6 @@ F2A = {'01': '7A',
  '99': 'C0'}
 ecudump = {}
 resizeFont = False
-favouriteScreen = ecu_own_screen('FAV')
-
-class MyLabelGreen(ButtonBehavior, Label):
-    def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
-        super(MyLabelGreen, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        if 'halign' not in kwargs:
-            self.halign = 'center'
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
-        if 'height' not in kwargs:
-            lines = len(self.text.split('\n'))
-            simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb + 1
-            if lines <= 1.9: lines = 1.9
-            if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size * 1.3
-        self.height = kivy.metrics.dp(self.height)
-        self.font_size = kivy.metrics.dp(self.font_size)
-        
-    def on_size(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0, 1, 0, 0.25)
-            Rectangle(pos=self.pos, size=self.size)
-
-class MyLabelBlue(ButtonBehavior, Label):
-    
-    def __init__(self, mfs = None, **kwargs):
-        fs = mod_globals.fontSize
-        if 'param_name' in kwargs:
-            self.param_name = kwargs['param_name']
-            del kwargs ['param_name']
-        super(MyLabelBlue, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        self.bind(text=self.on_text_changed)
-        if 'halign' not in kwargs:
-            self.halign = 'left'
-        if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'height' not in kwargs:
-            lines = len(self.text.split('\n'))
-            simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
-            if lines < simb: lines = simb + 1
-            if lines <= 1.9: lines = 1.9
-            if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size * 1.3
-        self.height = kivy.metrics.dp(self.height)
-        self.font_size = kivy.metrics.dp(self.font_size)
-        self.clicked = False
-
-    def on_size(self, widget, size):
-        
-        self.text_size = (size[0], None)
-        self.texture_update()
-        if self.size_hint_y is None and self.size_hint_x is not None:
-            self.height = fs * fmn
-        elif self.size_hint_x is None and self.size_hint_y is not None:
-            self.width = self.texture_size[0]
-        self.toNormal()
-        for dr in favouriteScreen.datarefs:
-            if dr.name == self.param_name:
-                self.toAdd()
-                self.clicked = True
-                break
-
-    def on_text_changed(self, widget, text):
-        self.on_size(self, self.size)
-
-    def toAdd(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0.38, 0.55, 0.95, 0.5)
-            Rectangle(pos=self.pos, size=self.size)
-
-    def toNormal(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(0, 0, 1, 0.25)
-            Rectangle(pos=self.pos, size=self.size)
-    
-    def on_press(self):
-        if self.clicked:
-            self.toNormal()
-            self.clicked = False
-        else: 
-            self.toAdd()
-            self.clicked = True
 
 class showDatarefGui(App):
 
@@ -609,7 +512,6 @@ class ECU():
                 if name == self.Identifications[i].codeMR:
                     name = i
                     break
-
         if name not in list(self.Identifications.keys()):
             return ('none', 'unknown identification')
         self.elm.clear_cache()

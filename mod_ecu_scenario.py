@@ -17,27 +17,18 @@ def playScenario(command, ecu, elm):
         ecuNumberIndex = ecuNumberPattern.search(scenarioData)
         scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))].lower()
         scenarioData = 'ecudata/'+scenarioData.lower()
-    print(scenarioName)
-    if scenarioName == 'du code vin':
-        if scenarioName.endswith('_ecu'):
-            scen = __import__(scenarioName[:len(scenarioName)-4])
-        elif scenarioName.endswith('_const'):
-            scen = __import__(scenarioName[:len(scenarioName)-6])
-        else:
-            scen = __import__(scenarioName)
+    if mod_globals.os != 'android': print(scenarioName)
+    if scenarioName.endswith('_ecu'):
+        name = scenarioName[:len(scenarioName)-4]
+    elif scenarioName.endswith('_const'):
+        name = scenarioName[:len(scenarioName)-6]
+    else:
+        name = scenarioName
+    if os.path.isfile(mod_globals.user_data_dir + '/' + name + '.py'):
+        scen = __import__(name)
         scen.run(elm, ecu, command, scenarioData)
         return True
-    else:    
-        if True:
-            if scenarioName.endswith('_ecu'):
-                scen = __import__(scenarioName[:len(scenarioName)-4])
-            elif scenarioName.endswith('_const'):
-                scen = __import__(scenarioName[:len(scenarioName)-6])
-            else:
-                scen = __import__(scenarioName)
-            scen.run(elm, ecu, command, scenarioData)
-            return True
-        else:
-            scen = __import__('show_scen')
-            scen.run(elm, ecu, command, scenarioData)
-            return True
+    else:
+        scen = __import__('show_scen')
+        scen.run(elm, ecu, command, scenarioData)
+        return True

@@ -2,9 +2,7 @@
 import mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.scrollview import ScrollView
+from collections import OrderedDict
 
 class Scenarii(App):
     global fs
@@ -25,13 +23,17 @@ class Scenarii(App):
             self.ScmParam[name] = value
 
         for Set in ScmSets:
-            setname = (mod_globals.language_dict[Set.getAttribute('name')])
-            ScmParams = Set.getElementsByTagName('ScmParam')
-            for Param in ScmParams:
-                name = (Param.getAttribute('name'))
-                value = (Param.getAttribute('value'))
-                self.ScmSet[setname] = value
-                self.ScmParam[name] = value
+            if len(Set.attributes) >= 1:
+                setname = Set.getAttribute('name')
+                ScmParams = Set.getElementsByTagName('ScmParam')
+                scmParamsDict = OrderedDict()
+                for Param in ScmParams:
+                    name = Param.getAttribute('name')
+                    value = Param.getAttribute('value')
+                    scmParamsDict[name] = value
+                self.ScmSet[setname] = scmParamsDict
+            else:
+                print(11)
         super(Scenarii, self).__init__()
 
     def build(self):
