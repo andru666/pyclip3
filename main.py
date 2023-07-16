@@ -5,15 +5,14 @@ except:
     pass
 from kivy.utils import platform
 from kivy.config import Config
-Config.set('kivy', 'exit_on_escape', '0')
 if platform != 'android':
     import ctypes
     user32 = ctypes.windll.user32
     Config.set('graphics', 'position', 'custom')
     Config.set('graphics', 'top',  20)
-    Config.set('graphics', 'left', int(user32.GetSystemMetrics(0)/4))
-import traceback, time, mod_globals
+    Config.set('graphics', 'left', int(user32.GetSystemMetrics(0))-400)
 from kivy.core.window import Window
+import traceback, time, mod_globals
 from kivy.app import App
 from kivy.graphics import Color, Rectangle
 from kivy.uix.scrollview import ScrollView
