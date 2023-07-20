@@ -18,17 +18,17 @@ def playScenario(command, ecu, elm):
         scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))].lower()
         scenarioData = 'ecudata/'+scenarioData.lower()
     if mod_globals.os != 'android': print(scenarioName)
-    if scenarioName.endswith('_ecu'):
-        name = scenarioName[:len(scenarioName)-4]
-    elif scenarioName.endswith('_const'):
-        name = scenarioName[:len(scenarioName)-6]
-    else:
-        name = scenarioName
-    if os.path.isfile(mod_globals.user_data_dir + '/' + name + '.py'):
+    try:
+        if scenarioName.endswith('_ecu'):
+            name = scenarioName[:len(scenarioName)-4]
+        elif scenarioName.endswith('_const'):
+            name = scenarioName[:len(scenarioName)-6]
+        else:
+            name = scenarioName
         scen = __import__(name)
         scen.run(elm, ecu, command, scenarioData)
         return True
-    else:
+    except ModuleNotFoundError:
         scen = __import__('show_scen')
         scen.run(elm, ecu, command, scenarioData)
         return True

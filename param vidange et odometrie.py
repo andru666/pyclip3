@@ -4,6 +4,7 @@ from mod_utils import *
 from kivy.app import App
 from collections import OrderedDict
 from kivy.clock import Clock
+from kivy.uix.dropdown import DropDown
 
 class ScrMsg(Screen):
     pass
@@ -74,21 +75,14 @@ class Scenarii(App):
         super(Scenarii, self).__init__()
 
     def button_screen(self, dat, start=None):
-        if start == 1:
-            self.begin_time = time.time()
-            responce = self.ecu.run_cmd(self. ScmParam['Cmde1'])
-        if dat == 'Scr7Msg8':
-            self.need_update = True
         self.sm.current = dat
 
     def build(self):
-        
-        fs = mod_globals.fontSize
         header = '[' + self.command.codeMR + '] ' + self.command.label
 
         root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         root.add_widget(MyLabel(text=header))
-        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48202')))
+        root.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48202'), bgcolor=(1, 0.5, 0, 0.3)))
 
         self.layout2 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
         
@@ -96,257 +90,91 @@ class Scenarii(App):
         
         self.scr1 = ScrMsg(name='Scr1')
         self.sm.add_widget(self.scr1)
-        self.sceen1 = self.sceen('text_48141', 'Scr2', None, None)
+        self.sceen1 = self.sceen('text_48141', 'Scr2')
         self.scr1.add_widget(self.sceen1)
-        
         self.scr2 = ScrMsg(name='Scr2')
         self.sm.add_widget(self.scr2)
-        layout_current2 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        layout_current2.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_47870'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
-        dropdown1 = DropDown(size_hint=(1, None), height=fs * 2)
-        for index in ['text_29533', 'text_31334', 'text_30979']:
-            btn1 = Button(text=get_message(self.ScmParam, index), size_hint_y = None, height = fs*2)
-            btn1.bind(on_release = lambda btn1: dropdown1.select(btn1.text))
-            dropdown1.add_widget(btn1)
-        mainbutton1 = Button(text =get_message(self.ScmParam, 'text_47870'), size_hint =(1, None), height=fs * 2.5)
-        mainbutton1.bind(on_release = dropdown1.open)
-        dropdown1.bind(on_select = lambda instance, x: setattr(mainbutton1, 'text', x))
-        layout_current2.add_widget(mainbutton1)
-        layout_current2.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48142'), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
-        
-        dropdown2 = DropDown(size_hint=(1, None), height=fs * 2)
-        for index in ['text_32076', 'text_32077']:
-            btn2 = Button(text=get_message(self.ScmParam, index), size_hint_y = None, height = fs*2)
-            btn2.bind(on_release = lambda btn2: dropdown2.select(btn2.text))
-            dropdown2.add_widget(btn2)
-        mainbutton2 = Button(text =get_message(self.ScmParam, 'text_48142'), size_hint =(1, None), height=fs * 2.5)
-        mainbutton2.bind(on_release = dropdown2.open)
-        dropdown2.bind(on_select = lambda instance, x: setattr(mainbutton2, 'text', x))
-        layout_current2.add_widget(mainbutton2)
-        
-        
-        
-        self.scr2.add_widget(layout_current2)
-        
-        
-        """
-        self.scr3 = ScrMsg(name='Scr3Msg3')
+        self.sceen2 = self.sceen(self.screen1(), 'Scr3', btn1='Scr1')
+        self.scr2.add_widget(self.sceen2)
+        self.scr3 = ScrMsg(name='Scr3')
         self.sm.add_widget(self.scr3)
-        self.sceen3 = self.sceen('Scr3Msg3', 'Scr4Msg4', 'Informations', 'Scr2Msg2')
+        self.sceen3 = self.sceen('text_33974', 'Scr3', btn1='Scr2')
         self.scr3.add_widget(self.sceen3)
         
-        self.scr4 = ScrMsg(name='Scr4Msg4')
-        self.sm.add_widget(self.scr4)
-        self.sceen4 = self.sceen('Scr4Msg4', 'Scr5Msg6', 'Informations', 'Scr3Msg3')
-        self.scr4.add_widget(self.sceen4)
-        
-        self.scr5 = ScrMsg(name='Scr5Msg6')
-        self.sm.add_widget(self.scr5)
-        self.sceen5 = self.sceen('Scr5Msg6', 'Scr6Msg7', 'Informations', 'Scr4Msg4')
-        self.scr5.add_widget(self.sceen5)
-        
-        self.scr6 = ScrMsg(name='Scr6Msg7')
-        self.sm.add_widget(self.scr6)
-        params = self.get_ecu_values()
-        self.status = params[self.ScmParam['State1']]
-        if self.status != (get_message(self.ScmParam, 'TOURNANT')):
-            self.sceen6 = self.sceen('Scr6Msg7', 'Scr7Msg8', 'Informations', 'Scr5Msg6', 2)
-        else:
-            self.sceen6 = self.sceen('Scr6Msg7', 'Scr7Msg8', 'Informations', 'Scr5Msg6', 1)
-        self.scr6.add_widget(self.sceen6)
-
-        self.scr7 = ScrMsg(name='Scr7Msg8')
-        self.sm.add_widget(self.scr7)
-        
-        if self.status != (get_message(self.ScmParam, 'TOURNANT')):
-            layout_current7 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-            layout_current7.add_widget(MyLabel(text=get_message(self.ScmParam, 'MsgBox_Message'), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
-            layout_current7.add_widget(self.make_box_params('State1'))
-            layout_current7.add_widget(self.make_box_params('Param6'))
-            layout_current7.add_widget(self.make_box_params('Param7'))
-            self.sceen7 = self.sceen('Scr7Msg8', None, None, None, None)
-            layout_current7.add_widget(self.sceen7)
-            self.scr7.add_widget(layout_current7)
-        else:
-            self.scr7.bind(on_enter=self.update)
-            self.scr7.add_widget(self.regen())"""
-            
         self.layout2.add_widget(self.sm)
         root.add_widget(self.layout2)
-        root.add_widget(Button(text=get_message(self.ScmParam, '1053'), on_press=self.finish, size_hint=(1, None), height=80))
-        root_s = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
-         'center_y': 0.5})
-        root_s.add_widget(root)
-        return root_s
-    
-    def update(self, dt):
-        if self.need_update:
-            self.timer_event = Clock.schedule_once(self.update_timer, 1)
-            self.clock_event = Clock.schedule_once(self.update_values, 0.1)
-            self.status_event = Clock.schedule_once(self.update_status, 0.1)
-    
-    def regen(self):
-        layout_current7 = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        self.phase, self.pfe = self.regen_status()
-        hours, minutes, seconds = self.timer()
-        layout_current7.add_widget(MyLabel(text=get_message(self.ScmParam, 'TextCommandInProgress'), bgcolor=(0, 1, 1, 0.3)))
-        self.label_time = MyLabel(text='', bgcolor=(1, 1, 0, 0.3))
-        layout_current7.add_widget(self.label_time)
-        layout_current7.add_widget(self.phase_status())
-        layout_current7.add_widget(self.make_box_params('Param1'))
-        layout_current7.add_widget(self.make_box_params('Param2'))
-        layout_current7.add_widget(self.make_box_params('Param3'))
-        layout_current7.add_widget(self.make_box_params('Param4'))
-        layout_current7.add_widget(self.make_box_params('Param5'))
-        layout_current7.add_widget(self.make_box_params('Param6'))
-        layout_current7.add_widget(self.make_box_params('Param7'))
-        layout_current7.add_widget(self.make_box_params('State1'))
-        layout_current7.add_widget(self.make_box_params('State2'))
-        layout_current7.add_widget(self.make_box_params('State3'))
-        layout_current7.add_widget(self.make_box_params('State4'))
-        self.button_stop = Button(text=get_message(self.ScmParam, '939'), on_press=self.stop_regen, size_hint=(1, None), height=80)
-        layout_current7.add_widget(self.button_stop)
-        return layout_current7
-    
-    
-    def update_timer(self, dt):
-        if not self.running:
-            return
-        hours, minutes, seconds = self.timer()
-        try:
-            self.label_time.text = get_message(self.ScmParam, '57936')+'   -   %02d:%02d:%02d' % (hours, minutes, seconds)
-        except:
-            pass
-        self.timer_event = Clock.schedule_once(self.update_timer, 1)
-    
-    def timer(self):
-        current_time = time.time()
-        elapsed = int(current_time-self.begin_time)
-        minutes, seconds = divmod(elapsed, 60)
-        hours, minutes = divmod(minutes, 60)
-        return hours, minutes, seconds
+        root.add_widget(MyButton(text=get_message(self.ScmParam, '1053'), on_press=self.finish, size_hint=(1, None), height=80))
+        return root
 
-    def phase_status(self):
-        glay = BoxLayout(orientation='horizontal', size_hint=(1, None), height=fs * 2.5)
-        self.label_status = MyLabel(text='', bgcolor=(1, 1, 0, 0.3))
-        glay.add_widget(self.label_status)
-        self.labels['phase_status'] = self.label_status
-        return glay
-
-    def stop_regen(self, instance=None):
-    
-        responce = self.ecu.run_cmd(self.ScmParam['Cmde2'])
-        params = self.get_ecu_values()
-        self.rescode = (params[self.ScmParam['State3']])
-        self.result = (mod_globals.language_dict[self.ScmSet[self.rescode]])
-        layout_popup = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
-        layout_popup.add_widget(MyLabel(text=(get_message(self.ScmParam, '804'))+' - '+(self.phase), size_hint=(1, 0.2), bgcolor=(1, 1, 0, 0.3)))
-        layout_popup.add_widget(MyLabel(text=(get_message(self.ScmParam, '23819'))+' :\n '+(self.result), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
-        layout_popup.add_widget(Button(text=get_message(self.ScmParam, '1053'), on_press=self.finish, size_hint=(1, None), height=80))
-        popup = Popup(title=get_message(self.ScmParam, 'TextCommandFinished'), content=layout_popup, size=(500, 500), size_hint=(None, None))
-        self.need_update = False
-        popup.open()
-
-    def update_status(self, dt):
-        if not self.running:
-            return
-        self.ecu.elm.clear_cache()
-        self.phase, self.pfe = self.regen_status()
-        try:
-            self.labels['phase_status'].text = get_message(self.ScmParam, '804')+' - '+(self.phase)
-        except:
-            pass
-        self.status_event = Clock.schedule_once(self.update_status, 0.1)
-
-    def regen_status(self, name = False, no_formatting = False):
-        params = self.get_ecu_values()
-        self.etat = (params[self.ScmParam['State2']])
-        self.pfe = 0
-        if self.etat == get_message(self.ScmParam, 'ETAT1'):
-            self.phase = get_message(self.ScmParam, 'Phase1')
-            self.pfe = 0
-        elif self.etat == get_message(self.ScmParam, 'ETAT2'): 
-            self.phase = get_message(self.ScmParam, 'Phase2')
-            self.pfe = 0
-        elif self.etat == get_message(self.ScmParam, 'ETAT3'): 
-            self.phase = get_message(self.ScmParam, 'Phase3')
-            self.pfe = 0
-        elif self.etat == get_message(self.ScmParam, 'ETAT4'): 
-            self.phase = get_message(self.ScmParam, 'Phase4')
-            self.pfe = 0
-        elif self.etat == get_message(self.ScmParam, 'ETAT5'): 
-            self.phase = get_message(self.ScmParam, 'Phase5')
-            self.pfe = 1
-        elif self.etat == get_message(self.ScmParam, 'ETAT6'): 
-            self.phase = get_message(self.ScmParam, 'Phase6')
-            self.pfe = 2
-        else:  
-            self.phase = self.etat
-        return self.phase, self.pfe
-
-    def sceen(self, screen, btn2, informations, btn1, start=None):
+    def screen1(self):
+        layout = GridLayout(cols=1, spacing=5, size_hint=(1, 1))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_33974'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0.8, 0, 0.3)))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_47870'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
+        self.drop_avto = DropDown()
+        for index in ['text_29533', 'text_31334', 'text_30979']:
+            btn1 = MyButton(text=get_message(self.ScmParam, index), size_hint_y = None, font_size=fs*1.5)
+            btn1.bind(on_release = lambda btn1: self.drop_avto.select(btn1.text))
+            self.drop_avto.add_widget(btn1)
+        self.but_avto = MyButton(text=get_message(self.ScmParam, 'text_184'), font_size=fs*1.5, size_hint=(1, 1))
+        self.but_avto.bind(on_release = self.drop_avto.open)
+        self.drop_avto.bind(on_select = lambda instance, x: setattr(self.but_avto, 'text', x))
+        layout.add_widget(self.but_avto)
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48142'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
         
-        layout_current = BoxLayout(orientation='vertical', spacing=5, size_hint=(1, 1))
+        self.drop_distn = DropDown()
+        for index in ['text_32076', 'text_32077']:
+            btn2 = MyButton(text=get_message(self.ScmParam, index), size_hint_y = None, font_size=fs*1.5)
+            btn2.bind(on_release = lambda btn2: self.drop_distn.select(btn2.text))
+            self.drop_distn.add_widget(btn2)
+        self.but_distn = MyButton(text =get_message(self.ScmParam, 'text_184'), font_size=fs*1.5, size_hint =(1, 1))
+        self.but_distn.bind(on_release = self.drop_distn.open)
+        self.drop_distn.bind(on_select = lambda instance, x: setattr(self.but_distn, 'text', x))
+        layout.add_widget(self.but_distn)
+        return layout
+
+    def sceen(self, screen, btn2, informations=None, btn1=None, start=None):
+        lat = GridLayout(cols=1, spacing=5, size_hint=(1, 1))
         if informations:
-            layout_current.add_widget(MyLabel(text=get_message(self.ScmParam, informations), size_hint=(1, 0.2), bgcolor=(1, 0, 0, 0.3)))
-        layout_current.add_widget(MyLabel(text=get_message(self.ScmParam, screen), size_hint=(1, 0.7), bgcolor=(0, 1, 1, 0.3)))
+            lat.add_widget(MyLabel(text=get_message(self.ScmParam, informations), size_hint=(1, None), bgcolor=(1, 0, 0, 0.3)))
+        root = ScrollView(size_hint=(1, 1))
+        if type(screen) is str:
+            root.add_widget(MyLabel(text=get_message(self.ScmParam, screen), bgcolor=(0, 1, 1, 0.3)))
+        else:
+            root.add_widget(screen)
+        lat.add_widget(root)
         if btn1 or btn2:
-            layout = BoxLayout(orientation='horizontal', spacing=5, size_hint=(1, 0.2))
+            layout = BoxLayout(orientation='horizontal', spacing=5, size_hint=(1, None))
         if btn1:
-            nbtn1 = Button(text=get_message(self.ScmParam, '6218'))
-            nbtn1.bind(on_press=lambda *args: self.button_screen(btn1))
+            nbtn1 = MyButton(text=get_message_by_id('6218'), font_size=fs*1.5)
+            layout.height = nbtn1.height
+            nbtn1.bind(on_press=lambda *args: self.MyButton_screen(btn1))
             layout.add_widget(nbtn1)
         if btn2:
             if start == 1:
-                nbtn2 = Button(text=get_message(self.ScmParam, '29116'))
-                nbtn2.bind(on_press=lambda *args: self.button_screen(btn2, 1))
+                nbtn2 = MyButton(text=get_message_by_id('29116'), font_size=fs*1.5)
+                nbtn2.bind(on_press=lambda *args: self.MyButton_screen(btn2, 1))
             elif start == 2:
-                nbtn2 = Button(text=get_message(self.ScmParam, '29116'))
-                nbtn2.bind(on_press=lambda *args: self.button_screen(btn2, 2))
+                nbtn2 = MyButton(text=get_message_by_id('29116'), font_size=fs*1.5)
+                nbtn2.bind(on_press=lambda *args: self.MyButton_screen(btn2, 2))
             else:
-                nbtn2 = Button(text=get_message(self.ScmParam, '6219'))
-                nbtn2.bind(on_press=lambda *args: self.button_screen(btn2))
+                nbtn2 = MyButton(text=get_message_by_id('6219'), font_size=fs*1.5)
+                nbtn2.bind(on_press=lambda *args: self.MyButton_screen(btn2))
+            layout.height = nbtn2.height
             layout.add_widget(nbtn2)
         if btn1 or btn2:
-            layout_current.add_widget(layout)
-        return layout_current
-    
-    def get_ecu_values(self):
-        dct = OrderedDict()
-        for name, key in self.ScmParam.items():
-            if not key[:1].isdigit():
-                if key[:2] == 'PR':
-                    codemr, label, value, unit = self.ecu.get_pr(self.ScmParam[name], True)
-                    key = '%s - %s' % (codemr, label)
-                    value = '%s %s' % (value, unit)
-                    dct[codemr] = value
-                    self.paramsLabels[codemr] = key
-                    self.need_update = True
-                if key[:2] == 'ET':
-                    codemr, label, value = self.ecu.get_st(self.ScmParam[name], True)
-                    key = '%s - %s' % (codemr, label)
-                    dct[codemr] = value
-                    self.paramsLabels[codemr] = key
-                    self.need_update = True
-                if key[:2] == 'ID':
-                    codemr, label, value = self.ecu.get_id(self.ScmParam[name], True)
-                    key = '%s - %s' % (codemr, label)
-                    dct[codemr] = str(value).strip()
-                    self.paramsLabels[codemr] = key
-        return dct
-        
-    def update_values(self, dt):
-        if not self.running:
-            return
-        self.ecu.elm.clear_cache()
-        params = self.get_ecu_values()
-        for param, val in params.items():
-            try:
-                self.labels[param].text = val.strip()
-            except:
-                continue
-        self.clock_event = Clock.schedule_once(self.update_values, 0.1)
-    
+            lat.add_widget(layout)
+        return lat
+
+    def MyButton_screen(self, dat, start=None):
+        print(self.but_avto.text)
+        print(self.but_distn.text)
+        if start == 1:
+            self.begin_time = time.time()
+            responce = self.ecu.run_cmd(self. ScmParam['Cmde1'])
+        if dat == 'Scr7Msg8':
+            self.need_update = True
+        self.sm.current = dat
+
     def make_box_params(self, parameter_name):
         params = self.get_ecu_values()
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
