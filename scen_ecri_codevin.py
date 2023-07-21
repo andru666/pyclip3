@@ -32,8 +32,7 @@ class VinWrite(App):
                     value = Param.getAttribute('value')
                     scmParamsDict[name] = value
                 self.ScmSet[setname] = scmParamsDict
-            else:
-                print(11)
+            
         super(VinWrite, self).__init__()
 
     def build(self):

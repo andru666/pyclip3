@@ -3,7 +3,7 @@ import mod_globals, mod_zip
 from mod_utils import *
 from kivy.app import App
 from collections import OrderedDict
-import xml.dom.minidom as et
+import xml.etree.ElementTree as et
 
 class Scenarii(App):
     global fs
@@ -26,15 +26,23 @@ class Scenarii(App):
         for Set in ScmSets:
             if len(Set.attributes) >= 1:
                 setname = Set.getAttribute('name')
+                Scm_Set = Set.getElementsByTagName('ScmSet')
                 ScmParams = Set.getElementsByTagName('ScmParam')
                 scmParamsDict = OrderedDict()
+                if Scm_Set:
+                    for sets in Scm_Set:
+                        setn = sets.getAttribute('name')
+                        ScmParamS = sets.getElementsByTagName('ScmParam')
+                        scmParamsDict[setn] = OrderedDict()
+                        for ParamS in ScmParamS:
+                            name = ParamS.getAttribute('name')
+                            value = ParamS.getAttribute('value')
+                            scmParamsDict[setn][name] = value
                 for Param in ScmParams:
                     name = Param.getAttribute('name')
                     value = Param.getAttribute('value')
                     scmParamsDict[name] = value
                 self.ScmSet[setname] = scmParamsDict
-            else:
-                print(11)
         self.file_saved = mod_globals.dumps_dir + self.ScmParam['RecordingFile']
 
         super(Scenarii, self).__init__()
@@ -61,65 +69,52 @@ class Scenarii(App):
         self.popup = MyPopup_close(get_message(self.ScmParam, 'MessageBoxTitle1'), self.root, op=None)
         self.popup.open()
     
+    def respon(self, dt):
+        pass
+        
+    
     def saveds(self, idents):
-        print('test')
         if  not os.path.isfile(self.file_saved):
             self.popup.title = get_message(self.ScmParam, 'MessageBoxTitle2')
             self.label.text = get_message(self.ScmParam, 'Message21')
             self.root.remove_widget(self.yes)
             return
         self.popup.dismiss()
-        ty = (et.parse(self.file_saved).documentElement)
-        tyScmParams = ty.getElementsByTagName('ScmParam')
+        self.root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
+        self.label = MyLabel(text=get_message(self.ScmParam, 'CmdeInProgress'), size_hint=(1, .8), font_size=fs*1.2, bgcolor=(1, 0, 0, 0.3))
+        self.root.add_widget(self.label)
+        tree = et.parse(self.file_saved)
+        root = tree.getroot()
         params = {}
-        for p in tyScmParams:
-            name = p.getAttribute('name')
-            value = p.getAttribute('value')
-            params[name] = value
+        for child in root:
+            name = child.attrib['name']
+            if name != self.ScmParam['Vdiag']:
+                params[name] = child.attrib['value']
+            else:
+                Vdiag = child.attrib['value']
+        self.popup = MyPopup_close(get_message(self.ScmParam, 'MessageBoxTitle1'), self.root, op=None)
+        self.popup.open()
+
         for k, v in self.ScmSet.items():
-            if k.startswith('vdiag'):
-                print(v['ini1'])
+            if k == 'vdiagGroup' + self.ScmParam['NumDataGroups']:
+                for i in range(1, int(v['Num_Commands'])+1):
+                    cmd = v['Command'+str(i)]
+                    sends = ''
+                    for l in range(int(v['startCommand'+str(i)]), int(v['endCommand'+str(i)])+1):
+                        p = params[v['Data_Read'+str(l)]['AgcdRef']]
+                        sends += p
+                    base.EventLoop.idle()
+                    response = self.ecu.run_cmd(cmd, sends)
+                    base.EventLoop.idle()
+                    self.label.text += '\n' 
+                    self.label.text += cmd + ' : ' + response
+                    if 'NR' in response:
+                        self.popup.title = get_message(self.ScmParam, 'CmdeFinish')
+                        self.label.text += get_message(self.ScmParam, 'CmdeImpossible')
+                    else:
+                        self.label.text += get_message(self.ScmParam, 'Message23')
         return
-        '''fileRoot = et.Element("ScmRoot")
-        fileRoot.text = "\n"
-        doom = et.fromstring(mod_zip.get_xml_scenario_et(self.data))
-        root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
-        lab = MyLabel(text=get_message(self.ScmParam, 'CmdeInProgress'))
-        root.add_widget(lab)
-        but = MyButton(text=get_message_by_id('16831'), font_size=fs*1.5)
-        root.add_widget(but)
-        pop = MyPopup(title=get_message(self.ScmParam, 'MessageBoxTitle1'), content=root)
-        pop.open()
-        but.bind(on_press=pop.dismiss)
-        Vdiag = get_message(self.ScmParam, 'Vdiag')
-        val_diag = str(self.ecu.get_id(Vdiag, 5))
-        if val_diag:
-            el = et.Element("ScmParam", name=Vdiag, value=val_diag)
-            el.tail = "\n"
-            fileRoot.insert(1,el)
-        lab.text += str('\n' + Vdiag + ' : ' + val_diag)
-        lab.height += fs * 1.2
-        
-        for child in doom:
-            if child.attrib['name'].startswith('Data_Read'):
-                val = child.attrib['value']
-                ident = self.ecu.get_id(val, 5)
-                lab.text += str('\n' + val + ' : ' + ident)
-                lab.height += fs * 1.2
-                if ident:
-                    el = et.Element("ScmParam", name=val, value=str(ident))
-                    el.tail = "\n"
-                    fileRoot.insert(1,el)
-        if len(fileRoot) != int(self.ScmParam['Nb_Data_Read']) + 1:
-            pop.title = get_message(self.ScmParam, 'CmdeFinish')
-            lab.text = get_message(self.ScmParam, 'Message2')
-            return
-        tree = et.ElementTree(fileRoot)
-        tree.write(self.file_saved)
-        MyPopup_close(get_message(self.ScmParam, 'SubTitleScr2'), MyLabel(text=get_message(self.ScmParam, 'Message3'), font_size=fs*1.5))'''
-
-
-
+    
 
 def run(elm, ecu, command, data):
     app = Scenarii(elm=elm, 

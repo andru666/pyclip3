@@ -64,8 +64,7 @@ class Scenario(App):
                         value = Param.getAttribute('value')
                         scmParamsDict[name] = value
                     self.ScmSet[setname] = scmParamsDict
-                else:
-                    print(11)
+
         if "IdentVdiag" in list(self.ScmParam.keys()):
             self.vdiagExists = True
 

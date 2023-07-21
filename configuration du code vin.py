@@ -26,12 +26,16 @@ class Scenarii(App):
         self.ScmParam = {}
         self.ScmSet = {}
         if 'ecudata' in self.data:
-            self.sdata = self.data.split('_')[0].replace('ecudata', 'scendata') + '_text.xml'
-            datas = [self.sdata, self.data]
+            sdata = self.data.rsplit('_', 2)[0].replace('ecudata', 'scendata') + '_text.xml'
+            dt = self.data.replace('_ecu_', '_const_')
+            datas = [sdata, dt, self.data]
         else:
             datas = self.data
         for dat in datas:
-            DOMTree = mod_zip.get_xml_scenario(dat)
+            try:
+                DOMTree = mod_zip.get_xml_scenario(dat)
+            except:
+                continue
             self.ScmRoom = DOMTree.documentElement
             ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
             ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
@@ -49,9 +53,7 @@ class Scenarii(App):
                         value = Param.getAttribute('value')
                         scmParamsDict[name] = value
                     self.ScmSet[setname] = scmParamsDict
-                else:
-                    print(len(Set.attributes))
-                    print(11)
+
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label

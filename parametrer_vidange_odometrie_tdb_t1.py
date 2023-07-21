@@ -26,40 +26,30 @@ class Scenarii(App):
         self.need_update = False
         self.start_regen = False
         self.begin_time = 0
-        DOMTree = mod_zip.get_xml_scenario(self.data)
-        self.ScmRoom = DOMTree.documentElement
-        ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
-        ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
+        
         self.ScmParam = {}
         self.ScmSet = {}
         self.labels = {}
         self.paramsLabels = OrderedDict()
-        
-        for Param in ScmParams:
-            name = (Param.getAttribute('name'))
-            value = (Param.getAttribute('value'))
-            self.ScmParam[name] = value
-        
-        for Set in ScmSets:
-            if len(Set.attributes) >= 1:
-                setname = Set.getAttribute('name')
-                ScmParams = Set.getElementsByTagName('ScmParam')
-                scmParamsDict = OrderedDict()
-                for Param in ScmParams:
-                    name = Param.getAttribute('name')
-                    value = Param.getAttribute('value')
-                    scmParamsDict[name] = value
-                self.ScmSet[setname] = scmParamsDict
-            
-        if self.data.startswith('ecudata'):
-            ScmRoom2 = mod_zip.get_xml_scenario(self.data.rsplit('_', 2)[0].replace('ecudata', 'scendata') +'_text.xml').documentElement
-            ScmParams2 = ScmRoom2.getElementsByTagName('ScmParam')
-            ScmSets2 = ScmRoom2.getElementsByTagName('ScmSet')
-            for Param in ScmParams2:
+        if 'ecudata' in self.data:
+            sdata = self.data.rsplit('_', 2)[0].replace('ecudata', 'scendata') + '_text.xml'
+            dt = self.data.replace('_ecu_', '_const_')
+            datas = [sdata, dt, self.data]
+        else:
+            datas = self.data
+        for dat in datas:
+            try:
+                DOMTree = mod_zip.get_xml_scenario(dat)
+            except:
+                continue
+            self.ScmRoom = DOMTree.documentElement
+            ScmParams = self.ScmRoom.getElementsByTagName('ScmParam')
+            ScmSets = self.ScmRoom.getElementsByTagName('ScmSet')
+            for Param in ScmParams:
                 name = (Param.getAttribute('name'))
                 value = (Param.getAttribute('value'))
                 self.ScmParam[name] = value
-            for Set in ScmSets2:
+            for Set in ScmSets:
                 if len(Set.attributes) >= 1:
                     setname = Set.getAttribute('name')
                     ScmParams = Set.getElementsByTagName('ScmParam')
@@ -69,7 +59,6 @@ class Scenarii(App):
                         value = Param.getAttribute('value')
                         scmParamsDict[name] = value
                     self.ScmSet[setname] = scmParamsDict
-
         super(Scenarii, self).__init__()
 
     def button_screen(self, dat, start=None):
@@ -77,7 +66,6 @@ class Scenarii(App):
 
     def build(self):
         header = '[' + self.command.codeMR + '] ' + self.command.label
-
         root = GridLayout(cols=1, spacing=fs * 0.5, size_hint=(1, 1))
         root.add_widget(MyLabel(text=header))
         root.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48202'), bgcolor=(1, 0.5, 0, 0.3)))
@@ -88,7 +76,7 @@ class Scenarii(App):
         
         self.scr1 = ScrMsg(name='Scr1')
         self.sm.add_widget(self.scr1)
-        self.sceen1 = self.sceen('text_48141', 'Scr2')
+        self.sceen1 = self.sceen('C_s2', 'Scr2')
         self.scr1.add_widget(self.sceen1)
         self.scr2 = ScrMsg(name='Scr2')
         self.sm.add_widget(self.scr2)
@@ -106,19 +94,8 @@ class Scenarii(App):
 
     def screen1(self):
         layout = GridLayout(cols=1, spacing=5, size_hint=(1, 1))
-        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_33974'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0.8, 0, 0.3)))
-        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_47870'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
-        self.drop_avto = DropDown()
-        for index in ['text_29533', 'text_31334', 'text_30979']:
-            btn1 = MyButton(text=get_message(self.ScmParam, index), size_hint_y = None, font_size=fs*1.5)
-            btn1.bind(on_release = lambda btn1: self.drop_avto.select(btn1.text))
-            self.drop_avto.add_widget(btn1)
-        self.but_avto = MyButton(text=get_message(self.ScmParam, 'text_184'), font_size=fs*1.5, size_hint=(1, 1))
-        self.but_avto.bind(on_release = self.drop_avto.open)
-        self.drop_avto.bind(on_select = lambda instance, x: setattr(self.but_avto, 'text', x))
-        layout.add_widget(self.but_avto)
-        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'text_48142'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
-        
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'C_s4'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0.8, 0, 0.3)))
+        layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'C_s3'), font_size=fs*1.2, size_hint=(1, 1), bgcolor=(1, 0, 0, 0.3)))
         self.drop_distn = DropDown()
         for index in ['text_32076', 'text_32077']:
             btn2 = MyButton(text=get_message(self.ScmParam, index), size_hint_y = None, font_size=fs*1.5)
@@ -128,6 +105,7 @@ class Scenarii(App):
         self.but_distn.bind(on_release = self.drop_distn.open)
         self.drop_distn.bind(on_select = lambda instance, x: setattr(self.but_distn, 'text', x))
         layout.add_widget(self.but_distn)
+        layout.add_widget(self.box('C_s5'))
         return layout
 
     def sceen(self, screen, btn2, informations=None, btn1=None, start=None):
@@ -164,14 +142,22 @@ class Scenarii(App):
         return lat
 
     def MyButton_screen(self, dat, start=None):
-        print(self.but_avto.text)
-        print(self.but_distn.text)
         if start == 1:
             self.begin_time = time.time()
             responce = self.ecu.run_cmd(self. ScmParam['Cmde1'])
         if dat == 'Scr7Msg8':
             self.need_update = True
         self.sm.current = dat
+
+    def box(self, text):
+        glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        label1 = MyLabelBlue(text=self.paramsLabels[self.ScmParam[text]], halign='left', size_hint=(.65, 1), param_name=parameter_name)
+        text = MyTextInput(text='')
+        glay.height = label1.height
+        glay.add_widget(label1)
+        glay.add_widget(text)
+        self.labels[self.ScmParam[parameter_name]] = text
+        return glay
 
     def make_box_params(self, parameter_name):
         params = self.get_ecu_values()

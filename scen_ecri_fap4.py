@@ -49,8 +49,6 @@ class Scenarii(App):
                     value = Param.getAttribute('value')
                     scmParamsDict[name] = value
                 self.ScmSet[setname] = scmParamsDict
-            else:
-                print(11)
 
         super(Scenarii, self).__init__()
 
