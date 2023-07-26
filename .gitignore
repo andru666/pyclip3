@@ -156,3 +156,4 @@ cython_debug/
 *.cmd
 *.csv
 *.xml
+scen/

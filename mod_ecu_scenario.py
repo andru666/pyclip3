@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re, os, mod_globals
+import re, os, mod_globals, sys
 
 if mod_globals.os == 'android':
     from jnius import autoclass
@@ -9,7 +9,11 @@ if mod_globals.os == 'android':
     if not os.path.exists(scen_dir):
         os.makedirs(scen_dir)
     sys.path.append(scen_dir)
-
+else:
+    scen_dir = mod_globals.user_data_dir + '/scen/'
+    if not os.path.exists(scen_dir):
+        os.makedirs(scen_dir)
+    sys.path.append(scen_dir)
 def playScenario(command, ecu, elm):
     services = ecu.Services
     scenarioName, scenarioData = command.scenario.split('#')
