@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import re, mod_globals, mod_zip, mod_ecu_mnemonic
+import re, mod_globals, mod_zip, mod_ecu_mnemonic, time
 from mod_utils import *
 from kivy.app import App
 from collections import OrderedDict
@@ -78,6 +78,7 @@ class Scenarii(App):
             return
         for k, v in self.ScmParam.items():
             if k.startswith('Cmde_ecr'):
+                time.sleep(int(self.ScmParam['Tempo'])/1000)
                 resp = self.ecu.run_cmd(v, ecri[self.ScmParam[k.replace('Cmde_ecr', 'Donnee_lec')]])
                 lab.text += resp
                 if 'NR' in resp:

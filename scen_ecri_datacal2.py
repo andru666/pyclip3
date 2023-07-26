@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-import mod_globals, mod_zip
+import mod_globals, mod_zip, time
+from datetime import datetime
 from mod_utils import *
 from kivy.app import App
 from collections import OrderedDict
@@ -94,21 +95,22 @@ class Scenarii(App):
                 Vdiag = child.attrib['value']
         self.popup = MyPopup_close(get_message(self.ScmParam, 'MessageBoxTitle1'), self.root, op=None)
         self.popup.open()
-
         for k, v in self.ScmSet.items():
             if k == 'vdiagGroup' + self.ScmParam['NumDataGroups']:
                 for i in range(1, int(v['Num_Commands'])+1):
-                    cmd = v['Command'+str(i)]
-                    sends = ''
+                    self.cmd = v['Command'+str(i)]
+                    self.sends = ''
                     for l in range(int(v['startCommand'+str(i)]), int(v['endCommand'+str(i)])+1):
                         p = params[v['Data_Read'+str(l)]['AgcdRef']]
-                        sends += p
+                        self.sends += p
                     base.EventLoop.idle()
-                    response = self.ecu.run_cmd(cmd, sends)
+                    time.sleep(int(self.ScmParam['Timer'])/1000)
+                    rsp = self.ecu.run_cmd(self.cmd, self.sends)
                     base.EventLoop.idle()
                     self.label.text += '\n' 
-                    self.label.text += cmd + ' : ' + response
-                    if 'NR' in response:
+                    self.label.text += self.cmd + ' : ' + rsp
+                    self.label.text += '\n' 
+                    if 'NR' in rsp:
                         self.popup.title = get_message(self.ScmParam, 'CmdeFinish')
                         self.label.text += get_message(self.ScmParam, 'CmdeImpossible')
                     else:
