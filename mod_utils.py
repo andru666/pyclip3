@@ -83,7 +83,7 @@ class MyTextInput(TextInput):
             if lines < 2: lines = lines
             self.height = lines * self.font_size * 1.75
         if mod_globals.os == 'android':
-            self.height = self.height * 1.75
+            self.height = self.height
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
