@@ -74,19 +74,17 @@ class MyTextInput(TextInput):
             self.font_size = fs*0.9
             font = True
         if 'height' not in kwargs:
+            
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb:
                 if (lines * 2) > simb: lines = simb + lines/2
                 else: lines = simb
-            if 2 < lines < 3: lines = lines * 1.5
-            if lines < 2: lines = lines * 1.5
+            if 2 < lines < 3: lines = lines
+            if lines < 2: lines = lines
             self.height = lines * self.font_size
         self.height = kivy.metrics.dp(self.height)
-        if font:
-            self.font_size = kivy.metrics.dp(self.font_size*0.9)
-        else:
-            self.font_size = kivy.metrics.dp(self.font_size)
+        self.font_size = kivy.metrics.dp(self.font_size)
         self.padding = str(self.font_size / self.height) + 'sp'
 
 class MyPopup(Popup):
