@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.47'
+__version__ = '0.01.48'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -467,7 +467,7 @@ class screenConfig(App):
         except:
             self.archive = str(mod_globals.db_archive_file).rpartition('\\')[2]
         if self.archive == 'None':
-            self.archive = 'NOT BASE'
+            self.archive = 'NOT BASE.\n Download pyrendata_XXX.zip and copy folder pyren'
             root = GridLayout(cols=1, padding=15, spacing=15, size_hint=(1, 1))
             popup = MyPopup(title='INFO', title_size=fs*1.5, title_align='center', content=MyLabel(text=self.archive, font_size=(fs*5), size_hint=(1, 1)), size_hint=(1, 1))
             return popup

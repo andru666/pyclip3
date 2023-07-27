@@ -74,7 +74,6 @@ class MyTextInput(TextInput):
             self.font_size = fs*0.9
             font = True
         if 'height' not in kwargs:
-            
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb:
@@ -82,7 +81,10 @@ class MyTextInput(TextInput):
                 else: lines = simb
             if 2 < lines < 3: lines = lines
             if lines < 2: lines = lines
-            self.height = lines * self.font_size
+            self.height = lines * self.font_size * 1.75
+        if mod_globals.os == 'android':
+            self.height = self.height * 1.75
+            self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.padding = str(self.font_size / self.height) + 'sp'
