@@ -131,7 +131,7 @@ class MyButton(Button):
             if lines < 2: lines = lines * 1.5
             self.height = lines * self.font_size * 1.5
         if mod_globals.os == 'android':
-            self.font_size = self.font_size * 0.8
+            self.font_size = self.font_size * 0.9
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
 
