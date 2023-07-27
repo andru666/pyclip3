@@ -81,9 +81,8 @@ class MyTextInput(TextInput):
                 else: lines = simb
             if 2 < lines < 3: lines = lines
             if lines < 2: lines = lines
-            self.height = lines * self.font_size * 1.75
+            self.height = lines * self.font_size * 1.5
         if mod_globals.os == 'android':
-            self.height = self.height
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
@@ -131,6 +130,8 @@ class MyButton(Button):
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 1.5
             self.height = lines * self.font_size * 1.5
+        if mod_globals.os == 'android':
+            self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
 
