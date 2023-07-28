@@ -82,8 +82,6 @@ class MyTextInput(TextInput):
             if 2 < lines < 3: lines = lines
             if lines < 2: lines = lines
             self.height = lines * self.font_size * 1.4
-        if mod_globals.os == 'android':
-            self.font_size = self.font_size * 0.9
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.padding = str(self.font_size / self.height) + 'sp'
