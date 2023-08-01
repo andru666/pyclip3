@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.01.51'
+__version__ = '0.01.52'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
