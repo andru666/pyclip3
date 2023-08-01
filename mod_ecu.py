@@ -240,11 +240,6 @@ class showDatarefGui(App):
 
         return dct
 
-    '''def updates_values(self, dt):
-        """Function to start a new thread each time."""
-        self.new_thread = threading.Thread(target = self.update_values) # Now call that function from this a new thread.
-        self.new_thread.start()'''
-
     def updates_values(self, dt):
         if not self.running:
             return
