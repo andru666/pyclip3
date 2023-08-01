@@ -209,7 +209,6 @@ class showDatarefGui(App):
         for dr in self.datarefs:
             EventLoop.idle()
             EventLoop.window.mainloop()
-            EventLoop.idle()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -250,9 +249,7 @@ class showDatarefGui(App):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
-        EventLoop.idle()
         params = self.get_ecu_values()
-        EventLoop.idle()
         for param, val in params.items():
             if val != 'Text' and val != 'DTCText':
                 self.labels[param].text = val.strip()
