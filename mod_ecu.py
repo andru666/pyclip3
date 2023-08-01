@@ -207,8 +207,6 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.idle()
-            EventLoop.window.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -240,16 +238,19 @@ class showDatarefGui(App):
 
         return dct
 
-    def updates_values(self, dt):
+    '''def updates_values(self, dt):
         """Function to start a new thread each time."""
         self.new_thread = threading.Thread(target = self.update_values) # Now call that function from this a new thread.
-        self.new_thread.start()
+        self.new_thread.start()'''
 
-    def update_values(self, dt):
+    def updates_values(self, dt):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
         params = self.get_ecu_values()
+        
+        EventLoop.idle()
+        EventLoop.window.mainloop()
         for param, val in params.items():
             if val != 'Text' and val != 'DTCText':
                 self.labels[param].text = val.strip()
