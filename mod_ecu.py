@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
+import sys, threading
 import time
 import xml.dom.minidom
 from collections import OrderedDict
@@ -238,7 +238,12 @@ class showDatarefGui(App):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
 
         return dct
-        
+
+    def updates_values(self, dt):
+        """Function to start a new thread each time."""
+        self.new_thread = threading.Thread(target = self.update_values) # Now call that function from this a new thread.
+        self.new_thread.start()
+
     def update_values(self, dt):
         if not self.running:
             return
@@ -250,9 +255,9 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
-            self.clock_event = Clock.schedule_once(self.update_values, 0.02)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
         else:
-            self.clock_event = Clock.schedule_once(self.update_values, 0.05)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -307,7 +312,7 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            self.clock_event = Clock.schedule_once(self.update_values, 0.5)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 
