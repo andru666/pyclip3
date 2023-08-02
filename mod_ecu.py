@@ -237,6 +237,7 @@ class showDatarefGui(App):
                 dct[dr.name] = str(dr.type)
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
+                self.csvline += ","
 
         return dct
 
@@ -600,16 +601,18 @@ class ECU():
     
     def prepareCSV(self, datarefs, path):
         csvf = 0
-        csvline = "sep=\\t\n"
-        csvline += "Time"
+        #csvline = "sep=\\t\n"
+        csvline = "Time,"
         nparams = 0
         for dr in datarefs:
             if dr.type=='State':
                 csvline += ";" + self.States[dr.name].codeMR + (":" + self.States[dr.name].label  if mod_globals.opt_csv_human else "")
+                csvline += ","
                 nparams += 1
             if dr.type=='Parameter':
                 csvline += (";" + self.Parameters[dr.name].codeMR + (":" +self.Parameters[dr.name].label if mod_globals.opt_csv_human else "") + 
             " [" + self.Parameters[dr.name].unit + "]")
+                csvline += ","
                 nparams += 1
         csvline = pyren_encode(csvline)
         if nparams:
