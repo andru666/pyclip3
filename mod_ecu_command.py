@@ -36,7 +36,6 @@ def runCommand(command, ecu, elm, param = '', cmdt = 'HEX'):
         service = ecu.Services[si]
         if len(service.params):
             isParam += len(service.params)
-
     if len(command.datarefs):
         strlst = []
         elm.clear_cache()
@@ -56,14 +55,20 @@ def runCommand(command, ecu, elm, param = '', cmdt = 'HEX'):
     for si in command.serviceID:
         service = ecu.Services[si]
         if len(service.params) == 1 and chosenParameter == '':
-            if len(service.params[0]['size']):
-                parsize = int(service.params[0]['size'])
+            size = service.params[0]['size']
+            if len(size):
+                parsize = int(size)
             else:
                 parsize = 0
             ch = param
             ch = ch.strip().upper()
-            if cmdt == 'HEX' and all((c in string.hexdigits for c in ch)) and len(ch) % 2 == 0:
+            if cmdt == 'HEX' and all((c in string.hexdigits for c in ch)):
                 if parsize > 0 and len(ch) != parsize * 2:
+                    if len(ch) < parsize * 2:
+                        ch = ch.zfill(parsize * 2)
+                    else:
+                        continue
+                if len(ch) % 2 != 0:
                     continue
                 chosenParameter = ch
             if cmdt == 'VIN' and len(ch) == 17 and 'I' not in ch and 'O' not in ch:

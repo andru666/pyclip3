@@ -84,8 +84,12 @@ class Scenarii(App):
             MyPopup_close(get_message(self.ScmParam, 'text_33973'), MyLabel(text=get_message(self.ScmParam, 'text_29121'), size_hint=(1, 1), font_size=fs*1.5))
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
-        self.ecu.run_cmd(self.ScmParam['pdd_VP-4-41'], vin_crc)
-        MyPopup_close(get_message(self.ScmParam, 'text_9234'), MyLabel(text=get_message(self.ScmParam, 'text_41453'), size_hint=(1, 1), font_size=fs*1.5))
+        resp = self.ecu.run_cmd(self.ScmParam['pdd_VP-4-41'], vin_crc)
+        label = MyLabel(text=get_message(self.ScmParam, 'text_41453'), size_hint=(1, 1), font_size=fs*1.5)
+        label.text += '\n'
+        label.text += self.ScmParam['pdd_VP-4-41'] + ':\n'
+        label.text += resp
+        MyPopup_close(get_message(self.ScmParam, 'text_9234'), label)
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
@@ -96,7 +100,7 @@ class Scenarii(App):
         layout_box.add_widget(self.buttons_ok)
         layout_box.add_widget(MyButton(text=get_message(self.ScmParam, 'text_NO'), font_size=fs, on_press=self.stop))
         layout.add_widget(layout_box)
-        rootP = ScrollView(size_hint=(1, 1), size=(Window.size[0]*0.9, Window.size[1]*0.9))
+        rootP = ScrollView(size_hint=(1, 1))
         rootP.add_widget(layout)
         status = get_message(self.ScmParam, 'text_33973')
         self.popup = MyPopup(title=status, content=rootP)

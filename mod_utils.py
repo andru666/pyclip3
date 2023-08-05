@@ -65,6 +65,10 @@ class MyTextInput(TextInput):
     def __init__(self, **kwargs):
         fs = mod_globals.fontSize
         font = None
+        id = ''
+        if 'id' in kwargs:
+            self.id = kwargs['id']
+            del kwargs ['id']
         super(MyTextInput, self).__init__(**kwargs)
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)

@@ -65,8 +65,12 @@ class VinWrite(App):
             MyPopup_close(get_message(self.ScmParam, 'MessageBoxERREUR'), MyLabel(text=get_message(self.ScmParam, 'MessageBox2'), size_hint=(1, 1), font_size=fs*2))
             return None
         vin_crc = hex_VIN_plus_CRC(vin)
-        self.ecu.run_cmd(self.ScmParam['ConfigurationName'], vin_crc)
-        MyPopup_close(get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT'), MyLabel(text=get_message(self.ScmParam, 'confFin_text'), size_hint=(1, 1), font_size=fs*2))
+        resp = self.ecu.run_cmd(self.ScmParam['ConfigurationName'], vin_crc)
+        label = MyLabel(text=get_message(self.ScmParam, 'confFin_text'), size_hint=(1, 1), font_size=fs*2)
+        label.text += '\n'
+        label.text += self.ScmParam['ConfigurationName'] + ':\n'
+        label.text += resp
+        MyPopup_close(get_message(self.ScmParam, 'MessageBoxAVERTISSEMENT'), label)
 
     def pupp(self, instance):
         layout = GridLayout(cols=1, spacing=5, padding=fs*0.5, size_hint=(1, None))
