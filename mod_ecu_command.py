@@ -177,7 +177,7 @@ class kivyExecCommand(App):
         error = ''
         chosenParameter = self.chosenParameter
         self.popup.dismiss()
-        lbltxt = MyLabel(text='Changing configuration...')
+        lbltxt = MyLabel(text='Changing configuration...', font_size=fs*2, size_hint=(1, 1))
         popup2 = MyPopup(title='Working', content=lbltxt)
         popup2.open()
         EventLoop.idle()

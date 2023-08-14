@@ -131,7 +131,6 @@ class Scenarii(App):
         layout = GridLayout(cols=1, spacing=5, size_hint=(1, 1))
         root = GridLayout(cols=1, spacing=5, size_hint=(1, None))
         hours, minutes, seconds = self.timer()
-        hours, minutes, seconds = self.timer()
         layout.add_widget(MyLabel(text=get_message(self.ScmParam, 'TextCommandInProgress'), bgcolor=(0, 1, 1, 0.3)))
         self.label_time = MyLabel(text='', bgcolor=(1, 1, 0, 0.3))
         layout.add_widget(self.label_time)
