@@ -358,6 +358,89 @@ class widgetChoiceLong(App):
         root.add_widget(layout)
         return root
 
+def packValues(requests, datas, requestName, iValues):
+    r = requests[requestName]
+    cmdPatt = r.SentBytes
+    for sdi in r.SentDI.values():
+        d = datas[sdi.Name]
+        n = [v for v in iValues.keys() if (v.startswith(d.Name) and v.endswith(requestName))]
+        if not len(n):
+            n = [v for v in iValues.keys() if v.endswith(requestName)]
+            if not len(n):
+                n = [v for v in iValues.keys() if v.startswith(d.Name)]
+                if not len(n):
+                    continue
+        
+        try:
+            value = iValues[n[0]]['value'].strip()
+        except:
+            value = iValues[d.Name].strip()
+        value = getValueFromInput(d, value)
+        littleEndian = True if sdi.Endian=="Little" else False
+        sb = sdi.FirstByte - 1 
+        bits = d.BitsCount
+        sbit = sdi.BitOffset
+        bytes =(bits+sbit-1)//8 + 1
+        if littleEndian:
+            lshift = sbit
+        else:
+            lshift =((bytes+1)*8 -(bits+sbit))%8
+            
+        try:
+            val = int(value,16)
+        except:
+            return 'ERROR: Wrong HEX value in parametr(%s) : "%s"' %(d.Name, value)
+        val =(val&(2**bits-1))<<lshift
+        value = hex(val)[2:]
+        if value[-1:].upper()=='L':
+            value = value[:-1]
+        if len(value)%2:
+            value = '0'+value
+        if value.upper().startswith('0X'): value = value[2:]
+        value = value.zfill(bytes*2).upper()
+        if not all(c in string.hexdigits for c in value) and len(value)==bytes*2:
+            return 'ERROR: Wrong value in parametr:%s(it should have %d bytes)' %(d.Name, d.BytesCount)
+        base = cmdPatt[sb*2:(sb+bytes)*2]
+        binbase = int(base,16)
+        binvalue = int(value,16)
+        mask =(2**bits-1)<<lshift
+        
+        binvalue = binbase ^(mask & binbase) | binvalue
+
+        value = hex(binvalue)[2:].upper()
+        if value[-1:].upper()=='L':
+            value = value[:-1]
+        value = value[-bytes*2:].zfill(bytes*2)
+        cmdPatt = cmdPatt[0:sb*2] + value + cmdPatt[(sb+bytes)*2:]
+
+    return cmdPatt
+
+def getValueFromInput(d, value):
+    if value == LANG.l_enter_here:
+        return 'ERROR: Wrong value in parametr:%s(it should have %d bytes), be decimal or starts with 0x for hex' %(
+                d.Name, d.BytesCount)
+    if len(d.List.keys()) and ':' in value:
+        value = value.split(':')[0]
+    if d.Scaled:
+        if ' ' in value:
+            value = value.split(' ')[0]
+        if value.upper().startswith('0X'):
+            value = value[2:]
+        else:
+            if not all((c in string.digits or c == '.' or c == ',' or c == '-' or c == 'e' or c == 'E') for c in value):
+                return 'ERROR: Wrong value in parametr:%s(it should have %d bytes), be decimal or starts with 0x for hex' %(
+                d.Name, d.BytesCount)
+            flv =(float(value) * float(d.DivideBy) - float(d.Offset)) / float(d.Step)
+            value = hex(int(flv))
+            
+    if d.BytesASCII:
+        hst = ''
+        if len(value)<(d.BitsCount//8):
+            value += ' '*(d.BitsCount//8 - len(value))
+        for c in value:
+            hst = hst + hex(ord(c))[2:].zfill(2)
+        value = hst
+    return value
 
 def kivyChoiceLong(list, question, header = ''):
     global widgetglobal
@@ -401,6 +484,10 @@ def ChoiceFromDict(dict, question, showId = True):
             ch = 'Q'
         if ch in list(d.keys()):
             return [d[ch], ch]
+
+def getValueFromInput(d, val):
+    print(d)
+    print(val)
 
 def pyren_encodeS(inp):
     if mod_globals.os == 'android':
