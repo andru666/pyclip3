@@ -21,11 +21,11 @@ class Parser:
         yacc.yacc(module=self)
 
     def calculate(self, value):
+        print(value)
         return yacc.parse(value, debug=0)
 
     
 class Calc(Parser):
-
     result = ""
 
     tokens = (
