@@ -207,7 +207,6 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.idle()
             EventLoop.window.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
@@ -238,7 +237,6 @@ class showDatarefGui(App):
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
-
         return dct
 
     def updates_values(self, dt):
