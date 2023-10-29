@@ -239,7 +239,7 @@ class showDatarefGui(App):
                 self.csvline += ","
         return dct
 
-    def updates_values(self, dt):
+    def updates_values(self):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
@@ -250,9 +250,9 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
+            threading.Thread(target=self.updates_values).start()
         else:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
+            threading.Thread(target=self.updates_values).start()
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -307,7 +307,7 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
+            threading.Thread(target=self.updates_values).start()
         return root
 
 
