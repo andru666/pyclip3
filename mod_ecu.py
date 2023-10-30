@@ -207,7 +207,6 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.window.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -250,9 +249,13 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
-            threading.Thread(target=self.updates_values).start()
+            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event.start()
+            self.clock_event.join()
         else:
-            threading.Thread(target=self.updates_values).start()
+            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event.start()
+            self.clock_event.join()
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -307,7 +310,9 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            threading.Thread(target=self.updates_values).start()
+            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event.start()
+            self.clock_event.join()
         return root
 
 
