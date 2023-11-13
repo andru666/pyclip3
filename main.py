@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.02.00'
+__version__ = '0.02.01'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -501,6 +501,7 @@ class screenConfig(App):
 
     def term(self, instance):
         self.finish(instance)
+        self.stop()
         from mod_term import Term
         Term(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log).test()
 

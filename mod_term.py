@@ -6,7 +6,6 @@ except:
 from kivy.utils import platform
 from kivy.core.window import Window
 from kivy.app import App
-from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
@@ -21,6 +20,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.filechooser import FileChooserListView
 from kivy.clock import Clock
 import sys, os, re, string, time, mod_globals, mod_elm, mod_utils, main
+from mod_utils import *
+
 
 __all__ = 'install_android'
 
@@ -95,7 +96,7 @@ class MyApp(App):
     
     def build(self):
 
-        Clock.schedule_once(self.select_macro, 1)
+        Clock.schedule_once(self.select_macro, 0.1)
         
         self.label = MyLabel(text='', bgcolor=(1, 1, 0, 0.3), font_size=fs, size_hint=(1, None), height=fs*1.5)
         self.roots = GridLayout(cols=1, padding=fs*1.5, spacing=fs*1.5, size_hint=(1, None), size_hint_y=None)
@@ -113,11 +114,10 @@ class MyApp(App):
     
     def select_macro(self, instance):
         root = GridLayout(cols=1, size_hint=(1, 1))
-        root.add_widget(MyLabel(text='header', size_hint=(1, None)))
         self.fichoo = FileChooserListView(path=self.dir_macro)
         root.add_widget(self.fichoo)
-        root.add_widget(Button(text='Open', on_release=self.popp, size_hint=(1, None)))
-        self.popup_macro = Popup(title='SELECT macro', font_size=fs, content=root, size=(600, 600))
+        root.add_widget(MyButton(text='Open', on_release=self.popp, size_hint=(1, None)))
+        self.popup_macro = MyPopup_close(title='SELECT macro', cont=root, cl=1, op=None)#Popup(title='SELECT macro', font_size=fs, content='', size=(600, 600))
         self.popup_macro.open()
 
     def popp(self, instance):
