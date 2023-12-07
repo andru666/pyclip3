@@ -244,7 +244,7 @@ class showDatarefGui(App):
         return dct
 
     def start_second_thread(self, l_text):
-        threading.Thread(target=self.updates_values, args=(l_text,)).start()
+        threading.Thread(target=self.updates_values).start()
 
     def updates_values(self):
         if not self.running:
@@ -257,13 +257,9 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
-            self.clock_event = threading.Thread(target=self.updates_values)
-            self.clock_event.start()
-            
+            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.02)
         else:
-            self.clock_event = threading.Thread(target=self.updates_values)
-            self.clock_event.start()
-            
+            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.05)
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -318,9 +314,7 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            self.clock_event = threading.Thread(target=self.updates_values)
-            self.clock_event.start()
-            
+            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.5)
         return root
 
 

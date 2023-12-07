@@ -209,8 +209,7 @@ class Port:
             except:
                 iterator = sorted(list(list_ports.comports()))
                 exit()
-            if mod_globals.opt_speed == 38400 and mod_globals.opt_rate != mod_globals.opt_speed:
-                self.check_elm()
+            self.check_elm()
 
     def __del__(self):
         pass

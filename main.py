@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.02.02'
+__version__ = '0.02.03'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -553,27 +553,43 @@ def main():
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
     mod_globals.Settings()
     kivyScreenConfig()
-    elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    """try:
+    #elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
+    try:
         elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     except:
-        labelText = '''
-            Could not connect to the ELM.
+        if mod_globals.opt_lang == 'RU':
+            labelText = '''
+                Не удалось подключиться к ELM.
 
-            Possible causes:
-            - Bluetooth is not enabled
-            - other applications are connected to your ELM e.g Torque
-            - other device is using this ELM
-            - ELM got unpaired
-            - ELM is read under new name or it changed its name
+                Возможные причины:
+                - Bluetooth не включен 
+                - к вашему ELM подключены другие приложения, например Torque
+                - другое устройство использует этот ELM
+                - ELM не подключен
+                - ELM считывается под новым именем или оно изменило свое название
 
-            Check your ELM connection and try again.
-        '''
+                Проверьте подключение к ELM и повторите попытку.
+            '''
+            tit = "Ошибка подключения ELM"
+        else:
+            labelText = '''
+                Could not connect to the ELM.
+
+                Possible causes:
+                - Bluetooth is not enabled
+                - other applications are connected to your ELM e.g Torque
+                - other device is using this ELM
+                - ELM got unpaired
+                - ELM is read under new name or it changed its name
+
+                Check your ELM connection and try again.
+            '''
+            tit = 'ELM connection error'
         lbltxt = MyLabel(text=labelText, font_size=mod_globals.fontSize)
-        popup_load = MyPopup(title='ELM connection error', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), on_dismiss=exit)
+        popup_load = MyPopup(title=tit, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
-        exit(2)"""
+        exit(2)
     if mod_globals.opt_speed < mod_globals.opt_rate and not mod_globals.opt_demo:
         elm.port.soft_boudrate(mod_globals.opt_rate)
     se = ScanEcus(elm)
