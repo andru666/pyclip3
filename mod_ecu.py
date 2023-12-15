@@ -8,7 +8,7 @@ from xml.dom.minidom import parse
 from kivy import base
 from kivy.app import App
 from kivy.base import EventLoop
-from kivy.clock import Clock, _default_time as time
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
@@ -132,7 +132,6 @@ ecudump = {}
 resizeFont = False
 
 class showDatarefGui(App):
-
     def __init__(self, ecu, datarefs, path):
         self.ecu = ecu
         self.blue_part_size = 0.7
@@ -244,9 +243,9 @@ class showDatarefGui(App):
         return dct
 
     def start_second_thread(self, l_text):
-        threading.Thread(target=self.updates_values).start()
+        threading.Thread(target=self.clock_event).start()
 
-    def updates_values(self):
+    def updates_values(self, dt):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
@@ -257,9 +256,9 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
-            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.02)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
         else:
-            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.05)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -314,7 +313,7 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            self.clock_event = Clock.schedule_once(self.start_second_thread, 0.5)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 
@@ -418,18 +417,24 @@ class ECU():
             self.elm.checkModulePerformaceLevel(self.DataIds)
         ecudump = {}
 
-    def saveDump(self):
+    def saveDump(self, lbltxt=None):
         dumpname = mod_globals.dumps_dir + str(int(time.time())) + '_' + self.ecudata['ecuname'] + '.txt'
         df = open(dumpname, 'wt')
         self.elm.clear_cache()
+        if lbltxt:
+            req = 0
+            reqs = len(self.Services.values())
         for service in list(self.Services.values()):
+            if req:
+                req += 1
+            if lbltxt:
+                lbltxt.text='Save dump ' + str(req) + ' in ' + str(reqs)
             if service.startReq[:2] in AllowedList:
                 pos = chr(ord(service.startReq[0]) + 4) + service.startReq[1]
                 rsp = self.elm.request(service.startReq, pos, False)
                 if ':' in rsp:
                     continue
                 df.write('%s:%s\n' % (service.startReq, rsp))
-
         df.close()
 
     def loadDump(self, dumpname = ''):

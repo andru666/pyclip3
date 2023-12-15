@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.02.03'
+__version__ = '0.02.04'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -664,7 +664,7 @@ def main():
             popup_init.open()
             base.EventLoop.idle()
             sys.stdout.flush()
-            ecu.saveDump()
+            ecu.saveDump(lbltxt)
             base.EventLoop.window.remove_widget(popup_init)
             popup_init.dismiss()
             base.stopTouchApp()
