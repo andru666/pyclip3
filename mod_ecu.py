@@ -8,7 +8,7 @@ from xml.dom.minidom import parse
 from kivy import base
 from kivy.app import App
 from kivy.base import EventLoop
-from kivy.clock import Clock
+from kivy.clock import Clock, mainthread
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
@@ -32,10 +32,6 @@ from mod_elm import dnat
 from mod_elm import snat
 from mod_ply import *
 from mod_utils import *
-
-from threading import Thread
-from time import sleep
-MAX_TIME = 1/60
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 F2A = {'01': '7A',
@@ -200,7 +196,7 @@ class showDatarefGui(App):
         if mod_globals.opt_csv and self.csvf!=0:
             self.csvf.close()
         self.stop()
-
+    
     def get_ecu_values(self):
         if mod_globals.opt_csv and self.csvf!=0:
             self.csvline = self.csvline + "\n"
@@ -244,7 +240,8 @@ class showDatarefGui(App):
 
     def start_second_thread(self, l_text):
         threading.Thread(target=self.clock_event).start()
-
+    
+    @mainthread
     def updates_values(self, dt):
         if not self.running:
             return

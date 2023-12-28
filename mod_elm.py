@@ -255,7 +255,7 @@ class Port:
                     if mod_globals.opt_obdlink:
                         byte = self.hdr.read(inInputBuffer)
                     else:
-                        byte = self.hdr.read(1)
+                        byte = self.hdr.read()
         except:
             pass
         if type(byte) == str:
@@ -264,19 +264,13 @@ class Port:
         return byte.decode('utf-8','ignore')
     
     def write(self, data):
-        
-        # dummy sync
         self.rwLock = True
         i = 0
         while self.kaLock and i < 10:
             time.sleep(0.02)
             i = i + 1
-
-        # data should be byte type
         if type(data) == str:
             data = data.encode()
-
-        #try:
         if self.portType == 1:
             try:
                 rcv_bytes = self.hdr.sendall(data)
@@ -838,27 +832,13 @@ class ELM:
                 del self.tmpNotSupportedCommands[req]  # remove it from negative commands queue, because of false negative
 
     def request(self, req, positive='', cache=True, serviceDelay="0"):
-        """ Check if request is saved in L2 cache.
-        If not then
-          - make real request
-          - convert responce to one line
-          - save in L2 cache
-        returns response without consistency check
-        """
-        
         if mod_globals.opt_demo and req in list(self.ecudump.keys()):
             return self.ecudump[req]
-        
         if cache and req in list(self.rsp_cache.keys()):
             return self.rsp_cache[req]
-        
-        # send cmd
         rsp = self.cmd(req, int(serviceDelay))
-        
-        # parse responce
         res = ""
         if self.currentprotocol != "can":
-            # Trivially reject first line(echo)
             rsp_split = rsp.split('\n')[1:]
             for s in rsp_split:
                 if '>' not in s and len(s.strip()):
@@ -867,92 +847,51 @@ class ELM:
             for s in rsp.split('\n'):
                 if ':' in s:
                     res += s[2:].strip() + ' '
-                else:  # responce consists only from one frame
+                else:
                     if s.replace(' ', '').startswith(positive.replace(' ', '')):
                         res += s.strip() + ' '
-        
         rsp = res
-        
-        # populate L2 cache
         if req[:2] in AllowedList:
             self.rsp_cache[req] = rsp
-        
-        # save log
         if self.vf != 0 and 'NR' not in rsp :
             tmp_addr = self.currentaddress
             if self.currentaddress in list(dnat.keys()):
                 tmp_addr = dnat[self.currentaddress]
             self.vf.write(log_tmstr() + ";" + tmp_addr + ";" + req + ";" + rsp + "\n")
             self.vf.flush()
-        
         return rsp
 
-    # noinspection PyUnboundLocalVariable
     def cmd(self, command, serviceDelay=0):
         command = command.upper()
-
-        # check if command not supported
         if command in list(self.notSupportedCommands.keys()):
             return self.notSupportedCommands[command]
-        
-        tb = time.time()  # start time
-        
+        tb = time.time()
         devmode = False
-        
-        # Ensure time gap between commands
-        # dl = self.busLoad + self.srvsDelay - tb + self.lastCMDtime
         if((tb - self.lastCMDtime) <(self.busLoad + self.srvsDelay)) and command.upper()[:2] not in ['AT','ST']:
             time.sleep(self.busLoad + self.srvsDelay - tb + self.lastCMDtime)
-        
-        tb = time.time()  # renew start time
-
-        # save current session
+        tb = time.time()
         saveSession = self.startSession
-
-        # If dev mode then temporary switch to Development Session
         if mod_globals.opt_dev and command[0:2] in DevList:
-            
             devmode = True
-            
-            # open Development session
             self.start_session(mod_globals.opt_devses)
             self.lastCMDtime = time.time()
-            
-            # log switching event
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "Switch to dev mode\n")
                 self.lf.flush()
-                
-        # If we are on CAN and there was more than keepAlive seconds of silence
-        # then send startSession command again
         if(tb - self.lastCMDtime) > self.keepAlive and len(self.startSession) > 0:
-            
-            # log KeepAlive event
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "KeepAlive\n")
                 self.lf.flush()
-                
-            # send keepalive
-            #if not mod_globals.opt_demo:
-            #  self.port.reinit() #experimental
             self.send_cmd(self.startSession)
-            self.lastCMDtime = time.time()  # for not to get into infinite loop
-        
-        # send command and check for ask to wait
+            self.lastCMDtime = time.time()
         cmdrsp = ""
         rep_count = 3
         while rep_count > 0:
             rep_count = rep_count - 1
             no_negative_wait_response = True
-            
             self.lastCMDtime = tc = time.time()
             cmdrsp = self.send_cmd(command)
-            
-            self.checkIfCommandUnsupported(command, cmdrsp) # check if response for this command is NR:12
-
-            # if command[0:2] not in AllowedList:
-            #  break
-
+            self.checkIfCommandUnsupported(command, cmdrsp)
             for line in cmdrsp.split('\n'):
                 line = line.strip().upper()
                 nr = ''
@@ -960,7 +899,7 @@ class ELM:
                     nr = line[6:8]
                 if line.startswith("NR"):
                     nr = line.split(':')[1]
-                if nr in ['21', '23']:  # it is look like the ECU asked us to wait a bit
+                if nr in ['21', '23']:
                     time.sleep(0.5)
                     no_negative_wait_response = False
                 elif nr in ['78']:
@@ -970,18 +909,14 @@ class ELM:
                     cmdrsp = self.send_cmd(command)
                     self.send_raw('at at 1')
                     break
-            
+                    
             if no_negative_wait_response:
                 break
-        # If dev mode then switch back from Development Session
+                
         if devmode:
-            
-            # restore current session
             self.startSession = saveSession
             self.start_session(self.startSession)
             self.lastCMDtime = time.time()
-            
-            # log switching event
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "Switch back from dev mode\n")
                 self.lf.flush()
@@ -998,19 +933,15 @@ class ELM:
                         tmp_addr = dnat[self.currentaddress]
                     self.vf.write(log_tmstr() + ";" + tmp_addr + ";" + command + ";" + line + ";" + negrsp[line[6:8]] + "\n")
                     self.vf.flush()
-
         return cmdrsp
     
     def send_cmd(self, command):
-        
         command = command.upper()
         if not mod_globals.opt_obdlink and len(command) == 6 and command[:4] == '1902':
             command = '1902AF'
-        
         if command.upper()[:2] in ["AT","ST"] or self.currentprotocol != "can":
             return self.send_raw(command)
-
-        if self.ATCFC0:
+        elif self.ATCFC0:
             return self.send_can_cfc0(command)
         else:
             if mod_globals.opt_obdlink:
@@ -1020,7 +951,7 @@ class ELM:
                     rsp = self.send_can_cfc(command)
             else:
                 rsp = self.send_can(command)
-            if self.error_frame > 0 or self.error_bufferfull > 0:  # then fallback to cfc0
+            if self.error_frame > 0 or self.error_bufferfull > 0:
                 self.ATCFC0 = True
                 self.cmd("at cfc0")
                 rsp = self.send_can_cfc0(command)
@@ -1394,92 +1325,61 @@ class ELM:
 
     def send_can_cfc0(self, command):
         command = command.strip().replace(' ', '').upper()
-
         if len(command) == 0:
             return
         if len(command) % 2 != 0:
             return "ODD ERROR"
         if not all(c in string.hexdigits for c in command):
             return "HEX ERROR"
-        
-        # do framing
         raw_command = []
         cmd_len = len(command) // 2
-        if cmd_len < 8:  # single frame
+        if cmd_len < 8:
             raw_command.append(("%0.2X" % cmd_len) + command)
         else:
-            # first frame
             raw_command.append("1" +("%0.3X" % cmd_len)[-3:] + command[:12])
             command = command[12:]
-            # consecutive frames
             frame_number = 1
             while len(command):
                 raw_command.append("2" +("%X" % frame_number)[-1:] + command[:14])
                 frame_number = frame_number + 1
                 command = command[14:]
-        
         responses = []
-        
-        # send frames
-        BS = 1  # Burst Size
-        ST = 0  # Frame Interval
-        Fc = 0  # Current frame
-        Fn = len(raw_command)  # Number of frames
-
-        if Fn > 1 or len(raw_command[0])>15: 
-            # set elm timeout to minimum among 3 values
-            #   1) 300ms constant
-            #   2) 2 * self.response_time in ms
-            #   3) 4.7s //(number of farmes in cmd)(5s session timeout - 300ms safety gap - 16ms windows timer discret)
+        BS = 1
+        ST = 0
+        Fc = 0
+        Fn = len(raw_command)
+        if Fn > 1 or len(raw_command[0])>15:
             min_tout = min(300, 2*self.response_time*1000, 4700.//len(raw_command)-16)
             if min_tout<4:
-                min_tout = 4 # not less then 4ms
+                min_tout = 4
             self.elmTimeout = hex(int(min_tout//4))[2:].zfill(2)
             self.send_raw('ATST' + self.elmTimeout)
             self.send_raw('ATAT1')
-
         while Fc < Fn:
-
-            # enable responses
             frsp = ''
             if not self.ATR1:
                 frsp = self.send_raw('AT R1')
                 self.ATR1 = True
-            
-            tb = time.time()  # time of sending(ff)
-
-            if Fn > 1 and Fc ==(Fn-1):  # set elm timeout to maximum for last response on long command
+            tb = time.time()
+            if Fn > 1 and Fc ==(Fn-1):
                 self.send_raw('ATSTFF')
                 self.send_raw('ATAT1')
-
-            if(Fc == 0 or Fc ==(Fn-1)) and len(raw_command[Fc])<16:  #first or last frame in command and len<16(bug in ELM)
-                frsp = self.send_raw(raw_command[Fc] + '1')  # we'll get only 1 frame: nr, fc, ff or sf
+            if(Fc == 0 or Fc ==(Fn-1)) and len(raw_command[Fc])<16:
+                frsp = self.send_raw(raw_command[Fc] + '1')
             else:
                 frsp = self.send_raw(raw_command[Fc])
-
-            #print '\nbp1:', raw_command[Fc]
-
             Fc = Fc + 1
-
-            # analyse response
-            # first pass. We have to left only response data frames
             s0 = []
             for s in frsp.upper().split('\n'):
-
-                if s.strip()[:len(raw_command[Fc - 1])] == raw_command[Fc - 1]:  # echo cancellation
+                if s.strip()[:len(raw_command[Fc - 1])] == raw_command[Fc - 1]:
                     continue
-
                 s = s.strip().replace(' ', '')
-                if len(s) == 0:  # empty string
+                if len(s) == 0:
                     continue
-
-                if all(c in string.hexdigits for c in s):  # some data
+                if all(c in string.hexdigits for c in s):
                     s0.append(s)
-
-            # second pass. Now we may check if 7Fxx78 is a last or not
             for s in s0:
-                if s[:1] == '3':  # FlowControl
-                    # extract Burst Size
+                if s[:1] == '3':
                     BS = s[2:4]
                     if BS == '': BS = '03'
                     BS = int(BS, 16)
@@ -1489,18 +1389,18 @@ class ELM:
                         ST = int(ST[1:2], 16) * 100
                     else:
                         ST = int(ST, 16)
-                    break  # go to sending consequent frames
-                elif s[:4] == '037F' and s[6:8] == '78': # NR:78
-                    if len(s0)>0 and s == s0[-1]: # it should be the last one
+                    break
+                elif s[:4] == '037F' and s[6:8] == '78':
+                    if len(s0)>0 and s == s0[-1]:
                         r = self.waitFrames(6)
                         if len(r.strip())>0:
                             responses.append(r)
                     else:
-                        continue  # ignore NR 78 if it is not the last
+                        continue
                 else:
                     responses.append(s)
                     continue
-            cf = min({BS - 1,(Fn - Fc) - 1})  # number of frames to send without response
+            cf = min({BS - 1,(Fn - Fc) - 1})
             if cf > 0:
                 if self.ATR1:
                     frsp = self.send_raw('at r0')
@@ -1508,17 +1408,12 @@ class ELM:
             
             while cf > 0:
                 cf = cf - 1
-                
-                # Ensure time gap between frames according to FlowControl
-                tc = time.time()  # current time
+                tc = time.time()
                 if(tc - tb) * 1000. < ST:
                     time.sleep(ST / 1000. -(tc - tb))
                 tb = tc
-                
                 frsp = self.send_raw(raw_command[Fc])
                 Fc = Fc + 1
-        
-        
         result = ""
         noErrors = True
         PC = False
@@ -1543,8 +1438,8 @@ class ELM:
                         result += s[4:16]
                         continue
                     
-                    if all(c in string.hexdigits for c in s):  # some data
-                        if s[:1] == '2':  # consecutive frames(cf)
+                    if all(c in string.hexdigits for c in s):
+                        if s[:1] == '2':
                             cFrame += 1
                             result += s[2:16]
                         continue
@@ -1569,21 +1464,13 @@ class ELM:
             cFrame = 1
 
             result = responses[0][4:16]
-            
-            # receiving consecutive frames
-            #while len(result) / 2 < nBytes:
             while cFrame < nFrames:
-                # now we should send ff
                 sBS = hex(min({nFrames - cFrame, MaxBurst}))[2:]
                 frsp = self.send_raw('300' + sBS + '00' + sBS)
-                
-                # analyse response
                 nodataflag = False
                 for s in frsp.split('\n'):
-                    
                     if s.strip()[:len(raw_command[Fc - 1])] == raw_command[Fc - 1]:  # echo cancelation
                         continue
-                    
                     if 'NO DATA' in s:
                         nodataflag = True
                         break
@@ -1627,14 +1514,11 @@ class ELM:
                 return "WRONG RESPONSE"
     
     def send_raw(self, command):
-        
         command = command.upper()
-        
         tb = time.time()
         if self.lf != 0:
             self.lf.write(">[" + log_tmstr() + "]" + command + "\n")
             self.lf.flush()
-        
         if not mod_globals.opt_demo:
             self.port.write(str(command + "\r").encode("utf-8"))
         while True:
@@ -1653,7 +1537,6 @@ class ELM:
             elif self.lf != 0:
                 self.lf.write("<[" + log_tmstr() + "]" + self.buff + "(shifted)" + command + "\n")
                 self.lf.flush()
-        # count errors
         if "?" in self.buff:
             self.error_question += 1
         if "BUFFER FULL" in self.buff:
@@ -1671,10 +1554,7 @@ class ELM:
 
         if command[0].isdigit() or command.startswith('STPX'):
             self.response_time =((self.response_time * 9) + roundtrip) / 10
-
-        # save responce to log
         if self.lf != 0:
-            # tm = str(time.time())
             self.lf.write("<[" + str(round(roundtrip, 3)) + "]" + self.buff + "\n")
             self.lf.flush()
         return self.buff
