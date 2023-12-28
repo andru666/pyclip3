@@ -769,7 +769,7 @@ class ELM:
         elif not all((c in string.hexdigits for c in command)):
             return 'HEX ERROR'
         raw_command = []
-        cmd_len = len(command) / 2
+        cmd_len = len(command) // 2
         if cmd_len < 8:
             if command in self.l1_cache.keys():
                 raw_command.append('%0.2X' % cmd_len + command + self.l1_cache[command])
@@ -819,7 +819,7 @@ class ELM:
         else:
             if responses[0][:1] == '1':
                 nbytes = int(responses[0][1:4], 16)
-                nframes = nbytes / 7 + 1
+                nframes = nbytes // 7 + 1
                 cframe = 1
                 result = responses[0][4:16]
             else:
@@ -842,7 +842,7 @@ class ELM:
             noerrors = False
         if noerrors and nframes < 16 and command[:1] == '2' and not mod_globals.opt_n1c:
             self.l1_cache[command] = str(hex(nframes))[2:].upper()
-        if len(result) / 2 >= nbytes and noerrors:
+        if len(result) // 2 >= nbytes and noerrors:
             result = ' '.join((a + b for a, b in zip(result[::2], result[1::2])))
             return result
         elif result[:2] == '7F' and result[4:6] in negrsp.keys():
@@ -863,7 +863,7 @@ class ELM:
         elif not all((c in string.hexdigits for c in command)):
             return 'HEX ERROR'
         raw_command = []
-        cmd_len = len(command) / 2
+        cmd_len = len(command) // 2
         if cmd_len < 8:
             raw_command.append('%0.2X' % cmd_len + command)
         else:
@@ -948,7 +948,7 @@ class ELM:
         elif responses[0][:1] == '1':
             nBytes = int(responses[0][1:4], 16)
             nBytes = nBytes - 6
-            nFrames = 1 + nBytes / 7 + bool(nBytes % 7)
+            nFrames = 1 + nbytes // 7 + bool(nBytes % 7)
             cFrame = 1
             result = responses[0][4:16]
             while cFrame < nFrames:
@@ -982,7 +982,7 @@ class ELM:
         else:
             self.error_frame += 1
             noErrors = False
-        if len(result) / 2 >= nBytes and noErrors and result[:2] != '7F':
+        if len(result) // 2 >= nBytes and noErrors and result[:2] != '7F':
             result = ' '.join((a + b for a, b in zip(result[::2], result[1::2])))
             return result
         elif result[:2] == '7F' and result[4:6] in negrsp.keys():
@@ -1003,7 +1003,7 @@ class ELM:
         elif not all((c in string.hexdigits for c in command)):
             return 'HEX ERROR'
         raw_command = []
-        cmd_len = len(command) / 2
+        cmd_len = len(command) // 2
         if cmd_len < 8:
             raw_command.append('%0.2X' % cmd_len + command)
         else:
@@ -1104,7 +1104,7 @@ class ELM:
         elif responses[0][:1] == '1':
             nBytes = int(responses[0][1:4], 16)
             nBytes = nBytes - 6
-            nFrames = 1 + nBytes / 7 + bool(nBytes % 7)
+            nFrames = 1 + nbytes // 7 + bool(nBytes % 7)
             cFrame = 1
             result = responses[0][4:16]
             while cFrame < nFrames:
@@ -1138,7 +1138,7 @@ class ELM:
         else:
             self.error_frame += 1
             noErrors = False
-        if len(result) / 2 >= nBytes and noErrors and result[:2] != '7F':
+        if len(result) // 2 >= nBytes and noErrors and result[:2] != '7F':
             result = ' '.join((a + b for a, b in zip(result[::2], result[1::2])))
             return result
         elif result[:2] == '7F' and result[4:6] in negrsp.keys():
