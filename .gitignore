@@ -152,7 +152,7 @@ cython_debug/
 *.txt
 *.p
 *.bat
-*.zip
+pyrendata*.zip
 *.cmd
 *.csv
 *.xml
