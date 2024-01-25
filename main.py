@@ -23,7 +23,7 @@ from kivy.uix.switch import Switch
 from kivy import base
 
 __all__ = 'install_android'
-__version__ = '0.02.07'
+__version__ = '0.01.56'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -113,14 +113,14 @@ if mod_globals.os == 'android':
     Params = autoclass('android.view.WindowManager$LayoutParams')
     user_datadir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/'
     mod_globals.user_data_dir = user_datadir
-    mod_globals.cache_dir = user_datadir + '/cache/'
+    mod_globals.cache_dir = user_datadir + '/cache3/'
     mod_globals.crash_dir = user_datadir + '/crashs/'
     mod_globals.log_dir = user_datadir + '/logs/'
     mod_globals.dumps_dir = user_datadir + '/dumps/'
     mod_globals.macro_dir = user_datadir + '/macro/'
     mod_globals.csv_dir = user_datadir + '/csv/'
     import sys
-    mod_globals.scen_dir = user_datadir + '/pyren/scen/'
+    mod_globals.scen_dir = user_datadir + '/pyren/scen3/'
     sys.path.append(mod_globals.scen_dir)
 
 elif mod_globals.os == 'nt':
@@ -164,7 +164,7 @@ def my_excepthook(excType, excValue, tb):
     for m in message:
         string += m
     error = MyTextInput(text=string, size_hint=(1, 1))
-    if mod_globals.os == 'android':
+    if mod_globals.os != 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
     popup = MyPopup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), on_dismiss=exit)
@@ -309,8 +309,8 @@ class screenConfig(App):
         setattr(self.langbutton, 'background_color', (0.345,0.345,0.345,1))
 
     def make_savedEcus(self):
-        ecus = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'savedEcus*.p')))
-        label = MyLabel(text='savedEcus', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
+        ecus = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'saved3Ecus*.p')))
+        label = MyLabel(text='saved3Ecus', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.ecus_dropdown = DropDown()
         glay = MyGridLayout(cols=2)
         for s_ecus in ecus:
@@ -394,7 +394,7 @@ class screenConfig(App):
         mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
         if self.mainbutton.text:
-            if 'com0' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
+            if 'com10' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '127.0.0.1:35000'
             elif 'wifi' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '192.168.0.10:35000'
@@ -553,8 +553,8 @@ def main():
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
     mod_globals.Settings()
     kivyScreenConfig()
-    #elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
-    try:
+    elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
+    """try:
         elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     except:
         if mod_globals.opt_lang == 'RU':
@@ -589,16 +589,16 @@ def main():
         popup_load = MyPopup(title=tit, content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), on_dismiss=exit)
         popup_load.open()
         base.runTouchApp()
-        exit(2)
+        exit(2)"""
     if mod_globals.opt_speed < mod_globals.opt_rate and not mod_globals.opt_demo:
         elm.port.soft_boudrate(mod_globals.opt_rate)
     se = ScanEcus(elm)
     if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
-        mod_globals.savedEcus = 'savedEcus.p'
+        mod_globals.savedEcus = 'saved3Ecus.p'
     SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
     if mod_globals.opt_can2:
         if mod_globals.opt_can2 or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
-            mod_globals.savedEcus = 'savedEcus_can2.p'
+            mod_globals.savedEcus = 'saved3Ecus_can2.p'
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus_can2
     if not os.path.exists(SEFname):
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus

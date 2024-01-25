@@ -206,6 +206,8 @@ class showDatarefGui(App):
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
         dct = OrderedDict()
+        EventLoop.window.mainloop()
+        EventLoop.idle()
         for dr in self.datarefs:
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
@@ -241,12 +243,12 @@ class showDatarefGui(App):
     def start_second_thread(self, l_text):
         threading.Thread(target=self.clock_event).start()
     
-    @mainthread
     def updates_values(self, dt):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
         params = self.get_ecu_values()
+        EventLoop.idle()
         for param, val in params.items():
             if val != 'Text' and val != 'DTCText':
                 self.labels[param].text = val.strip()
