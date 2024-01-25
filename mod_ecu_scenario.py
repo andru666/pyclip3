@@ -5,12 +5,12 @@ if mod_globals.os == 'android':
     from jnius import autoclass
     Environment = autoclass('android.os.Environment')
     import sys
-    scen_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/scen/'
+    scen_dir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/scen3/'
     if not os.path.exists(scen_dir):
         os.makedirs(scen_dir)
     sys.path.append(scen_dir)
 else:
-    scen_dir = mod_globals.user_data_dir + '/scen/'
+    scen_dir = mod_globals.user_data_dir + '/scen3/'
     if not os.path.exists(scen_dir):
         os.makedirs(scen_dir)
     sys.path.append(scen_dir)
