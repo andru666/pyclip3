@@ -246,7 +246,7 @@ class showDatarefGui(App):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
-        params = self.get_ecu_values()
+        #params = self.get_ecu_values()
         '''for param, val in params.items():
             #EventLoop.idle()
             EventLoop.window.mainloop()
