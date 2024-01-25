@@ -247,11 +247,11 @@ class showDatarefGui(App):
             return
         self.ecu.elm.clear_cache()
         params = self.get_ecu_values()
-        for param, val in params.items():
+        '''for param, val in params.items():
             #EventLoop.idle()
             EventLoop.window.mainloop()
             if val != 'Text' and val != 'DTCText':
-                self.labels[param].text = val.strip()
+                self.labels[param].text = val.strip()'''
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
