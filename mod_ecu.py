@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, threading
+import sys
 import time
 import xml.dom.minidom
 from collections import OrderedDict
@@ -133,6 +133,7 @@ class showDatarefGui(App):
         self.blue_part_size = 0.7
         self.datarefs = datarefs
         self.labels = {}
+        self.params = {}
         self.needupdate = False
         self.clock_event = None
         self.running = True
@@ -206,10 +207,9 @@ class showDatarefGui(App):
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
         dct = OrderedDict()
-        EventLoop.idle()
-        EventLoop.window.mainloop()
-            
         for dr in self.datarefs:
+            EventLoop.idle()
+            EventLoop.window.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -239,18 +239,15 @@ class showDatarefGui(App):
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
-        
-        return dct
-
-    def start_second_thread(self, l_text):
-        threading.Thread(target=self.clock_event).start()
+        self.params = dct
+        #return dct
     
     def updates_values(self, dt):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
-        params = self.get_ecu_values()
-        for param, val in params.items():
+        self.get_ecu_values()
+        for param, val in self.params.items():
             if val != 'Text' and val != 'DTCText':
                 self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
@@ -280,7 +277,7 @@ class showDatarefGui(App):
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
         layout.add_widget(MyLabel(text=header))
-        params = self.get_ecu_values()
+        self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
             len_str = len(param)
@@ -289,7 +286,7 @@ class showDatarefGui(App):
 
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
-        for paramName, val in params.items():
+        for paramName, val in self.params.items():
             if val == 'Text':
                 layout.add_widget(MyLabel(text=paramName))
             elif val == 'DTCText':
