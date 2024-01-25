@@ -206,7 +206,7 @@ class showDatarefGui(App):
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
         dct = OrderedDict()
-        #EventLoop.idle()
+        EventLoop.idle()
         EventLoop.window.mainloop()
             
         for dr in self.datarefs:
