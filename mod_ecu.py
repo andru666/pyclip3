@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys
+import sys, threading
 import time
 import xml.dom.minidom
 from collections import OrderedDict
@@ -208,7 +208,6 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.idle()
             EventLoop.window.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
@@ -242,7 +241,7 @@ class showDatarefGui(App):
         self.params = dct
         #return dct
     
-    def updates_values(self, dt):
+    def updates_values(self):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
@@ -251,11 +250,12 @@ class showDatarefGui(App):
             if val != 'Text' and val != 'DTCText':
                 self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
-        
-        if mod_globals.opt_csv:
+        if self.needupdate:
+            threading.Thread(target=self.updates_values).start()
+        """if mod_globals.opt_csv:
             self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
         else:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
+            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)"""
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -310,7 +310,8 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
+            threading.Thread(target=self.updates_values).start()
+            #self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 
