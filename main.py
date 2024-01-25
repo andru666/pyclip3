@@ -21,6 +21,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
+import glob
 
 __all__ = 'install_android'
 __version__ = '0.01.58'
@@ -545,7 +546,7 @@ def main():
     if not os.path.exists(mod_globals.scen_dir):
         os.makedirs(mod_globals.scen_dir)
     
-    import glob
+    
     zip_macro = sorted(glob.glob(os.path.join('./', 'macro.zip')), reverse=True)
     if len(zip_macro):
         import zipfile
