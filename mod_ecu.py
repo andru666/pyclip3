@@ -206,6 +206,9 @@ class showDatarefGui(App):
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
         dct = OrderedDict()
+        #EventLoop.idle()
+        EventLoop.window.mainloop()
+            
         for dr in self.datarefs:
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
@@ -246,12 +249,10 @@ class showDatarefGui(App):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
-        #params = self.get_ecu_values()
-        '''for param, val in params.items():
-            #EventLoop.idle()
-            EventLoop.window.mainloop()
+        params = self.get_ecu_values()
+        for param, val in params.items():
             if val != 'Text' and val != 'DTCText':
-                self.labels[param].text = val.strip()'''
+                self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
         if mod_globals.opt_csv:
