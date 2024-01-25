@@ -206,13 +206,8 @@ class showDatarefGui(App):
             self.csvline = datetime.now().strftime("%H:%M:%S.%f")
             
         dct = OrderedDict()
-        base.runTouchApp(embedded=True)
         for dr in self.datarefs:
-            try:
-                EventLoop.run()
-                
-            except:
-                EventLoop.window.mainloop()
+            EventLoop.mainloop()
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -243,7 +238,6 @@ class showDatarefGui(App):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
         
-        base.stopTouchApp()
         return dct
 
     def start_second_thread(self, l_text):
