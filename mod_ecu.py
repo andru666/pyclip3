@@ -304,7 +304,7 @@ class showDatarefGui(App):
                 layout.add_widget(prelabel)
             else:
                 layout.add_widget(self.make_box_params(paramName, val))
-        quitbutton = MyButton(text='<BACK>', size_hint=(1, None), on_press=self.finish)
+        quitbutton = MyButton(text='<' + mod_globals.language_dict['6218'] + '>', size_hint=(1, None), on_press=self.finish)
         layout.add_widget(quitbutton)
         root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
@@ -600,9 +600,9 @@ class ECU():
                     datastr = self.Commands[dr.name].codeMR + ' ' + self.Commands[dr.name].label
                     cmds.append(dr.name)
                 menu.append(datastr)
-            menu.append('<Up>')
+            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
             choice = ChoiceLong(menu, 'Choose :', header)
-            if choice[0] == '<Up>':
+            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                 return
             header = header + ' -> ' + cmds[int(choice[1]) - 1] + ' [Command] '
             executeCommand(self.Commands[cmds[int(choice[1]) - 1]], self, self.elm, header)
@@ -769,9 +769,9 @@ class ECU():
             if len(function.subfunctions) != 0:
                 for sfu in function.subfunctions:
                     menu.append(sfu.text)
-                menu.append('<Up>')
+                menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
                 choice = Choice(menu, 'Choose :')
-                if choice[0] == '<Up>':
+                if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                     return
                 self.show_subfunction(function.subfunctions[int(choice[1]) - 1], path + ' -> ' + function.text)
             if len(function.datarefs) != 0:
@@ -785,9 +785,9 @@ class ECU():
             if len(screen.functions) != 0:
                 for fu in screen.functions:
                     menu.append(fu.text)
-                menu.append('<Up>')
+                menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
                 choice = Choice(menu, 'Choose :')
-                if choice[0] == '<Up>':
+                if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                     return
                 self.show_function(screen.functions[int(choice[1]) - 1], screen.name)
             if len(screen.datarefs) != 0:
@@ -809,10 +809,10 @@ class ECU():
             for d in listkeys:
                 menu.append(defstr[d])
 
-            menu.append('<Up>')
+            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
             menu.append('<Clear>')
             choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<Up>':
+            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
             if choice[0] == '<Clear>':
@@ -854,10 +854,10 @@ class ECU():
             for d in listkeys:
                 menu.append(defstr[d])
 
-            menu.append('<Up>')
+            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
             menu.append('<Clear>')
             choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<Up>':
+            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
             if choice[0] == '<Clear>':
@@ -898,10 +898,10 @@ class ECU():
             dtcs, defstr, hlpstr = get_default_failflag(self.Defaults, self.Mnemonics, self.Services, self.elm, self.calc)
             for d in sorted(defstr.keys()):
                 menu.append(defstr[d])
-            menu.append('<Up>')
+            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
             menu.append('<Clear>')
             choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<Up>':
+            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                 return
             if choice[0] == '<Clear>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
@@ -920,76 +920,37 @@ class ECU():
             menu = []
             for l in self.screens:
                 if l.name == 'DE':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'DE : Ошибки устройства'
-                    else:
-                        l.name = 'DE : Device errors'
+                    l.name = 'DE : ' + mod_globals.language_dict['260']
                 if l.name == 'ID':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'ID : Идентификации'
-                    else:
-                        l.name = 'ID : Device errors'
+                    l.name = 'ID : ' + mod_globals.language_dict['2140']
                 if l.name == 'SY':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'SY : Состояние системы'
-                    else:
-                        l.name = 'SY : System state'
+                    l.name = 'SY : ' + mod_globals.language_dict['251']
                 if l.name == 'LC':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'LC : Конфигурация системы'
-                    else:
-                        l.name = 'LC : System configuration'
+                    l.name = 'LC : ' + mod_globals.language_dict['517']
                 if l.name == 'SP':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'SP : Системные параметры'
-                    else:
-                        l.name = 'SP : System parameters'
+                    l.name = 'SP : ' + mod_globals.language_dict['297']
                 if l.name == 'AC':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'AC : Выполнение тестов'
-                    else:
-                        l.name = 'AC : Executing tests'
+                    l.name = 'AC : ' + mod_globals.language_dict['262']
                 if l.name == 'CF':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'CF : Изменение конфигурации'
-                    else:
-                        l.name = 'CF : Changing configuration'
+                    l.name = 'CF : '  + mod_globals.language_dict['8362']
                 if l.name == 'VP':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'VP : Программирование VIN'
-                    else:
-                        l.name = 'VP : VIN programming'
+                    l.name = 'VP : ' + mod_globals.language_dict['268']
                 if l.name == 'RZ':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'RZ : СБРОСЫ'
-                    else:
-                        l.name = 'RZ : Resets'
+                    l.name = 'RZ : ' + mod_globals.language_dict['4416']
                 if l.name == 'SC':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'SC : Сценарии конфигурации'
-                    else:
-                        l.name = 'SC : Configuration scenarios'
+                    l.name = 'SC : ' + mod_globals.language_dict['267']
                 if l.name == 'SCS':
                     if mod_globals.opt_lang == 'RU':
                         l.name = 'SCS : Сценарии настройки безопасности'
                     else:
                         l.name = 'SCS : Security configuration scenarios'
                 if l.name == 'EZ':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'EZ : EZSTEP'
-                    else:
-                        l.name = 'EZ : EZSTEP'
+                    l.name = 'EZ : EZSTEP'
                 if l.name == 'FAV':
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'FAV : Избранные параметры'
-                    else:
-                        l.name = 'FAV : Favourite Parameteres'
+                    l.name = 'FAV : ' + mod_globals.language_dict['26330']
                 if l.name == 'ED':
                     self.ext_de = l.datarefs
-                    if mod_globals.opt_lang == 'RU':
-                        l.name = 'ED : Дополнительная информация'
-                    else:
-                        l.name = 'ED : DE extra information'
+                    l.name = 'ED : ' + mod_globals.language_dict['638']
                     continue
                 menu.append(l.name)
             if mod_globals.opt_cmd:
@@ -997,12 +958,12 @@ class ECU():
                     menu.append('ECM : Расширенный набор команд')
                 else:
                     menu.append('ECM : Extended command set')
-            menu.append('<Up>')
+            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
             if mod_globals.opt_lang == 'RU':
                 choice = Choice(menu, 'Выбор :')
             else:
                 choice = Choice(menu, 'Choose :')
-            if choice[0] == '<Up>':
+            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
                 favouriteScreen.datarefs = []
                 return
             if choice[0][:2] == 'DE':

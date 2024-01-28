@@ -234,6 +234,7 @@ class MyLabelGreen(ButtonBehavior, Label):
 class MyLabelBlue(ButtonBehavior, Label):
     global fs
     fs = mod_globals.fontSize
+    param_name = ''
     def __init__(self, mfs = None, **kwargs):
         if 'param_name' in kwargs:
             self.param_name = kwargs['param_name']
@@ -259,7 +260,6 @@ class MyLabelBlue(ButtonBehavior, Label):
         self.clicked = False
 
     def on_size(self, widget, size):
-        
         self.text_size = (size[0], None)
         self.texture_update()
         if self.size_hint_y is None and self.size_hint_x is not None:
