@@ -66,6 +66,8 @@ class Scenarii(App):
         glay = MyGridLayout(cols=1, bgcolor =(0, 0, 0, 1))
         codemr, label, value = self.ecu.get_id(self.ScmParam[inj], True)
         values = '%s : %s' % ((codemr), (value))
+        if value:
+            notv = value
         lab = MyLabel(text=label, size_hint=(1, None), bgcolor=(0, 1, 1, 0.3))
         glay.add_widget(lab)
         glay.height = lab.height
@@ -169,8 +171,11 @@ class Scenarii(App):
             return None
         else:
             ch = get_message(self.ScmParam, 'CommandeTerminee')
-            self.ecu.run_cmd(self.ScmParam['EcritureCodeInjecteur'], inj_code)
-            MyPopup_close(get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), MyLabel(text=ch, size_hint=(1, 1), font_size=fs*1.5, halign='center'))
+            resp = self.ecu.run_cmd(self.ScmParam['EcritureCodeInjecteur'], inj_code)
+            if 'NR' in resp:
+                MyPopup_close(get_message(self.ScmParam, 'TexteErreurNack'), MyLabel(text=ch, size_hint=(1, 1), font_size=fs*1.5, halign='center'))
+            else:
+                MyPopup_close(get_message(self.ScmParam, 'TexteSousTitreCommandeTerminee'), MyLabel(text=ch, size_hint=(1, 1), font_size=fs*1.5, halign='center'))
             return None
 
 def run(elm, ecu, command, data):

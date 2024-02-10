@@ -307,7 +307,7 @@ class Calc(Parser):
         tmp = tmp.replace(' ', '')
         if len(tmp)%2: tmp = "0" + tmp
         #p[0] = tmp.decode("hex")
-        p[0] = bytes.fromhex(tmp).decode('utf-8')
+        p[0] = bytes.fromhex(tmp).decode('utf-8', 'ignore')
     p_expression_HexaToAscii.__doc__='expression : HEXTOASCII'
     
     def p_expression_group(self, p):

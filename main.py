@@ -21,10 +21,11 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
+from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.01.59'
+__version__ = '0.02.00'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -395,7 +396,7 @@ class screenConfig(App):
         mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
         if self.mainbutton.text:
-            if 'com10' in self.mainbutton.text.lower() or 'com6' in self.mainbutton.text.lower():
+            if 'com10' in self.mainbutton.text.lower() or 'com8' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '127.0.0.1:35000'
             elif 'wifi' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '192.168.0.10:35000'
@@ -493,12 +494,44 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('KWP Force SlowInit', mod_globals.opt_si))
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    26-06-2023', font_size=(fs*0.5), height=(fs*0.7)))
-        self.lay = layout
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    10-02-2024', font_size=(fs*0.5), height=(fs*0.7)))
+        layout.add_widget(MyButton(text='DONATE', height=fs*2, on_release=self.donate))
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root.add_widget(layout)
         return root
+
+    def donate(self, dt):
+        layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1, 1))
+        glay0 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        self.carte1 = MyLabel(text='5435 5311 2185 5868', size_hint=(0.6, 1))
+        glay0.add_widget(MyLabel(text='№ card:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay0.add_widget(self.carte1)
+        glay0.add_widget(MyButton(text='Copy', id='0', size_hint=(0.2, 1), on_release=self.copy_donate))
+        layout.add_widget(glay0)
+        glay1 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        self.carte2 = MyLabel(text='5265 5200 0560 3762', size_hint=(0.6, 1))
+        glay1.add_widget(MyLabel(text='№ card:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay1.add_widget(self.carte2)
+        glay1.add_widget(MyButton(text='Copy', id='1', size_hint=(0.2, 1), on_release=self.copy_donate))
+        layout.add_widget(glay1)
+        glay2 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        self.qiwi = MyLabel(text='+375293144900', size_hint=(0.6, 1))
+        glay2.add_widget(MyLabel(text='QIWI:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay2.add_widget(self.qiwi)
+        glay2.add_widget(MyButton(text='Copy', id='2', size_hint=(0.2, 1), on_release=self.copy_donate))
+        layout.add_widget(glay2)
+        MyPopup_close(title='Select the donation method to copy the data', cont=layout, l=None)
+
+    def copy_donate(self, dt):
+        if dt.id == '0':
+            d = self.carte1.text
+        if dt.id == '1':
+            d = self.carte2.text
+        if dt.id == '2':
+            d = self.qiwi.text
+        Clipboard.copy(d)
+        MyPopup_close(title='INFO', cont=MyLabel(text='Copied to the clipboard '+d, size_hint=(1, 1)), l=None)
 
     def term(self, instance):
         self.finish(instance)

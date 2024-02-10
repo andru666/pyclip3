@@ -43,7 +43,7 @@ def InfoPopup(bas=None):
     if not bas:
         base.stopTouchApp()
 
-def MyPopup_close(title='', cont=True, l=True, op=True, cl=None):
+def MyPopup_close(title='', cont='', l=True, op=True, cl=None):
     fs = mod_globals.fontSize
     layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
     if not l:

@@ -143,7 +143,7 @@ class Scenario(App):
         layout.add_widget(self.phase)
         layout.add_widget(self.make_box_params(self.key0, self.value0))
         layout.add_widget(self.make_box_params(self.key1, self.value1))
-        layout.add_widget(MyButton(text=get_message_by_id('16870'), on_press=self.stopf))
+        layout.add_widget(MyButton(text=get_message_by_id('69'), on_press=self.stopf))
         self.popup_open(get_message(self.ScmParam, 'TexteCommandeEnCours'), layout, 0.9, 0.8)
         if self.need_update:
             self.timer_event = Clock.schedule_once(self.update_timer, 1)
