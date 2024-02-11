@@ -101,10 +101,10 @@ android.permissions = INTERNET,BLUETOOTH,BLUETOOTH_ADMIN,MANAGE_EXTERNAL_STORAGE
 android.api = 32
 
 # (int) Minimum API your APK / AAB will support.
-android.minapi = 25
+#android.minapi = 25
 
 # (int) Android SDK version to use
-android.sdk = 25
+#android.sdk = 25
 
 # (str) Android NDK version to use
 #android.ndk = 25b
