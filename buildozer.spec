@@ -98,7 +98,7 @@ android.permissions = INTERNET,BLUETOOTH,BLUETOOTH_ADMIN,MANAGE_EXTERNAL_STORAGE
 #android.features = android.hardware.usb.host
 
 # (int) Target Android API, should be as high as possible.
-android.api = 32
+android.api = 34
 
 # (int) Minimum API your APK / AAB will support.
 android.minapi = 23
