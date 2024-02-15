@@ -14,7 +14,7 @@ if platform != 'android':
     import serial
     from serial.tools import list_ports
 else:
-    from jnius import autoclass
+    from jnius import autoclass, cast
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
