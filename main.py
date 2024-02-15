@@ -25,7 +25,7 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.00'
+__version__ = '0.02.01'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -637,7 +637,21 @@ def main():
     if not os.path.exists(SEFname):
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
 
-    if mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
+    if (mod_globals.opt_port == '127.0.0.1:35000' or mod_globals.opt_port.lower() == 'com7') and mod_globals.opt_ecuid_on:
+        se.read_Uces_file(all=True)
+        se.detectedEcus = []
+        for i in mod_globals.opt_ecuid.split(','):
+            if i in list(se.allecus.keys()):
+                se.allecus[i]['ecuname'] = i
+                se.allecus[i]['idf'] = se.allecus[i]['ModelId'][2:4]
+                if se.allecus[i]['idf']!='':
+                    if se.allecus[i]['idf'][0] == '0':
+                        se.allecus[i]['idf'] = se.allecus[i]['idf'][1]
+                se.allecus[i]['pin'] = 'can'
+                se.detectedEcus.append(se.allecus[i])
+        
+
+    elif mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
         se.read_Uces_file(all=True)
         se.detectedEcus = []
         for i in mod_globals.opt_ecuid.split(','):

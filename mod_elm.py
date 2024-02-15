@@ -19,6 +19,7 @@ else:
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
+    usbDevice = autoclass('android.hardware.usb.UsbDevice')
     UUID = autoclass('java.util.UUID')
 
 # List of commands which may require to open another Developer session(option --dev)
@@ -139,7 +140,7 @@ def get_devices():
             devs[desc] = port
 
         return devs
-    
+    devs['deviceName'] = usbDevice.getDeviceList().values()
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
         deviceName = device.getName()
