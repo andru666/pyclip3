@@ -16,19 +16,19 @@ if platform != 'android':
 else:
     from jnius import autoclass, cast
     
-    from usb4a import usb
-    from usbserial4a import serial4a
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
     UUID = autoclass('java.util.UUID')
     
-    PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    Context = autoclass('android.content.Context')
-    UsbManager = autoclass('android.hardware.usb.UsbManager')
-    activity = PythonActivity.mActivity
-    usb_mgr = cast(UsbManager, activity.getSystemService(Context.USB_SERVICE))
+    UsbConstants = autoclass('android.hardware.usb.UsbConstants')
+    Context = autoclass('org.kivy.android.PythonActivity')
+    ByteBuffer = autoclass('java.nio.ByteBuffer')
+    UsbRequest = autoclass('android.hardware.usb.UsbRequest')
+    PendingIntent = autoclass('android.app.PendingIntent')
+    activity = cast('android.content.Context',Context.mActivity)
+    manager = activity.getSystemService("usb")
 
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
@@ -149,12 +149,10 @@ def get_devices():
 
         return devs
     
-    dev = usb_mgr.getDeviceList()
-    valuesArrays = dev.toArray() #returns list in python
-    for valuesArray in valuesArrays:
-        deviceName = valuesArray.getDeviceName()
-        if deviceName:
-            devs[deviceName] = valuesArray.getDeviceId()
+    dev = manager
+    for valuesArray in dev:
+        
+        devs[valuesArray] = valuesArray
     
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
