@@ -19,14 +19,12 @@ else:
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
-    usbDevice = autoclass('android.hardware.usb.UsbDevice')
-    AndroidPythonActivity = autoclass('org.kivy.android.PythonActivity')
-    activity = PythonActivity.mActivity
-    context = autoclass('android.content.Context')
-    usbEndpoint = autoclass('android.hardware.usb.UsbEndpoint')
-    usbManager = autoclass('android.hardware.usb.UsbManager')
-    usbRequest = autoclass('android.hardware.usb.UsbRequest')
     UUID = autoclass('java.util.UUID')
+    
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    context = autoclass('android.content.Context')
+    usbManager = autoclass('android.hardware.usb.UsbManager')
+    activity = PythonActivity.mActivity
     usbMgr = cast(usbManager, activity.getSystemService(context.USB_SERVICE))
 
 # List of commands which may require to open another Developer session(option --dev)
@@ -147,12 +145,14 @@ def get_devices():
             devs[desc] = port
 
         return devs
+    
     dev = usbMgr.getDeviceList().values()
     valuesArrays = dev.toArray() #returns list in python
     for valuesArray in valuesArrays:
         deviceName = valuesArray.getDeviceName()
         if deviceName:
             devs[deviceName] = valuesArray.getDeviceId()
+    
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
         deviceName = device.getName()

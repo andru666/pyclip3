@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, sys, atexit, subprocess, string, signal, glob
+import os, sys, atexit, subprocess, string, signal, glob, re
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -383,7 +383,7 @@ def packValues(requests, datas, requestName, iValues):
         sb = sdi.FirstByte - 1 
         bits = d.BitsCount
         sbit = sdi.BitOffset
-        bytes =(bits+sbit-1)//8 + 1
+        bytes = (bits+sbit-1)//8 + 1
         if littleEndian:
             lshift = sbit
         else:
@@ -418,32 +418,45 @@ def packValues(requests, datas, requestName, iValues):
 
     return cmdPatt
 
-def getValueFromInput(d, value):
-    if value == LANG.l_enter_here:
-        return 'ERROR: Wrong value in parametr:%s(it should have %d bytes), be decimal or starts with 0x for hex' %(
-                d.Name, d.BytesCount)
-    if len(d.List.keys()) and ':' in value:
-        value = value.split(':')[0]
-    if d.Scaled:
-        if ' ' in value:
-            value = value.split(' ')[0]
-        if value.upper().startswith('0X'):
-            value = value[2:]
-        else:
-            if not all((c in string.digits or c == '.' or c == ',' or c == '-' or c == 'e' or c == 'E') for c in value):
-                return 'ERROR: Wrong value in parametr:%s(it should have %d bytes), be decimal or starts with 0x for hex' %(
-                d.Name, d.BytesCount)
-            flv =(float(value) * float(d.DivideBy) - float(d.Offset)) / float(d.Step)
-            value = hex(int(flv))
-            
-    if d.BytesASCII:
-        hst = ''
-        if len(value)<(d.BitsCount//8):
-            value += ' '*(d.BitsCount//8 - len(value))
-        for c in value:
-            hst = hst + hex(ord(c))[2:].zfill(2)
-        value = hst
-    return value
+def getValueFromInput(ecu, d, value):
+    computation = ecu.Parameters[d].computation
+    splitter = re.compile(r'([()+*/-])')
+    value = float(value)
+    r = splitter.split(computation)
+    r = [value for value in r if value]
+    rr = list(reversed(r))
+    l = len(r) - 1 
+    if r[l-1] == '/':
+        value = value * float(r[l])
+    if r[l-1] == '*':
+        value = value / float(r[l])
+    if r[l-1] == '+':
+        value = value - float(r[l])
+    if r[l-1] == '-':
+        value = value + float(r[l])
+    if r[0] == '(':
+        if r[2] == '*':
+            value = value / float(r[1])
+        if r[2] == '/':
+            value = value * float(r[1])
+        if r[2] == '-':
+            value = value + float(r[1])
+        if r[2] == '+':
+            value = value - float(r[1])
+    try:
+        ll = r.index('(', 1)
+    except:
+        ll = ''
+    if ll:
+        if r[ll+2] == '*':
+            value = value / float(r[ll+1])
+        if r[ll+2] == '/':
+            value = value * float(r[ll+1])
+        if r[ll+2] == '-':
+            value = value + float(r[ll+1])
+        if r[ll+2] == '+':
+            value = value - float(r[ll+1])
+    return StringToIntToHex(value)
 
 def kivyChoiceLong(list, question, header = ''):
     global widgetglobal
@@ -487,10 +500,6 @@ def ChoiceFromDict(dict, question, showId = True):
             ch = 'Q'
         if ch in list(d.keys()):
             return [d[ch], ch]
-
-def getValueFromInput(d, val):
-    print(d)
-    print(val)
 
 def pyren_encodeS(inp):
     if mod_globals.os == 'android':
