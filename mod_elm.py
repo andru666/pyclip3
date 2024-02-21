@@ -141,7 +141,7 @@ def get_devices():
         for port, desc, hwid in iterator:
             devs[desc] = port
 
-        #return devs
+        return devs
     
     
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
