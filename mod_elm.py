@@ -15,21 +15,15 @@ if platform != 'android':
     from serial.tools import list_ports
 else:
     from jnius import autoclass, cast
-    
+    import serial
+    from serial.tools import list_ports
+
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
     UUID = autoclass('java.util.UUID')
     
-    UsbConstants = autoclass('android.hardware.usb.UsbConstants')
-    Context = autoclass('org.kivy.android.PythonActivity')
-    ByteBuffer = autoclass('java.nio.ByteBuffer')
-    UsbRequest = autoclass('android.hardware.usb.UsbRequest')
-    PendingIntent = autoclass('android.app.PendingIntent')
-    activity = cast('android.content.Context',Context.mActivity)
-    manager = activity.getSystemService("usb")
-
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
 
@@ -142,17 +136,13 @@ def get_bt_socket_stream():
 
 def get_devices():
     devs = {}
-    if mod_globals.os != 'android':
+    if True:
         iterator = sorted(list(list_ports.comports()))
         for port, desc, hwid in iterator:
             devs[desc] = port
 
-        return devs
+        #return devs
     
-    dev = manager
-    for valuesArray in dev:
-        
-        devs[valuesArray] = valuesArray
     
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
