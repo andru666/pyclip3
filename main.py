@@ -25,7 +25,7 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.01'
+__version__ = '0.02.02'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
