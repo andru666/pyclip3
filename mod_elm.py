@@ -25,10 +25,10 @@ else:
     UUID = autoclass('java.util.UUID')
     
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    context = autoclass('android.content.Context')
-    usbManager = autoclass('android.hardware.usb.UsbManager')
+    Context = autoclass('android.content.Context')
+    UsbManager = autoclass('android.hardware.usb.UsbManager')
     activity = PythonActivity.mActivity
-    usbMgr = cast(usbManager, activity.getSystemService(context.USB_SERVICE))
+    usb_mgr = cast(UsbManager, activity.getSystemService(Context.USB_SERVICE))
 
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
@@ -149,7 +149,7 @@ def get_devices():
 
         return devs
     
-    dev = usbManager.getDeviceList().values()
+    dev = usb_mgr.getDeviceList()
     valuesArrays = dev.toArray() #returns list in python
     for valuesArray in valuesArrays:
         deviceName = valuesArray.getDeviceName()
