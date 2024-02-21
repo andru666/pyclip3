@@ -146,7 +146,7 @@ def get_devices():
 
         return devs
     
-    dev = usbMgr.getDeviceList().values()
+    dev = usbManager.getDeviceList().values()
     valuesArrays = dev.toArray() #returns list in python
     for valuesArray in valuesArrays:
         deviceName = valuesArray.getDeviceName()
