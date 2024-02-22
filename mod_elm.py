@@ -134,7 +134,7 @@ def get_bt_socket_stream():
 
 def get_devices():
     devs = {}
-    if False:
+    if mod_globals.os != 'android':
         iterator = sorted(list(list_ports.comports()))
         for port, desc, hwid in iterator:
             devs[desc] = port
