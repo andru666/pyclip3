@@ -23,6 +23,15 @@ else:
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
     UUID = autoclass('java.util.UUID')
     
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    Context = autoclass('android.content.Context')
+    UsbManager = autoclass('android.hardware.usb.UsbManager')
+    activity = PythonActivity.mActivity
+    activ = cast(Context, activity)
+    usbMgr = activ.getSystemService("usb")
+    #
+    #usbMgr = cast(usbManager, activity.getSystemService(context.USB_SERVICE))
+
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
 
@@ -142,7 +151,14 @@ def get_devices():
 
         return devs
     
-    
+
+    dev = usbMgr.getDeviceList().values()
+    valuesArrays = dev.toArray() #returns list in python
+    for valuesArray in valuesArrays:
+        deviceName = valuesArray.getDeviceName()
+        if deviceName:
+            devs[deviceName] = valuesArray.getDeviceId()
+
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
         deviceName = device.getName()
