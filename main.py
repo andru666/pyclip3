@@ -287,7 +287,7 @@ class screenConfig(App):
         for name, address in porte:
             if mod_globals.opt_port == name:
                 mod_globals.opt_dev_address = address
-            btn = MyButton(text=name + '>' + address, size_hint=(0.65, None))
+            btn = MyButton(text=str(name + '>' + address), size_hint=(0.65, None))
             btn.height = label.height*1.5
             btn.font_size = label.font_size
             btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
