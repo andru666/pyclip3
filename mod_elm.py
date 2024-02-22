@@ -16,7 +16,7 @@ if platform != 'android':
 else:
     from jnius import autoclass
     
-    import usb.core
+    print(111)
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
