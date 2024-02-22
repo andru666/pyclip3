@@ -15,7 +15,7 @@ if platform != 'android':
     from serial.tools import list_ports
 else:
     from jnius import autoclass
-    import serial
+    
     from serial.tools import list_ports
 
     mod_globals.os = 'android'
