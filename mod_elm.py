@@ -14,9 +14,7 @@ if platform != 'android':
     import serial
     from serial.tools import list_ports
 else:
-    from jnius import autoclass, cast
-    import serial
-    from serial.tools import list_ports
+    from jnius import autoclass, cas
 
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
@@ -136,7 +134,7 @@ def get_bt_socket_stream():
 
 def get_devices():
     devs = {}
-    if True:
+    if False:
         iterator = sorted(list(list_ports.comports()))
         for port, desc, hwid in iterator:
             devs[desc] = port
