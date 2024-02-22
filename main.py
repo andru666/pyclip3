@@ -148,7 +148,13 @@ else:
     except:
         pass
 
-
+from mod_elm import ELM, get_devices
+from mod_zip import *
+from mod_scan_ecus import ScanEcus
+from mod_ecu import ECU
+from mod_ecu_mnemonic import *
+from mod_utils import *
+from mod_ecu_default import *
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 argv_glob = sys.argv
 sys.argv = sys.argv[0:1]
@@ -170,13 +176,7 @@ def my_excepthook(excType, excValue, tb):
 
 sys.excepthook = my_excepthook
 resizeFont = False
-from mod_elm import ELM, get_devices
-from mod_zip import *
-from mod_scan_ecus import ScanEcus
-from mod_ecu import ECU
-from mod_ecu_mnemonic import *
-from mod_utils import *
-from mod_ecu_default import *
+
 def set_orientation_landscape():
     if mod_globals.os == 'android':
         activity = AndroidPythonActivity.mActivity
