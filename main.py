@@ -514,12 +514,6 @@ class screenConfig(App):
         glay1.add_widget(self.carte2)
         glay1.add_widget(MyButton(text='Copy', id='1', size_hint=(0.2, 1), on_release=self.copy_donate))
         layout.add_widget(glay1)
-        glay2 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
-        self.qiwi = MyLabel(text='+375293144900', size_hint=(0.6, 1))
-        glay2.add_widget(MyLabel(text='QIWI:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
-        glay2.add_widget(self.qiwi)
-        glay2.add_widget(MyButton(text='Copy', id='2', size_hint=(0.2, 1), on_release=self.copy_donate))
-        layout.add_widget(glay2)
         MyPopup_close(title='Select the donation method to copy the data', cont=layout, l=None)
 
     def copy_donate(self, dt):
@@ -527,8 +521,6 @@ class screenConfig(App):
             d = self.carte1.text
         if dt.id == '1':
             d = self.carte2.text
-        if dt.id == '2':
-            d = self.qiwi.text
         Clipboard.copy(d)
         MyPopup_close(title='INFO', cont=MyLabel(text='Copied to the clipboard '+d, size_hint=(1, 1)), l=None)
 
