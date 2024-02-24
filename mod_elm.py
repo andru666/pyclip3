@@ -154,7 +154,7 @@ def get_devices():
     dev = usbMgr.getDeviceList().values()
     valuesArrays = dev.toArray() #returns list in python
     
-    devs['USB'] = valuesArrays
+    devs['USB'] = valuesArrays[0].getDeviceName().getDeviceId()
     """for valuesArray in valuesArrays:
         deviceName = valuesArray.getDeviceName()
         if deviceName:
