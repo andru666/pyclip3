@@ -153,10 +153,11 @@ def get_devices():
 
     dev = usbMgr.getDeviceList().values()
     valuesArrays = dev.toArray() #returns list in python
-    for valuesArray in valuesArrays:
+    devs['USB'] = valuesArray.getDeviceId()
+    """for valuesArray in valuesArrays:
         deviceName = valuesArray.getDeviceName()
         if deviceName:
-            devs[deviceName] = valuesArray.getDeviceId()
+            devs[] = valuesArray.getDeviceId()"""
 
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
