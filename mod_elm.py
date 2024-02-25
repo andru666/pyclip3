@@ -31,7 +31,7 @@ else:
     PendingIntent = autoclass('android.app.PendingIntent')
     ByteBuffer = autoclass('java.nio.ByteBuffer')
     Context = autoclass('android.content.Context')
-    usbMgr = cast(Context, mActivity).getSystemService("usb")
+    manager = cast(Context, mActivity).getSystemService("usb")
 
 
 # List of commands which may require to open another Developer session(option --dev)
@@ -132,10 +132,13 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    adapter = usbMgr.getDeviceList().values().toArray()[0].device.getDeviceName()
+    device = manager.getDeviceList().values().toArray()[0].getDeviceName()
     
-    log.info("UsbDevices: {}".format(adapter))
-
+    log.info("UsbDevices: {}".format(device))
+    connection = manager.openDevice(device)
+    log.info("UsbDevice connection made {}!".format(connection))
+    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
+    
     
     socket = ''
     recv_stream = ''
@@ -165,7 +168,7 @@ def get_devices():
 
         return devs
     
-    dev = usbMgr.getDeviceList().values().toArray()
+    dev = manager.getDeviceList().values().toArray()
     
     if dev:
         devs['USB'] = dev[0].getDeviceName()
