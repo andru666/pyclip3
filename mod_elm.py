@@ -132,7 +132,7 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    adapter = usbMgr.getDeviceList().values().toArray()[0]device.getDeviceName()
+    adapter = usbMgr.getDeviceList().values().toArray()[0].device.getDeviceName()
     
     log.info("UsbDevices: {}".format(adapter))
 
