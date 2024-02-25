@@ -170,7 +170,7 @@ def get_devices():
     log.info("UsbDevices: {}".format(dev))
     
     if dev:
-        devs['USB'] = dev[0].getDeviceName().getDeviceId()
+        devs['USB'] = dev[0].getDeviceName()
 
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
