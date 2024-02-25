@@ -132,15 +132,14 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    adapter = BluetoothAdapter.getDefaultAdapter()
-    adapter.cancelDiscovery()
+    adapter = usbMgr.getDeviceList().values().toArray()[0]device.getDeviceName()
+    
+    log.info("UsbDevices: {}".format(adapter))
 
-    device = adapter.getRemoteDevice(bytearray.fromhex(''.join(mod_globals.opt_dev_address.split(':'))))
-
-    socket = device.createRfcommSocketToServiceRecord(UUID.fromString('00001101-0000-1000-8000-00805F9B34FB'))
-    socket.connect()
-    recv_stream = socket.getInputStream()
-    send_stream = socket.getOutputStream()
+    
+    socket = ''
+    recv_stream = ''
+    send_stream = ''
 
     return(socket, recv_stream, send_stream)
 
@@ -167,7 +166,6 @@ def get_devices():
         return devs
     
     dev = usbMgr.getDeviceList().values().toArray()
-    log.info("UsbDevices: {}".format(dev))
     
     if dev:
         devs['USB'] = dev[0].getDeviceName()
@@ -208,9 +206,7 @@ class Port:
            re.match(r"^[0-9A-F]{12}$", upPortName):
             upPortName = upPortName.replace(':','').replace('.','')
             MAC = ':'.join(a + b for a, b in zip(upPortName[::2], upPortName[1::2]))
-        
-        log.info("portName {}!".format(portName))
-        
+                
         if mod_globals.os != 'android' and MAC:
             try:
                 self.macaddr = portName
@@ -268,7 +264,10 @@ class Port:
         self.socket.close()
 
     def getConnected(self):
-        self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
+        if portName == 'USB'
+            self.socket, self.recv_stream, self.send_stream = get_usb_socket_stream()
+        else:
+            self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
 
     def read(self):
         byte = ""
