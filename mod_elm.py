@@ -198,6 +198,7 @@ class Port:
     
     def __init__(self, portName, speed, portTimeout):
         self.portTimeout = portTimeout
+        self.portName = portName
         portName = portName.strip()
         MAC = None
         upPortName = portName.upper()
@@ -264,7 +265,7 @@ class Port:
         self.socket.close()
 
     def getConnected(self):
-        if portName == 'USB':
+        if self.portName == 'USB':
             self.socket, self.recv_stream, self.send_stream = get_usb_socket_stream()
         else:
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
