@@ -287,7 +287,10 @@ class screenConfig(App):
         for name, address in porte:
             if mod_globals.opt_port == name:
                 mod_globals.opt_dev_address = address
-            btn = MyButton(text=str(name) + '>' + str(address), size_hint=(0.65, None))
+            if name == 'USB' and address:
+                btn = MyButton(text='USB', size_hint=(0.65, None))
+            else:
+                btn = MyButton(text=str(name) + '>' + str(address), size_hint=(0.65, None))
             btn.height = label.height*1.5
             btn.font_size = label.font_size
             btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))

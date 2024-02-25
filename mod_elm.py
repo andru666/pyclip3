@@ -9,7 +9,8 @@ import socket
 from datetime import datetime
 from collections import OrderedDict
 from kivy.utils import platform
-
+import logging
+log = logging.getLogger("kivy")
 if platform != 'android':
     import serial
     from serial.tools import list_ports
@@ -23,13 +24,15 @@ else:
     UUID = autoclass('java.util.UUID')
     
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    Context = autoclass('android.content.Context')
+    mActivity = PythonActivity.mActivity
+    UsbConstants = autoclass('android.hardware.usb.UsbConstants')
+    UsbRequest = autoclass('android.hardware.usb.UsbRequest')
     UsbManager = autoclass('android.hardware.usb.UsbManager')
-    activity = PythonActivity.mActivity
-    activ = cast(Context, activity)
-    usbMgr = activ.getSystemService("usb")
-    #
-    #usbMgr = cast(usbManager, activity.getSystemService(context.USB_SERVICE))
+    PendingIntent = autoclass('android.app.PendingIntent')
+    ByteBuffer = autoclass('java.nio.ByteBuffer')
+    Context = autoclass('android.content.Context')
+    usbMgr = cast(Context, mActivity).getSystemService("usb")
+
 
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
@@ -128,6 +131,19 @@ negrsp = {"10": "NR: General Reject",
           "92": "NR: Voltage Too High",
           "93": "NR: Voltage Too Low"}
 
+def get_usb_socket_stream():
+    adapter = BluetoothAdapter.getDefaultAdapter()
+    adapter.cancelDiscovery()
+
+    device = adapter.getRemoteDevice(bytearray.fromhex(''.join(mod_globals.opt_dev_address.split(':'))))
+
+    socket = device.createRfcommSocketToServiceRecord(UUID.fromString('00001101-0000-1000-8000-00805F9B34FB'))
+    socket.connect()
+    recv_stream = socket.getInputStream()
+    send_stream = socket.getOutputStream()
+
+    return(socket, recv_stream, send_stream)
+
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()
     adapter.cancelDiscovery()
@@ -150,15 +166,10 @@ def get_devices():
 
         return devs
     
-
-    dev = usbMgr.getDeviceList().values()
-    valuesArrays = dev.toArray() #returns list in python
+    dev = usbMgr.getDeviceList().values().toArray()
+    log.info("UsbDevices: {}".format(dev))
     
-    devs['USB'] = valuesArrays[0].getDeviceName().getDeviceId()
-    """for valuesArray in valuesArrays:
-        deviceName = valuesArray.getDeviceName()
-        if deviceName:
-            devs[] = valuesArray.getDeviceId()"""
+    devs['USB'] = dev[0].getDeviceName().getDeviceId()
 
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
