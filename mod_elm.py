@@ -208,7 +208,9 @@ class Port:
            re.match(r"^[0-9A-F]{12}$", upPortName):
             upPortName = upPortName.replace(':','').replace('.','')
             MAC = ':'.join(a + b for a, b in zip(upPortName[::2], upPortName[1::2]))
-
+        
+        log.info("portName {}!".format(portName))
+        
         if mod_globals.os != 'android' and MAC:
             try:
                 self.macaddr = portName
