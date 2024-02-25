@@ -264,7 +264,7 @@ class Port:
         self.socket.close()
 
     def getConnected(self):
-        if portName == 'USB'
+        if portName == 'USB':
             self.socket, self.recv_stream, self.send_stream = get_usb_socket_stream()
         else:
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
