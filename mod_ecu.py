@@ -252,10 +252,6 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
-        """if mod_globals.opt_csv:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
-        else:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)"""
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -311,7 +307,6 @@ class showDatarefGui(App):
         root.add_widget(layout)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
-            #self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 

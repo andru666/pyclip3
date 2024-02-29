@@ -132,19 +132,39 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    device = manager.getDeviceList().values().toArray()[0].getDeviceName()
+    device = manager.getDeviceList().values().toArray()[0]
     
     log.info("UsbDevices: {}".format(device))
     connection = manager.openDevice(device)
     log.info("UsbDevice connection made {}!".format(connection))
     log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
-    
-    
-    socket = ''
-    recv_stream = ''
+    _control_interface = device.getInterface(0)
+    num_endpoints = _control_interface.getEndpointCount()
     send_stream = ''
-
-    return(socket, recv_stream, send_stream)
+    if num_endpoints < 3:
+        msg = "not enough endpoints - need 3, got {}".format(num_endpoints)
+        log.error(msg)
+    for i in range(num_endpoints):
+        ep = _control_interface.getEndpoint(i)
+        if ((ep.getDirection() == UsbConstants.USB_DIR_IN) and
+            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)):
+            log.debug("Found controlling endpoint")
+            _control_endpoint = ep
+        elif ((ep.getDirection() == UsbConstants.USB_DIR_IN) and
+            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)):
+            log.debug("Found reading endpoint")
+            _read_endpoint = ep
+        elif ((ep.getDirection() == UsbConstants.USB_DIR_OUT) and
+            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)):
+            log.debug("Found writing endpoint")
+            _write_endpoint = ep  
+            
+        if None not in [_control_endpoint,
+            _write_endpoint,
+            _read_endpoint]:
+            log.debug("Found all endpoints")
+            break
+    return(_control_endpoint, _read_endpoint, _write_endpoint)
 
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()
@@ -231,7 +251,6 @@ class Port:
             self.hdr.connect((self.ipaddr, self.tcpprt))
             self.hdr.setblocking(True)
         elif mod_globals.os == 'android':
-            self.portType = 2
             self.getConnected()
         else:
             self.portName = portName
@@ -269,8 +288,10 @@ class Port:
 
     def getConnected(self):
         if self.portName == 'USB':
+            self.portType = 3
             self.socket, self.recv_stream, self.send_stream = get_usb_socket_stream()
         else:
+            self.portType = 2
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
 
     def read(self):
@@ -282,6 +303,9 @@ class Port:
                 except:
                     pass
             elif self.portType == 2:
+                if self.recv_stream.available():
+                    byte = chr(self.recv_stream.read())
+            elif self.portType == 3:
                 if self.recv_stream.available():
                     byte = chr(self.recv_stream.read())
             else:
