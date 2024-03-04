@@ -757,6 +757,7 @@ class ECU():
             return
 
     def show_function(self, function, path):
+        print('show_function')
         while 1:
             clearScreen()
             menu = []
@@ -773,6 +774,7 @@ class ECU():
                 return
 
     def show_screen(self, screen):
+        print('show_screen')
         while 1:
             clearScreen()
             menu = []
@@ -907,6 +909,7 @@ class ECU():
             self.show_datarefs(helpString + self.Defaults[dtchex].datarefs, path)
 
     def show_screens(self):
+        print('show_screens')
         self.screens.append(favouriteScreen)
         while 1:
             clearScreen()

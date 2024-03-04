@@ -222,6 +222,29 @@ class ScanEcus():
         EventLoop.window.canvas.clear()
         del popup_scan
 
+
+
+    def prepareECUs(self):
+        tot = ''
+        for l in self.detectedEcus:
+            if l['idf']=='1':
+                print("### Connecting to Engine ###")
+                self.chooseECU(l['ecuname'])
+                tot += "%-15s : " % "Engine    PR025" 
+                num, string = ecu.get_pr('PR025')
+                print(pyren_encode(string))
+                tot += str(num); tot += '\n'
+                tot += "%-15s : " % "Engine    PR992" 
+                num, string = ecu.get_pr('PR992')
+                print(pyren_encode(string))
+                tot += str(num); tot += '\n'
+                num, string = ecu.get_pr('PR391')
+                print(pyren_encode(string))
+                num, string = ecu.get_pr('PR412')
+                print(pyren_encode(string))
+                print()
+        
+    
     def reScanErrors(self):
         mod_globals.opt_scan = True
         self.reqres = []
@@ -312,11 +335,15 @@ class ScanEcus():
                      row['stdType'])
                 listecu.append(line)
         
+        listecu.append('Mileage survey')
         listecu.append('Rescan errors')
         listecu.append('<Exit>')
         choice = Choice(listecu, 'Choose ECU :')
         if choice[0] == 'Rescan errors':
             self.reScanErrors()
+            return -1
+        if choice[0] == 'Mileage survey':
+            self.prepareECUs()
             return -1
         if choice[0].lower() == '<exit>' or choice[0].lower() == '<up>':
             exit(1)
@@ -558,6 +585,7 @@ class ScanEcus():
                                         idtt.append(idmask)
                                         idtt.append(idval)
                         self.allecus[name]['ids'] = idtt
+
     def chooseModel(self, num):
         orderBy = 0
         for row in sorted(self.vhcls, key=lambda k: k[orderBy]):
