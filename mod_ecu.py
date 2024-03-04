@@ -134,8 +134,7 @@ class showDatarefGui(App):
         self.datarefs = datarefs
         self.labels = {}
         self.params = {}
-        self.needupdate = False
-        self.clock_event = None
+        self.needupdate = True
         self.running = True
         self.path = path
         self.paramsLabels = OrderedDict()
@@ -151,8 +150,6 @@ class showDatarefGui(App):
         if keycode1 == 45 and mod_globals.fontSize > 10:
             mod_globals.fontSize = mod_globals.fontSize - 1
             resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
             self.needupdate = False
             self.running = False
             self.stop()
@@ -160,10 +157,12 @@ class showDatarefGui(App):
         if keycode1 == 61 and mod_globals.fontSize < 40:
             mod_globals.fontSize = mod_globals.fontSize + 1
             resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
             self.needupdate = False
             self.running = False
+            self.stop()
+            return True
+        if keycode1 == 27:
+            choice_result = ['<' + mod_globals.language_dict['6218'] + '>', -1]
             self.stop()
             return True
         return False
@@ -217,7 +216,6 @@ class showDatarefGui(App):
                 key = '%s - %s' % (codeMR, label)
                 dct[name] = str(value)
                 self.paramsLabels[name] = key
-                self.needupdate = True
             if dr.type == 'Parameter':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -227,7 +225,6 @@ class showDatarefGui(App):
                 val = '%s %s' % (value, unit)
                 dct[name] = str(val)
                 self.paramsLabels[name] = key
-                self.needupdate = True
             if dr.type == 'Identification':
                 name, codeMR, label, value = get_identification(self.ecu.Identifications[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True)
                 key = '%s - %s' % (codeMR, label)
@@ -252,6 +249,8 @@ class showDatarefGui(App):
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
+            if mod_globals.opt_demo:
+                self.needupdate = False
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -595,9 +594,9 @@ class ECU():
                     datastr = self.Commands[dr.name].codeMR + ' ' + self.Commands[dr.name].label
                     cmds.append(dr.name)
                 menu.append(datastr)
-            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
+            menu.append('<' + mod_globals.language_dict['6218'] + '>')
             choice = ChoiceLong(menu, 'Choose :', header)
-            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+            if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 return
             header = header + ' -> ' + cmds[int(choice[1]) - 1] + ' [Command] '
             executeCommand(self.Commands[cmds[int(choice[1]) - 1]], self, self.elm, header)
@@ -764,9 +763,9 @@ class ECU():
             if len(function.subfunctions) != 0:
                 for sfu in function.subfunctions:
                     menu.append(sfu.text)
-                menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
+                menu.append('<' + mod_globals.language_dict['6218'] + '>')
                 choice = Choice(menu, 'Choose :')
-                if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+                if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                     return
                 self.show_subfunction(function.subfunctions[int(choice[1]) - 1], path + ' -> ' + function.text)
             if len(function.datarefs) != 0:
@@ -780,9 +779,9 @@ class ECU():
             if len(screen.functions) != 0:
                 for fu in screen.functions:
                     menu.append(fu.text)
-                menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
+                menu.append('<' + mod_globals.language_dict['6218'] + '>')
                 choice = Choice(menu, 'Choose :')
-                if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+                if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                     return
                 self.show_function(screen.functions[int(choice[1]) - 1], screen.name)
             if len(screen.datarefs) != 0:
@@ -804,13 +803,13 @@ class ECU():
             for d in listkeys:
                 menu.append(defstr[d])
 
-            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
-            menu.append('<Clear>')
-            choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+            menu.append('<' + mod_globals.language_dict['6218'] + '>')
+            menu.append('<' + mod_globals.language_dict['52612'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
-            if choice[0] == '<Clear>':
+            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             index = int(choice[1]) - 1
@@ -849,13 +848,13 @@ class ECU():
             for d in listkeys:
                 menu.append(defstr[d])
 
-            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
-            menu.append('<Clear>')
-            choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+            menu.append('<' + mod_globals.language_dict['6218'] + '>')
+            menu.append('<' + mod_globals.language_dict['52612'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
-            if choice[0] == '<Clear>':
+            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             index = int(choice[1]) - 1
@@ -893,12 +892,12 @@ class ECU():
             dtcs, defstr, hlpstr = get_default_failflag(self.Defaults, self.Mnemonics, self.Services, self.elm, self.calc)
             for d in sorted(defstr.keys()):
                 menu.append(defstr[d])
-            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
-            menu.append('<Clear>')
-            choice = Choice(menu, 'Choose one for detailed view or <Clear>:')
-            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+            menu.append('<' + mod_globals.language_dict['6218'] + '>')
+            menu.append('<' + mod_globals.language_dict['52612'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 return
-            if choice[0] == '<Clear>':
+            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             dtchex = dtcs[int(choice[1]) - 1]
@@ -953,12 +952,12 @@ class ECU():
                     menu.append('ECM : Расширенный набор команд')
                 else:
                     menu.append('ECM : Extended command set')
-            menu.append('<' + mod_globals.language_dict['C3P_88028'] + '>')
+            menu.append('<' + mod_globals.language_dict['6218'] + '>')
             if mod_globals.opt_lang == 'RU':
                 choice = Choice(menu, 'Выбор :')
             else:
                 choice = Choice(menu, 'Choose :')
-            if choice[0] == '<' + mod_globals.language_dict['C3P_88028'] + '>':
+            if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 favouriteScreen.datarefs = []
                 return
             if choice[0][:2] == 'DE':

@@ -322,7 +322,7 @@ class widgetChoiceLong(App):
             self.stop()
             return True
         if keycode1 == 27:
-            choice_result = ['<Up>', -1]
+            choice_result = ['<' + mod_globals.language_dict['6218'] + '>', -1]
             self.stop()
             return True
         return False
@@ -483,7 +483,7 @@ def ChoiceFromDict(dict, question, showId = True):
     exitNumber = 0
     for k in sorted(dict.keys()):
         s = dict[k]
-        if k.lower() == '<up>' or k.lower() == '<exit>':
+        if k.lower() == '<' + mod_globals.language_dict['6218'].lower() + '>' or k.lower() == '<exit>':
             exitNumber = c
             d['Q'] = k
         else:
