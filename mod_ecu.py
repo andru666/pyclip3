@@ -272,7 +272,8 @@ class showDatarefGui(App):
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
         layout.add_widget(MyLabel(text=header))
-        self.get_ecu_values()
+        if len(self.params) == 0:
+            self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
             len_str = len(param)
