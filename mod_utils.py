@@ -348,7 +348,7 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         if self.question == 'Mileage survey':
-            layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs))
+            layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
         else:
             for entry in self.menu_entries:

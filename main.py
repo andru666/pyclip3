@@ -398,7 +398,7 @@ class screenConfig(App):
         mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
         if self.mainbutton.text:
-            if 'com10' in self.mainbutton.text.lower() or 'com8' in self.mainbutton.text.lower():
+            if 'com9' in self.mainbutton.text.lower() or 'com8' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '127.0.0.1:35000'
             elif 'wifi' in self.mainbutton.text.lower():
                 mod_globals.opt_port = '192.168.0.10:35000'
