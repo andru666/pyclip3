@@ -25,7 +25,7 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.01'
+__version__ = '0.02.02'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -673,7 +673,6 @@ def main():
     popup_load.dismiss()
     base.stopTouchApp()
     base.EventLoop.window.canvas.clear()
-
     while 1:
         clearScreen()
         choosen_ecu = se.chooseECU(mod_globals.opt_ecuid)

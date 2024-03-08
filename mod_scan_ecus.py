@@ -15,6 +15,7 @@ from mod_utils import *
 import mod_zip
 import mod_elm as m_elm
 import mod_globals
+from mod_ecu import ECU
 import sys
 import glob
 import os
@@ -222,28 +223,58 @@ class ScanEcus():
         EventLoop.window.canvas.clear()
         del popup_scan
 
-
+    def chooseEcu(self, ecu_number):
+        choosen_ecu = self.chooseECU(ecu_number)
+        if choosen_ecu==-1:
+            print ("#\n"*3,"#   Unknown ECU defined!!!\n","#\n"*3)
+            return
+        ecucashfile = mod_globals.cache_dir + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + ".p"
+    
+        if os.path.isfile(ecucashfile):
+            ecu = pickle.load(open(ecucashfile, "rb"))
+        else:
+            ecu = ECU(choosen_ecu, mod_globals.language_dict)
+            pickle.dump(ecu, open(ecucashfile, "wb"))
+        ecu.initELM(self.elm)
+        if mod_globals.opt_demo:
+            ecu.loadDump()
+        return ecu
 
     def prepareECUs(self):
         tot = ''
         for l in self.detectedEcus:
             if l['idf']=='1':
                 print("### Connecting to Engine ###")
-                self.chooseECU(l['ecuname'])
+                ecu = self.chooseEcu(l['ecuname'])
                 tot += "%-15s : " % "Engine    PR025" 
                 num, string = ecu.get_pr('PR025')
-                print(pyren_encode(string))
                 tot += str(num); tot += '\n'
                 tot += "%-15s : " % "Engine    PR992" 
                 num, string = ecu.get_pr('PR992')
-                print(pyren_encode(string))
                 tot += str(num); tot += '\n'
                 num, string = ecu.get_pr('PR391')
-                print(pyren_encode(string))
                 num, string = ecu.get_pr('PR412')
-                print(pyren_encode(string))
                 print()
-        
+            if l['idf']=='2':    #family 02
+                print("### Connecting to ABS ###") 
+                ecu = self.chooseEcu(l['ecuname'])
+                tot += "%-15s : " % "ABS             PR121" 
+                num, string = ecu.get_pr('PR121')
+                tot += str(num); tot += '\n'
+                print()
+            if l['idf']=='3':    #family 03
+                print("### Connecting to TDB ###") 
+                ecu = self.chooseEcu(l['ecuname'])
+                tot += "%-15s : " % "TDB             PR009" 
+                num, string = ecu.get_pr('PR009')
+                tot += str(num); tot += '\n'
+                tot += "%-15s : " % "TDB (km)    PR025" 
+                num, string = ecu.get_pr('PR025')
+                tot += str(num); tot += '\n'
+                tot += "%-15s : " % "TDB (mil) PR026" 
+                num, string = ecu.get_pr('PR026')
+                tot += str(num); tot += '\n'
+        return tot
     
     def reScanErrors(self):
         mod_globals.opt_scan = True
@@ -343,7 +374,7 @@ class ScanEcus():
             self.reScanErrors()
             return -1
         if choice[0] == 'Mileage survey':
-            self.prepareECUs()
+            Choice(self.prepareECUs(), 'Mileage survey')
             return -1
         if choice[0].lower() == '<exit>' or choice[0].lower() == '<up>':
             exit(1)

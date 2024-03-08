@@ -347,14 +347,18 @@ class widgetChoiceLong(App):
         question = MyLabel(text=self.question)
         layout.add_widget(question)
         i = 1
-        for entry in self.menu_entries:
-            btn = MyButton(text=' ' + (entry), size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
-            btn.bind(size=btn.setter('text_size'))
-            btn.txt = entry
-            btn.ID = i
-            btn.bind(on_press=self.choice_done)
-            layout.add_widget(btn)
-            i += 1
+        if self.question == 'Mileage survey':
+            layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs))
+            layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
+        else:
+            for entry in self.menu_entries:
+                btn = MyButton(text=' ' + (entry), size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
+                btn.bind(size=btn.setter('text_size'))
+                btn.txt = entry
+                btn.ID = i
+                btn.bind(on_press=self.choice_done)
+                layout.add_widget(btn)
+                i += 1
 
         root = ScrollView(size_hint=(1, 1), pos_hint={'center_x': 0.5,
          'center_y': 0.5}, do_scroll_x=False)
