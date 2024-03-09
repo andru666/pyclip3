@@ -422,7 +422,7 @@ class screenConfig(App):
         if not mod_globals.opt_port and not mod_globals.opt_demo:
             MyPopup_close(cont=MyLabel(text='Not select ELM!', font_size=(fs*3), size_hint = (1, 0.7)))
         elif mod_globals.opt_lang == 'SELECT':
-            MyPopup_close(cont=MyLabel(text='Not select language!', font_size=(fs*3), size_hint = (1, 0.7)), lang=False)
+            MyPopup_close(cont=MyLabel(text='Not select language!', font_size=(fs*3), size_hint = (1, 0.7)), l=False)
         elif not mod_globals.savedEcus and not mod_globals.opt_scan and not mod_globals.opt_ecuid_on and not os.path.exists(mod_globals.user_data_dir + '/' + mod_globals.savedEcus):
             MyPopup_close(cont=MyLabel(text='Not select savedEcus!', font_size=(fs*3), size_hint = (1, 0.7)))
         elif mod_globals.opt_ecuid_on and not mod_globals.opt_ecuid:

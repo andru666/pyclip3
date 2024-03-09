@@ -226,8 +226,7 @@ class ScanEcus():
     def chooseEcu(self, ecu_number):
         choosen_ecu = self.chooseECU(ecu_number)
         if choosen_ecu==-1:
-            print ("#\n"*3,"#   Unknown ECU defined!!!\n","#\n"*3)
-            return
+            return "#\n"*3,"#   Unknown ECU defined!!!\n","#\n"*3
         ecucashfile = mod_globals.cache_dir + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + ".p"
     
         if os.path.isfile(ecucashfile):
