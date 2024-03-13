@@ -636,7 +636,7 @@ class ScanEcus():
         self.load_model_ECUs(tcomfilename)
 
     def compare_ecu(self, row, rrsp, req):
-        if len(req) / 2 == 3:
+        if len(req) // 2 == 3:
             rrsp = rrsp[3:]
         base = 0
         res = 0
@@ -645,19 +645,21 @@ class ScanEcus():
         if not all(c in string.hexdigits for c in ttrrsp):
             return False
         else:
-            while base + 6 <= len(row) and int(row[base + 3]) * 3 + 2 <= len(rrsp):
-                req = row[base]
+            while base + 6 <= len(row):
                 if row[base] != req:
+                    req = row[base]
                     rrsp = self.elm.cmd(req)[3:]
                     ttrrsp = rrsp.replace(' ', '')
                     if not all((c in string.hexdigits for c in ttrrsp)):
                         return False
-                    if len(req) / 2 == 3:
+                    if len(req) // 2 == 3:
                         rrsp = rrsp[3:]
+                if (int(row[base+3])*3+2) > len(rrsp):
+                    return False
                 byte = int(rrsp[int(row[base + 3]) * 3:int(row[base + 3]) * 3 + 2], 16)
                 mask = int(row[base + 4], 16)
                 val = int(row[base + 5], 16)
-                if byte & mask == val:
+                if (byte & mask) == val:
                     res += 1
                 att += 1
                 if att != res:
@@ -665,7 +667,8 @@ class ScanEcus():
                 base += 6
             if res == att and res > 0:
                 return True
-            return False
+            else:
+                return False
 
     def request_can(self, row):
         self.elm.start_session(row['startDiagReq'])
@@ -744,7 +747,6 @@ class ScanEcus():
             if row['dst'] + row['startDiagReq'] + row['stdType'] + row['ids'][0] + row['protocol'] == r[0]:
                 rrsp = r[1]
                 rerr = r[2]
-
         if rrsp == '':
             rrsp, rerr = self.request_can(row)
             if not rrsp:
@@ -754,9 +756,9 @@ class ScanEcus():
             if row['stdType'] == 'STD_A':
                 rerr = str(int(rerr[3:5], 16)) if len(rerr) > 5 and rerr[:2] == '57' else '0'
             if row['stdType'] == 'STD_B':
-                rerr = str((len(rerr) - 8) / 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
+                rerr = str((len(rerr) - 8) // 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
             if row['stdType'] == 'UDS':
-                rerr = str((len(rerr) - 8) / 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
+                rerr = str((len(rerr) - 8) // 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
             if row['stdType'] == 'FAILFLAG':
                 rerr = 'N/A'
             row['rerr'] = rerr
@@ -797,9 +799,9 @@ class ScanEcus():
             if row['stdType'] == 'STD_A':
                 rerr = str(int(rerr[3:5], 16)) if len(rerr) > 5 and rerr[:2] == '57' else '0'
             if row['stdType'] == 'STD_B':
-                rerr = str((len(rerr) - 8) / 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
+                rerr = str((len(rerr) - 8) // 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
             if row['stdType'] == 'UDS':
-                rerr = str((len(rerr) - 8) / 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
+                rerr = str((len(rerr) - 8) // 12) if len(rerr) > 8 and rerr[:2] == '59' else '0'
             if row['stdType'] == 'FAILFLAG':
                 rerr = 'N/A'
             row['rerr'] = rerr

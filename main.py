@@ -25,7 +25,7 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.02'
+__version__ = '0.02.03'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -644,7 +644,6 @@ def main():
                 se.allecus[i]['pin'] = 'can'
                 se.detectedEcus.append(se.allecus[i])
         
-
     elif mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
         se.read_Uces_file(all=True)
         se.detectedEcus = []

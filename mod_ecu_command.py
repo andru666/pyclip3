@@ -96,7 +96,7 @@ def getDataId(req, ecu, elm):
     if not rsp.upper().startswith('62' + dataid):
         return ('', '')
     data = rsp.replace('62' + dataid, '')
-    datalen = int(ecu.DataIds[dataid].dataBitLength) / 4
+    datalen = int(ecu.DataIds[dataid].dataBitLength) // 4
     if len(data) < datalen:
         return ('', '')
     return (dataid, data[:datalen])
@@ -112,7 +112,7 @@ def packData(ecu, mnemo, dataid, data, value):
     sb = int(pr.startByte) - 1
     bits = int(mn.bitsLength)
     sbit = int(pr.startBit)
-    bytes = (bits + sbit - 1) / 8 + 1
+    bytes = (bits + sbit - 1) // 8 + 1
     if littleEndian:
         lshift = sbit
     else:
@@ -315,8 +315,8 @@ class kivyExecCommand(App):
         if len(self.command.prerequisite) > 0:
             lines = len(self.command.prerequisite.split('\n'))
             simb = len(self.command.prerequisite)
-            if lines < simb / 60:
-                lines = simb / 60
+            if lines < simb // 60:
+                lines = simb // 60
             if lines < 7:
                 lines = 7
             if lines > 20:
