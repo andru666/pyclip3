@@ -193,6 +193,7 @@ class screenConfig(App):
     def __init__(self):
         self.button = {}
         self.textInput = {}
+        self.Donate = {}
         super(screenConfig, self).__init__()
         self.settings = mod_globals.Settings()
         Window.bind(on_keyboard=self.key_handler)
@@ -496,8 +497,8 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('KWP Force SlowInit', mod_globals.opt_si))
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    10-02-2024', font_size=(fs*0.5), height=(fs*0.7)))
         layout.add_widget(MyButton(text='DONATE', height=fs*2, on_release=self.donate))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    10-02-2024', font_size=(fs*0.5), height=(fs*0.7)))
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root.add_widget(layout)
@@ -506,24 +507,46 @@ class screenConfig(App):
     def donate(self, dt):
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1, 1))
         glay0 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
-        self.carte1 = MyLabel(text='5435 5311 2185 5868', size_hint=(0.6, 1))
-        glay0.add_widget(MyLabel(text='№ card:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        self.carte1 = MyLabel(text='+375293144900', size_hint=(0.6, 1), bgcolor = (0.5, 0, 0, 1),)
+        self.Donate['0'] = self.carte1
+        glay0.add_widget(MyLabel(text='SBER BELARUS:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
         glay0.add_widget(self.carte1)
         glay0.add_widget(MyButton(text='Copy', id='0', size_hint=(0.2, 1), on_release=self.copy_donate))
         layout.add_widget(glay0)
+        layout.add_widget(MyLabel(text='BNB-BANK', bgcolor = (0.5, 0, 0, 1), size_hint=(0.2, 1)))
         glay1 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
-        self.carte2 = MyLabel(text='5265 5200 0560 3762', size_hint=(0.6, 1))
+        glay12 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        self.carte2 = MyLabel(text='5265 5200 0560 3762', size_hint=(0.6, 1), bgcolor = (0.5, 0, 0, 1),)
+        self.carte22 = MyLabel(text='ANDREI KUZMENKA', size_hint=(0.6, 1), bgcolor = (0.5, 0, 0, 1),)
+        self.Donate['1'] = self.carte2
+        self.Donate['12'] = self.carte22
         glay1.add_widget(MyLabel(text='№ card:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
         glay1.add_widget(self.carte2)
         glay1.add_widget(MyButton(text='Copy', id='1', size_hint=(0.2, 1), on_release=self.copy_donate))
         layout.add_widget(glay1)
+        glay12.add_widget(MyLabel(text='NAME:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay12.add_widget(self.carte22)
+        glay12.add_widget(MyButton(text='Copy', id='12', size_hint=(0.2, 1), on_release=self.copy_donate))
+        layout.add_widget(glay12)
+        glay2 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        glay22 = BoxLayout(orientation='horizontal', size_hint=(1, 1))
+        self.carte3 = MyLabel(text='410014615392075', size_hint=(0.6, 1), bgcolor = (0.5, 0, 0, 1),)
+        self.carte31 = MyLabel(text='YOOMONEY VIRTUAL', size_hint=(0.6, 1))
+        self.Donate['2'] = self.carte3
+        self.Donate['22'] = self.carte31
+        layout.add_widget(MyLabel(text='yoomoney', bgcolor = (0.5, 0, 0, 1), size_hint=(0.2, 1)))
+        glay2.add_widget(MyLabel(text='№ card:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay22.add_widget(MyLabel(text='NAME:', bgcolor = (0.5, 0.5, 0, 1), size_hint=(0.2, 1)))
+        glay22.add_widget(self.carte31)
+        glay2.add_widget(self.carte3)
+        glay2.add_widget(MyButton(text='Copy', id='2', size_hint=(0.2, 1), on_release=self.copy_donate))
+        glay22.add_widget(MyButton(text='Copy', id='22', size_hint=(0.2, 1), on_release=self.copy_donate))
+        layout.add_widget(glay2)
+        layout.add_widget(glay22)
         MyPopup_close(title='Select the donation method to copy the data', cont=layout, l=None)
 
     def copy_donate(self, dt):
-        if dt.id == '0':
-            d = self.carte1.text
-        if dt.id == '1':
-            d = self.carte2.text
+        d = self.Donate[dt.id].text
         Clipboard.copy(d)
         MyPopup_close(title='INFO', cont=MyLabel(text='Copied to the clipboard '+d, size_hint=(1, 1)), l=None)
 
