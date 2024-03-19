@@ -386,6 +386,7 @@ class screenConfig(App):
             mod_globals.fontSize = 20
         mod_globals.opt_demo = self.button['Demo mode'].active
         mod_globals.opt_scan = self.button['Scan vehicle'].active
+        #mod_globals.opt_scan = True
         mod_globals.opt_csv = self.button['CSV Log'].active
         mod_globals.opt_csv_only = False
         mod_globals.opt_csv_human = False

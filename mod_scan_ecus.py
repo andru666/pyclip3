@@ -625,6 +625,7 @@ class ScanEcus():
             ch = ChoiceLong(self.models, 'Choose model :')
         else:
             ch = [self.models[num - 1], num]
+        #ch = ['X81X ESPACE IV', 27]
         choice = sorted(self.vhcls, key=lambda k: k[orderBy])[int(ch[1]) - 1]
         model = choice[0]
         tcomfilename = choice[1]
