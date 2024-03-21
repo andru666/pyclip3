@@ -132,16 +132,22 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    device = None
-    for device in manager.getDeviceList().values().toArray():
-        if device:
+    device = 'test'
+    devices = manager.getDeviceList().values().toArray()
+    log.info("UsbDevices: {}".format(devices))
+    for device in devices:
+        if device: 
             log.info("Found device {}".format(device.getDeviceName()))
-            break
+        break
     _control_endpoint = None
     _write_endpoint = None
     _read_endpoint = None
-    log.info("UsbDevices: {}".format(device))
+    log.info(" device {}".format(device))
     connection = manager.openDevice(device)
+    if not connection:
+        log.info("Failed to open device!")
+        return
+        
     log.info("UsbDevice connection made {}!".format(connection))
     log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
     _control_interface = device.getInterface(0)

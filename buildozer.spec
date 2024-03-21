@@ -37,7 +37,7 @@ version.filename = %(source.dir)s/main.py
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.8.10,hostpython3==3.8.10,kivy==2.0.0,android,android.permissions
+requirements = python3==3.8.10,hostpython3==3.8.10,kivy==2.0.0,android,android.permissions,pyjnius, usb4a, usbserial4a
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -158,7 +158,7 @@ android.private_storage = True
 # android.apptheme = "@android:style/Theme.NoTitleBar"
 
 # (list) Pattern to whitelist for the whole project
-#android.whitelist =
+android.whitelist = lib-dynload/termios.so
 
 # (str) Path to a custom whitelist file
 #android.whitelist_src =
