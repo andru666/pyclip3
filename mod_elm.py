@@ -133,7 +133,9 @@ negrsp = {"10": "NR: General Reject",
 
 def get_usb_socket_stream():
     device = manager.getDeviceList().values().toArray()[0]
-    
+    _control_endpoint = None
+    _write_endpoint = None
+    _read_endpoint = None
     log.info("UsbDevices: {}".format(device))
     connection = manager.openDevice(device)
     log.info("UsbDevice connection made {}!".format(connection))

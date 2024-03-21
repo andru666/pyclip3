@@ -9,6 +9,7 @@ from kivy import base
 from kivy.app import App
 from kivy.base import EventLoop
 from kivy.clock import Clock, mainthread
+from kivy.uix.progressbar import ProgressBar
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.uix.boxlayout import BoxLayout
@@ -410,18 +411,27 @@ class ECU():
             self.elm.checkModulePerformaceLevel(self.DataIds)
         ecudump = {}
 
-    def saveDump(self, lbltxt=None):
+    def saveDump(self):
+        reqs = len(self.Services.values())
+        layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1, 1))
+        lbltxt = MyLabel(text='Save dump', font_size=fs, size_hint=(1, 1))
+        pb = ProgressBar(max=reqs)
+        layout.add_widget(lbltxt)
+        layout.add_widget(pb)
+        popup_init = MyPopup(title='Save dump', content=layout, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
+        base.runTouchApp(embedded=True)
+        popup_init.open()
+        base.EventLoop.idle()
+        sys.stdout.flush()
         dumpname = mod_globals.dumps_dir + str(int(time.time())) + '_' + self.ecudata['ecuname'] + '.txt'
         df = open(dumpname, 'wt')
         self.elm.clear_cache()
-        if lbltxt:
-            req = 0
-            reqs = len(self.Services.values())
+        i = 0
         for service in list(self.Services.values()):
-            if req:
-                req += 1
-            if lbltxt:
-                lbltxt.text='Save dump ' + str(req) + ' in ' + str(reqs)
+            lbltxt.text='Save ' + str(i) + ' in ' + str(reqs)
+            base.EventLoop.idle()
+            pb.value = i
+            i += 1
             if service.startReq[:2] in AllowedList:
                 pos = chr(ord(service.startReq[0]) + 4) + service.startReq[1]
                 rsp = self.elm.request(service.startReq, pos, False)
@@ -429,6 +439,10 @@ class ECU():
                     continue
                 df.write('%s:%s\n' % (service.startReq, rsp))
         df.close()
+        base.EventLoop.window.remove_widget(popup_init)
+        popup_init.dismiss()
+        base.stopTouchApp()
+        base.EventLoop.window.canvas.clear()
 
     def loadDump(self, dumpname = ''):
 

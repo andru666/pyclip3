@@ -25,7 +25,7 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.03'
+__version__ = '0.02.04'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -722,17 +722,7 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump:
-            lbltxt = MyLabel(text='Save dump', font_size=fs*2, size_hint=(1, 1))
-            popup_init = MyPopup(title='Initializing', content=lbltxt, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None))
-            base.runTouchApp(embedded=True)
-            popup_init.open()
-            base.EventLoop.idle()
-            sys.stdout.flush()
-            ecu.saveDump(lbltxt)
-            base.EventLoop.window.remove_widget(popup_init)
-            popup_init.dismiss()
-            base.stopTouchApp()
-            base.EventLoop.window.canvas.clear()
+            ecu.saveDump()
         ecu.show_screens()
 
 if __name__ == '__main__':
