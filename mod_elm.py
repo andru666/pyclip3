@@ -146,6 +146,8 @@ def get_usb_socket_stream():
     log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
     _control_interface = device.getInterface(0)
     num_endpoints = _control_interface.getEndpointCount()
+    log.debug("Control iface={}".format(_control_interface))
+    log.debug("num_endpoints={}".format(num_endpoints))
     if num_endpoints < 3:
         msg = "not enough endpoints - need 3, got {}".format(num_endpoints)
         log.error(msg)
