@@ -24,16 +24,7 @@ else:
     UUID = autoclass('java.util.UUID')
     
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    mActivity = PythonActivity.mActivity
-    UsbConstants = autoclass('android.hardware.usb.UsbConstants')
-    UsbRequest = autoclass('android.hardware.usb.UsbRequest')
-    UsbManager = autoclass('android.hardware.usb.UsbManager')
-    PendingIntent = autoclass('android.app.PendingIntent')
-    ByteBuffer = autoclass('java.nio.ByteBuffer')
-    Context = autoclass('android.content.Context')
-    manager = cast(Context, mActivity).getSystemService("usb")
-
-
+    
 # List of commands which may require to open another Developer session(option --dev)
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
 
@@ -132,57 +123,16 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    from kvserial.driver import CdcAcmSerialPort
-    s = CdcAcmSerialPort('/dev/ttyACM0')
-    log.info("s: {}".format(s))
-    '''device = 'test'
-    devices = manager.getDeviceList().values().toArray()
-    log.info("UsbDevices: {}".format(devices))
-    for device in devices:
-        if device: 
-            log.info("Found device {}".format(device.getDeviceName()))
-        break
-    _control_endpoint = None
-    _write_endpoint = None
-    _read_endpoint = None
-    log.info(" device {}".format(device))
-    connection = manager.openDevice(device)
-    if not connection:
-        log.info("Failed to open device!")
-        #return
-        
-    log.info("UsbDevice connection made {}!".format(connection))
-    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
-    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterface()))
-    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterface(0)))
-    _control_interface = device.getInterface(0)
-    num_endpoints = _control_interface.getEndpointCount()
-    log.debug("Control iface={}".format(_control_interface))
-    log.debug("num_endpoints={}".format(num_endpoints))
-    if num_endpoints < 3:
-        msg = "not enough endpoints - need 3, got {}".format(num_endpoints)
-        log.error(msg)
-    for i in range(num_endpoints):
-        ep = _control_interface.getEndpoint(i)
-        if ((ep.getDirection() == UsbConstants.USB_DIR_IN) and
-            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_INT)):
-            log.debug("Found controlling endpoint")
-            _control_endpoint = ep
-        elif ((ep.getDirection() == UsbConstants.USB_DIR_IN) and
-            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)):
-            log.debug("Found reading endpoint")
-            _read_endpoint = ep
-        elif ((ep.getDirection() == UsbConstants.USB_DIR_OUT) and
-            (ep.getType() == UsbConstants.USB_ENDPOINT_XFER_BULK)):
-            log.debug("Found writing endpoint")
-            _write_endpoint = ep  
-            
-        if None not in [_control_endpoint,
-            _write_endpoint,
-            _read_endpoint]:
-            log.debug("Found all endpoints")
-            break'''
-    return('', '', '')
+    from usb4a import usb
+    from usbserial4a import serial4a
+    device = ''
+    usb_device_list = usb.get_usb_device_list()
+    for device in usb_device_list:
+    	if device:
+    	    device = device.getDeviceName()
+    if not device:
+        return 
+    return device, serial4a
 
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()
@@ -240,6 +190,7 @@ class Port:
     def __init__(self, portName, speed, portTimeout):
         self.portTimeout = portTimeout
         self.portName = portName
+        self.speed = speed
         portName = portName.strip()
         MAC = None
         upPortName = portName.upper()
@@ -307,7 +258,8 @@ class Port:
     def getConnected(self):
         if self.portName == 'USB':
             self.portType = 3
-            self.socket, self.recv_stream, self.send_stream = get_usb_socket_stream()
+            device, serial4a = get_usb_socket_stream()
+            self.hdr = serial4a.get_serial_port(device, self.speed, timeout=self.portTimeout)
         else:
             self.portType = 2
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
@@ -324,8 +276,9 @@ class Port:
                 if self.recv_stream.available():
                     byte = chr(self.recv_stream.read())
             elif self.portType == 3:
-                if self.recv_stream.available():
-                    byte = chr(self.recv_stream.read())
+                inInputBuffer = self.hdr.inWaiting()
+                if inInputBuffer:
+                    byte = self.hdr.read(inInputBuffer)
             else:
                 inInputBuffer = self.hdr.inWaiting()
                 if inInputBuffer:
@@ -1952,7 +1905,4 @@ class ELM:
         
         refreshRate = 1 // self.screenRefreshTime
         self.screenRefreshTime = 0
-        return refreshRate
-    
-    def reset_elm(self):
-        self.cmd("at z")
+        return refres
