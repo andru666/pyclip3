@@ -257,9 +257,9 @@ class Port:
         if self.portName == 'USB':
             from usbserial4a import serial4a
             self.portType = 3
-            #device = get_usb_socket_stream()
+            device = get_usb_socket_stream()
             log.info("self.portName: {}".format(self.portName))
-            self.hdr = serial4a.get_serial_port(self.portName, self.speed, timeout=self.portTimeout)
+            self.hdr = serial4a.get_serial_port(device, self.speed, timeout=self.portTimeout)
         else:
             self.portType = 2
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
