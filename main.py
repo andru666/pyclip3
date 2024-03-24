@@ -22,7 +22,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
 from kivy.core.clipboard import Clipboard
-import glob
+import glob, logging
+log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
 __version__ = '0.02.05'
@@ -32,6 +33,7 @@ if mod_globals.os == 'android':
     from jnius import cast, autoclass
     from android import mActivity, api_version
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
+    log.info("BluetoothAdapter.getDefaultAdapter().isEnabled(): {}".format(BluetoothAdapter.getDefaultAdapter().isEnabled()))
     if BluetoothAdapter.getDefaultAdapter().isEnabled(): 
         this.root.get_devices()
     from android.permissions import request_permissions, check_permission, Permission

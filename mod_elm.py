@@ -132,7 +132,9 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    
+    from kvserial.driver import CdcAcmSerialPort
+    s = CdcAcmSerialPort('/dev/ttyACM0')
+    log.info("s: {}".format(s))
     '''device = 'test'
     devices = manager.getDeviceList().values().toArray()
     log.info("UsbDevices: {}".format(devices))
