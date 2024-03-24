@@ -135,7 +135,7 @@ def get_usb_socket_stream():
 
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()
-    adapter.ACTION_REQUEST_ENABLE
+    adapter.enable()
     adapter.cancelDiscovery()
 
     device = adapter.getRemoteDevice(bytearray.fromhex(''.join(mod_globals.opt_dev_address.split(':'))))
