@@ -132,7 +132,8 @@ negrsp = {"10": "NR: General Reject",
           "93": "NR: Voltage Too Low"}
 
 def get_usb_socket_stream():
-    device = 'test'
+    
+    '''device = 'test'
     devices = manager.getDeviceList().values().toArray()
     log.info("UsbDevices: {}".format(devices))
     for device in devices:
@@ -146,10 +147,12 @@ def get_usb_socket_stream():
     connection = manager.openDevice(device)
     if not connection:
         log.info("Failed to open device!")
-        return
+        #return
         
     log.info("UsbDevice connection made {}!".format(connection))
     log.info("UsbDevice getInterfaceCount {}!".format(device.getInterfaceCount()))
+    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterface()))
+    log.info("UsbDevice getInterfaceCount {}!".format(device.getInterface(0)))
     _control_interface = device.getInterface(0)
     num_endpoints = _control_interface.getEndpointCount()
     log.debug("Control iface={}".format(_control_interface))
@@ -176,8 +179,8 @@ def get_usb_socket_stream():
             _write_endpoint,
             _read_endpoint]:
             log.debug("Found all endpoints")
-            break
-    return(_control_endpoint, _read_endpoint, _write_endpoint)
+            break'''
+    return('', '', '')
 
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()

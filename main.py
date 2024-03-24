@@ -25,15 +25,16 @@ from kivy.core.clipboard import Clipboard
 import glob
 
 __all__ = 'install_android'
-__version__ = '0.02.04'
+__version__ = '0.02.05'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
     from android import mActivity, api_version
-    
-    from android.permissions import request_permissions, check_permission, Permission
+    BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
 
+    from android.permissions import request_permissions, check_permission, Permission
+    request_permissions([Permission.BLUETOOTH_CONNECT,Permission.BLUETOOTH_SCAN,Permission.ACCESS_FINE_LOCATION])
     permissions = []
     if api_version > 30:
         try:
