@@ -32,9 +32,10 @@ if mod_globals.os == 'android':
     from jnius import cast, autoclass
     from android import mActivity, api_version
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
-
+    if BluetoothAdapter.getDefaultAdapter().isEnabled(): 
+        this.root.get_devices()
     from android.permissions import request_permissions, check_permission, Permission
-    request_permissions([Permission.BLUETOOTH_CONNECT,Permission.BLUETOOTH_SCAN,Permission.ACCESS_FINE_LOCATION])
+
     permissions = []
     if api_version > 30:
         try:
