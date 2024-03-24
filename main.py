@@ -34,8 +34,8 @@ if mod_globals.os == 'android':
     from android import mActivity, api_version
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     log.info("BluetoothAdapter.getDefaultAdapter().isEnabled(): {}".format(BluetoothAdapter.getDefaultAdapter().isEnabled()))
-    if BluetoothAdapter.getDefaultAdapter().isEnabled(): 
-        this.root.get_devices()
+    if not BluetoothAdapter.getDefaultAdapter().isEnabled(): 
+        BluetoothAdapter.getDefaultAdapter().isEnabled()
     from android.permissions import request_permissions, check_permission, Permission
 
     permissions = []
