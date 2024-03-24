@@ -124,7 +124,6 @@ negrsp = {"10": "NR: General Reject",
 
 def get_usb_socket_stream():
     from usb4a import usb
-    from usbserial4a import serial4a
     device = ''
     usb_device_list = usb.get_usb_device_list()
     for device in usb_device_list:
@@ -132,7 +131,7 @@ def get_usb_socket_stream():
     	    device = device.getDeviceName()
     if not device:
         return 
-    return device, serial4a
+    return device
 
 def get_bt_socket_stream():
     adapter = BluetoothAdapter.getDefaultAdapter()
@@ -155,11 +154,10 @@ def get_devices():
             devs[desc] = port
 
         return devs
+    device = get_usb_socket_stream()
     
-    dev = manager.getDeviceList().values().toArray()
-    
-    if dev:
-        devs['USB'] = dev[0].getDeviceName()
+    if device:
+        devs['USB'] = device
 
     paired_devices = BluetoothAdapter.getDefaultAdapter().getBondedDevices().toArray()
     for device in paired_devices:
@@ -257,9 +255,11 @@ class Port:
 
     def getConnected(self):
         if self.portName == 'USB':
+            from usbserial4a import serial4a
             self.portType = 3
-            device, serial4a = get_usb_socket_stream()
-            self.hdr = serial4a.get_serial_port(device, self.speed, timeout=self.portTimeout)
+            #device = get_usb_socket_stream()
+            log.info("self.portName: {}".format(self.portName))
+            self.hdr = serial4a.get_serial_port(self.portName, self.speed, timeout=self.portTimeout)
         else:
             self.portType = 2
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
