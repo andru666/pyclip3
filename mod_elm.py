@@ -259,7 +259,6 @@ class Port:
             from usbserial4a import serial4a
             self.portType = 3
             device = get_usb_socket_stream()
-            log.info("self.portName: {}".format(self.portName))
             self.hdr = serial4a.get_serial_port(device, self.speed, timeout=self.portTimeout)
         else:
             self.portType = 2

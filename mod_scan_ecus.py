@@ -152,7 +152,7 @@ class ScanEcus():
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
         if mod_globals.opt_can2:
             if mod_globals.opt_scan or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '': mod_globals.savedEcus = 'saved3Ecus_can2.p'
-            SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus_can2
+            SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
         if mod_globals.opt_demo and not os.path.isfile(SEFname):
             SEFname = './' + mod_globals.savedEcus
         if os.path.isfile(SEFname) and not mod_globals.opt_scan:

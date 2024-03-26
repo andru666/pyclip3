@@ -655,7 +655,7 @@ def main():
     if mod_globals.opt_can2:
         if mod_globals.opt_can2 or mod_globals.savedEcus == 'Select' or mod_globals.savedEcus == '':
             mod_globals.savedEcus = 'saved3Ecus_can2.p'
-        SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus_can2
+        SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
     if not os.path.exists(SEFname):
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
 
