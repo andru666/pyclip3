@@ -970,6 +970,14 @@ class ECU():
                     menu.append('ECM : Расширенный набор команд')
                 else:
                     menu.append('ECM : Extended command set')
+            if mod_globals.opt_demo:
+                if self.Parameters : menu.append('PRA : ' + mod_globals.language_dict['2496'])
+                if self.States : menu.append('ETA : ' + mod_globals.language_dict['2497'])
+                if self.Identifications :
+                    if mod_globals.opt_lang == 'RU':
+                        menu.append('IDA : ВСЕ ИДЕНТИФИКАЦИИ')
+                    else:
+                        menu.append('IDA : ALL IDENTIFICATIONS')
             menu.append('<' + mod_globals.language_dict['6218'] + '>')
             if mod_globals.opt_lang == 'RU':
                 choice = Choice(menu, 'Выбор :')
@@ -993,6 +1001,44 @@ class ECU():
                     scrn.datarefs.append(ecu_screen_dataref('', cm, 'Command'))
                 self.show_screen(scrn)
                 continue
+            if choice[0][:3]=="PRA":  
+                scrn = ecu_screen( "PRA" ) 
+                scrn.datarefs = []
+                tempDict = {}
+                for pr in self.Parameters:
+                    if not self.Parameters[pr].agcdRef.endswith('FF'):
+                        tempDict[pr] = self.Parameters[pr].codeMR
+                sortedParams = sorted(list(tempDict.items()), key=lambda x:int(x[1][2:]))
+                for pr in sortedParams:
+                    if self.Parameters[pr[0]].mnemolist:
+                        if self.Mnemonics[self.Parameters[pr[0]].mnemolist[0]].serviceID:
+                            scrn.datarefs.append( ecu_screen_dataref("",pr[0],"Parameter")) 
+                self.show_screen(scrn)
+                continue
+              
+            if choice[0][:3]=="ETA":  
+                scrn = ecu_screen( "ETA" ) 
+                scrn.datarefs = []
+                tempDict = {}
+                for st in self.States:
+                    if not self.States[st].agcdRef.endswith('FF') and self.States[st].agcdRef.startswith('ET'):
+                        tempDict[st] = self.States[st].codeMR
+                sortedStates = sorted(list(tempDict.items()), key=lambda x:[int(t) if t.isdigit() else t.lower() for t in re.split('(\d+)', x[1])])
+                for st in sortedStates:
+                    if self.States[st[0]].mnemolist:
+                        if self.Mnemonics[self.States[st[0]].mnemolist[0]].serviceID:
+                            scrn.datarefs.append( ecu_screen_dataref("",st[0],"State")) 
+                self.show_screen(scrn)
+                continue
+
+            if choice[0][:3]=="IDA":  
+                scrn = ecu_screen( "IDA" ) 
+                scrn.datarefs = []
+                for idk in sorted(self.Identifications):
+                    scrn.datarefs.append( ecu_screen_dataref("",idk,"Identification")) 
+                self.show_screen(scrn)
+                continue
+              
             if choice[0][:3] == 'FAV':
                 if not favouriteScreen.datarefs:
                     if self.loadFavList():

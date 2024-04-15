@@ -29,7 +29,7 @@ else:
 DevList = ['27', '28', '2E', '30', '31', '32', '34', '35', '36', '37', '3B', '3D']
 
 # List of commands allowed in any mode
-AllowedList = ['12', '19', '1A', '21', '22', '23']
+AllowedList = ['12', '17', '19', '1A', '21', '22', '23']
 
 # Max frame burst for Flow Control
 MaxBurst = 0x7
@@ -70,7 +70,6 @@ dnat = {"01":"740","02":"704","04":"742","06":"790","07":"751","08":"758","09":"
 # Code snippet from https://github.com/rbei-etas/busmaster
 # Negative responses
 negrsp = {"10": "NR: General Reject",
-          "11": "NR: Service Not Supported",
           "12": "NR: SubFunction Not Supported",
           "13": "NR: Incorrect Message Length Or Invalid Format",
           "21": "NR: Busy Repeat Request",
@@ -119,8 +118,7 @@ negrsp = {"10": "NR: General Reject",
           "8F": "NR: Brake Switch(es)NotClosed(brake pedal not pressed or not applied)",
           "90": "NR: Shifter Lever Not In Park ",
           "91": "NR: Torque Converter Clutch Locked",
-          "92": "NR: Voltage Too High",
-          "93": "NR: Voltage Too Low"}
+          "92": "NR: Voltage Too High"}
 
 def get_usb_socket_stream():
     from usb4a import usb
