@@ -540,8 +540,8 @@ class screenConfig(App):
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
         check = MyButton(text='Check ELM327', height=(fs*4), on_press=self.check_elm)
-        gobtn = MyButton(text='START', height=(fs*2.5), on_press=self.finish)
-        layout.add_widget(gobtn)
+        layout.add_widget(MyButton(text='GRAFIC', height=(fs*2.5), on_press=self.grafic))
+        layout.add_widget(MyButton(text='START', height=(fs*2.5), on_press=self.finish))
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
         layout.add_widget(self.make_bt_device_entry())
@@ -564,6 +564,25 @@ class screenConfig(App):
          'center_y': 0.5})
         root.add_widget(layout)
         return root
+
+    def grafic(self, dt):
+        layout = BoxLayout(orientation='vertical')
+        graph = Graph(xlabel='X', ylabel='Y', x_ticks_minor=5,
+                      x_ticks_major=25, y_ticks_major=1,
+                      y_grid_label=True, x_grid_label=True, padding=5,
+                      x_grid=True, y_grid=True, xmin=-0, xmax=100, ymin=-1, ymax=1)
+        '''for i in range(24):
+            data_to_graph = [(x, sin(x)+ i) for x in range(0, 101)] #apply a DC offset to each trace to display multiple traces
+            self.plot = MeshLinePlot(color=[.5, .5, 1, 1])
+            self.plot.points =  data_to_graph'''
+        plot = MeshLinePlot(color=[1, 0, 0, 1])
+        plot.points = [(x, sin(x / 10.)) for x in range(0, 101)]
+        graph.add_plot(plot)
+        layout.add_widget(graph)
+        root = ScrollView(size_hint=(1, 1))
+        root.add_widget(layout)
+        pop = Popup(title='grafic', content=root)
+        pop.open()
 
     def donate(self, dt):
         layout = GridLayout(cols=1, padding=fs/4, spacing=fs/4, size_hint=(1, 1))

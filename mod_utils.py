@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os, sys, atexit, subprocess, string, signal, glob, re
 from kivy.app import App
+from kivy_garden.graph import Graph, MeshLinePlot
+from math import sin
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
