@@ -15,6 +15,7 @@ opt_dev_address = ''
 opt_lang = ''
 opt_car = ''
 opt_log = ''
+test = True
 opt_ecuid_on = False
 #opt_ecuid_on = True
 opt_obdlink = False

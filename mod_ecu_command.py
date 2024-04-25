@@ -365,16 +365,16 @@ class kivyExecCommand(App):
             layout.add_widget(asciiBtn)
             layout.add_widget(vinBtn)
             layout.add_widget(self.userInput)
-            self.btn = MyButton(text='<EXECUTE>', disabled = True)
+            self.btn = MyButton(text='<' + mod_globals.language_dict['1748'] + '>', disabled = True)
             self.btn.paramid = ''
             self.btn.bind(on_press=self.exec_command)
             layout.add_widget(self.btn)
         if not has_param and not has_scenario:
-            btn = MyButton(text='<EXECUTE>')
+            btn = MyButton(text='<' + mod_globals.language_dict['1748'] + '>')
             btn.paramid = None
             btn.bind(on_press=self.exec_command)
             layout.add_widget(btn)
-        btn = MyButton(text='<CANCEL>')
+        btn = MyButton(text='<' + mod_globals.language_dict['1053'] + '>')
         btn.bind(on_press=self.back)
         layout.add_widget(btn)
         root = ScrollView(size_hint=(1, 1), pos_hint={'center_x': 0.5,

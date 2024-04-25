@@ -16,6 +16,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.scrollview import ScrollView
 from kivy.utils import platform
 from kivy import base
+from kivy.uix.checkbox import CheckBox
 from kivy.uix.popup import Popup
 import kivy.metrics
 from mod_ecu_screen import *
@@ -300,10 +301,12 @@ class MyLabelBlue(ButtonBehavior, Label):
 
 class widgetChoiceLong(App):
 
-    def __init__(self, list, question, header = ''):
+    def __init__(self, list, question, header = '', select=False):
         self.menu_entries = list
+        self.select = select
         self.header = header
         self.question = question
+        self.Check = {}
         self.choice_result = None
         super(widgetChoiceLong, self).__init__()
         Window.bind(on_keyboard=self.key_handler)
@@ -336,6 +339,17 @@ class widgetChoiceLong(App):
         InfoPopup()
         base.EventLoop.window.canvas.clear()
 
+    def make_check(self, str1, active, callback = None):
+        glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
+        label = MyLabel(text=str1, halign='left',  size_hint=(0.8, None), bgcolor = (0.5, 0.5, 0, 1))
+        checkbox = CheckBox(size_hint=(0.2, None))
+        self.Check[active] = checkbox
+        checkbox.height = label.height
+        glay.height = 1.2 * label.height
+        glay.add_widget(label)
+        glay.add_widget(checkbox)
+        return glay
+
     def build(self):
         fs = mod_globals.fontSize
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1.0, None))
@@ -349,7 +363,10 @@ class widgetChoiceLong(App):
         question = MyLabel(text=self.question)
         layout.add_widget(question)
         i = 1
-        if self.question == 'Mileage survey':
+        if self.select:
+            layout.add_widget(self.make_check('pr0', 'pr0'))            
+            layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))            
+        elif self.question == 'Mileage survey':
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
         else:
@@ -464,11 +481,11 @@ def getValueFromInput(ecu, d, value):
             value = value - float(r[ll+1])
     return StringToIntToHex(value)
 
-def kivyChoiceLong(list, question, header = ''):
+def kivyChoiceLong(list, question, header = '', select=False):
     global widgetglobal
     global resizeFont
     while 1:
-        widgetglobal = widgetChoiceLong(list, question, header)
+        widgetglobal = widgetChoiceLong(list, question, header, select)
         widgetglobal.run()
         if not resizeFont:
             return choice_result
@@ -477,6 +494,10 @@ def kivyChoiceLong(list, question, header = ''):
 
 def Choice(list, question):
     return kivyChoiceLong(list, question)
+
+
+def ChoiceSelect(list, question):
+    return kivyChoiceLong(list, question, select=True)
 
 
 def ChoiceLong(list, question, header = ''):

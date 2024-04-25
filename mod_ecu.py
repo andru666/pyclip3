@@ -263,6 +263,7 @@ class showDatarefGui(App):
             return True
 
     def build(self):
+        print('app')
         if mod_globals.opt_perform:
             self.ecu.elm.currentScreenDataIds = []
         if mod_globals.opt_csv and mod_globals.ext_cur_DTC == '000000':
@@ -643,6 +644,33 @@ class ECU():
             csvf = open(mod_globals.csv_dir + pyren_encode(csv_filename), "wt")
         return csvf, csvline
 
+    def grafic(self):
+        menu = []
+        for k, v in self.Parameters.items():
+            menu.append(k)
+        menu.append('<' + mod_globals.language_dict['6218'] + '>')
+        choice = ChoiceSelect(menu, 'Choose :')
+        if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
+            return
+        '''layout = BoxLayout(orientation='vertical', size_hint=(None, 1))
+        #self.plot = MeshLinePlot(color=[1, 0, 0, 1])
+        self.graph = Graph(xlabel='X', ylabel='Y', y_ticks_major=1, y_grid_label=True, x_grid_label=True, padding=5, y_grid=True, ymin=0, ymax=1)
+        #self.graph.add_plot(self.plot)
+        rt = [(x, sin(x / 10.)) for x in range(0, 101)]
+        #self.plot.points = [(0, 0)]
+        #for i in range(0, 101):
+        #    self.plot.points.append((i, i/2))
+        for i in range(1):
+            data_to_graph = [(x, sin(x)+ i) for x in range(0, 101)] #apply a DC offset to each trace to display multiple traces
+            self.plot = MeshLinePlot(color=[.5, .5, 1, 1])
+            self.plot.points = data_to_graph
+            self.graph.add_plot(self.plot)
+        layout.add_widget(self.graph)
+        root = ScrollView(size_hint=(1, 1))
+        root.add_widget(layout)
+        pop = Popup(title='grafic', content=root)
+        pop.open()'''
+
     def show_datarefs(self, datarefs, path):
         global resizeFont
         csvf = 0
@@ -772,7 +800,6 @@ class ECU():
             return
 
     def show_function(self, function, path):
-        print('show_function')
         while 1:
             clearScreen()
             menu = []
@@ -789,7 +816,6 @@ class ECU():
                 return
 
     def show_screen(self, screen):
-        print('show_screen')
         while 1:
             clearScreen()
             menu = []
@@ -965,6 +991,8 @@ class ECU():
                     l.name = 'ED : ' + mod_globals.language_dict['638']
                     continue
                 menu.append(l.name)
+            if mod_globals.test:
+                menu.append('GR: График')
             if mod_globals.opt_cmd:
                 if mod_globals.opt_lang == 'RU':
                     menu.append('ECM : Расширенный набор команд')
@@ -986,6 +1014,9 @@ class ECU():
             if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 favouriteScreen.datarefs = []
                 return
+            if choice[0][:2] == 'GR':
+                self.grafic()
+                continue
             if choice[0][:2] == 'DE':
                 if self.ecudata['stdType'] == 'STD_A':
                     self.show_defaults_std_a()
@@ -1047,8 +1078,8 @@ class ECU():
                         clearScreen()
                 else:
                     self.show_screen(favouriteScreen)
-            else:
-                self.show_screen(self.screens[int(choice[1]) - 1])
+                continue
+            self.show_screen(self.screens[int(choice[1]) - 1])
 
     def addElem(self, elem):
         if elem[:2] == 'PR':
@@ -1086,6 +1117,7 @@ class ECU():
                                 clearScreen()
         else:
             return False
+
     def loadFavList(self):
         fn = mod_globals.cache_dir + 'favlist_' + self.ecudata['ecuname'] + '.txt'
 
@@ -1104,6 +1136,7 @@ class ECU():
             return True
         else:
             return False
+
     def saveFavList(self):
         fl = open(mod_globals.cache_dir + 'favlist_' +self.ecudata['ecuname']+".txt", "w")
         for dr in favouriteScreen.datarefs:
