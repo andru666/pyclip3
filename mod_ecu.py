@@ -246,7 +246,10 @@ class showDatarefGui(App):
         self.get_ecu_values()
         for param, val in self.params.items():
             if val != 'Text' and val != 'DTCText':
-                self.labels[param].text = val.strip()
+                if self.ecu.GRAF:
+                    print(val)
+                else:
+                    self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
@@ -263,7 +266,6 @@ class showDatarefGui(App):
             return True
 
     def build(self):
-        print('app')
         if mod_globals.opt_perform:
             self.ecu.elm.currentScreenDataIds = []
         if mod_globals.opt_csv and mod_globals.ext_cur_DTC == '000000':
@@ -284,27 +286,45 @@ class showDatarefGui(App):
 
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
-        for paramName, val in self.params.items():
-            if val == 'Text':
-                layout.add_widget(MyLabel(text=paramName))
-            elif val == 'DTCText':
-                lines = len(paramName.split('\n'))
-                simb = len(paramName)
-                operation = simb / int(60/defaultFS)
-                if lines <= operation:
-                    lines = operation
-                    lines += 1
-                elif lines - 1 == operation or lines - 2 == operation:
-                    lines += 1
-                if fs >= 40:
-                    lines += 1
-                prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
-                layout.add_widget(prelabel)
-            else:
-                layout.add_widget(self.make_box_params(paramName, val))
+        if self.ecu.GRAF:
+            print(self.params)
+            layout.size_hint = (1, 1)
+            self.graph = Graph(xlabel='Time(sec)', x_ticks_major=5, y_ticks_major=5, y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, ymin=0, ymax=25, xmin=0, xmax=25)
+            i = 1
+            u = 2
+            pr = {}
+            for paramName, val in self.params.items():
+                data_to_graph = [(x, sin(x/u)) for x in range(0, 51)]
+                color = [1-i/5, 1-i/5, 1, 1]
+                self.plot = MeshLinePlot(color=color)
+                i += 1
+                u += 2
+                pr[paramName] = color
+                self.plot.points = data_to_graph
+                self.graph.add_plot(self.plot)
+            layout.add_widget(self.graph)
+        else:
+            for paramName, val in self.params.items():
+                if val == 'Text':
+                    layout.add_widget(MyLabel(text=paramName))
+                elif val == 'DTCText':
+                    lines = len(paramName.split('\n'))
+                    simb = len(paramName)
+                    operation = simb / int(60/defaultFS)
+                    if lines <= operation:
+                        lines = operation
+                        lines += 1
+                    elif lines - 1 == operation or lines - 2 == operation:
+                        lines += 1
+                    if fs >= 40:
+                        lines += 1
+                    prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
+                    layout.add_widget(prelabel)
+                else:
+                    layout.add_widget(self.make_box_params(paramName, val))
         quitbutton = MyButton(text='<' + mod_globals.language_dict['6218'] + '>', size_hint=(1, None), on_press=self.finish)
         layout.add_widget(quitbutton)
-        root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=False, pos_hint={'center_x': 0.5,
+        root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=True, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root.add_widget(layout)
         if self.needupdate:
@@ -314,6 +334,7 @@ class showDatarefGui(App):
 
 class ECU():
     global fs
+    GRAF = False
     fs = mod_globals.fontSize
     getDTCmnemo = ''
     resetDTCcommand = ''
@@ -331,6 +352,7 @@ class ECU():
     minimumrefreshrate = 0.1
 
     def __init__(self, cecu, tran):
+        self.GRAF = False
         self.elm = 0
         self.ecudata = cecu
         self.getDTCmnemo = ''
@@ -647,31 +669,22 @@ class ECU():
     def grafic(self):
         menu = []
         for k, v in self.Parameters.items():
-            menu.append(k)
-        menu.append('<' + mod_globals.language_dict['6218'] + '>')
+            if not v.agcdRef.endswith('FF'):
+                menu.append(v.codeMR + ':' + v.label)
+            #menu.append(v)
+        menu.sort()
         choice = ChoiceSelect(menu, 'Choose :')
         if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
             return
-        '''layout = BoxLayout(orientation='vertical', size_hint=(None, 1))
-        #self.plot = MeshLinePlot(color=[1, 0, 0, 1])
-        self.graph = Graph(xlabel='X', ylabel='Y', y_ticks_major=1, y_grid_label=True, x_grid_label=True, padding=5, y_grid=True, ymin=0, ymax=1)
-        #self.graph.add_plot(self.plot)
-        rt = [(x, sin(x / 10.)) for x in range(0, 101)]
-        #self.plot.points = [(0, 0)]
-        #for i in range(0, 101):
-        #    self.plot.points.append((i, i/2))
-        for i in range(1):
-            data_to_graph = [(x, sin(x)+ i) for x in range(0, 101)] #apply a DC offset to each trace to display multiple traces
-            self.plot = MeshLinePlot(color=[.5, .5, 1, 1])
-            self.plot.points = data_to_graph
-            self.graph.add_plot(self.plot)
-        layout.add_widget(self.graph)
-        root = ScrollView(size_hint=(1, 1))
-        root.add_widget(layout)
-        pop = Popup(title='grafic', content=root)
-        pop.open()'''
+        if choice[2]:
+            for i in choice[2]:
+                print(i)
+                self.addElem(i)
+            self.GRAF = True
+            self.show_screen(favouriteScreen)
 
     def show_datarefs(self, datarefs, path):
+        print('show_datarefs')
         global resizeFont
         csvf = 0
         mask = False
@@ -710,6 +723,8 @@ class ECU():
         while 1:
             gui = showDatarefGui(self, datarefs, path)
             gui.run()
+            if self.GRAF:
+                self.GRAF = False
             if not resizeFont:
                 return
             resizeFont = False
@@ -800,6 +815,7 @@ class ECU():
             return
 
     def show_function(self, function, path):
+        print('show_function')
         while 1:
             clearScreen()
             menu = []

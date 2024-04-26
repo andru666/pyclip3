@@ -334,18 +334,26 @@ class widgetChoiceLong(App):
 
     def choice_done(self, instance):
         global choice_result
-        choice_result = [instance.txt, instance.ID]
+        print(self.Check)
+        Checks = []
+        if self.select:
+            for k, v in self.Check.items():
+                if v.active:
+                    Checks.append(k)
+            choice_result = [instance.text, instance.ID, Checks]
+        else:
+            choice_result = [instance.txt, instance.ID]
         self.stop()
         InfoPopup()
         base.EventLoop.window.canvas.clear()
 
     def make_check(self, str1, active, callback = None):
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        label = MyLabel(text=str1, halign='left',  size_hint=(0.8, None), bgcolor = (0.5, 0.5, 0, 1))
+        label = MyLabelBlue(text=str1, halign='left',  size_hint=(0.8, None))
         checkbox = CheckBox(size_hint=(0.2, None))
         self.Check[active] = checkbox
         checkbox.height = label.height
-        glay.height = 1.2 * label.height
+        glay.height = label.height
         glay.add_widget(label)
         glay.add_widget(checkbox)
         return glay
@@ -364,8 +372,15 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         if self.select:
-            layout.add_widget(self.make_check('pr0', 'pr0'))            
-            layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))            
+            for entry in self.menu_entries:
+                layout.spacing=5
+                layout.add_widget(self.make_check(entry, entry.split(':')[0]))  
+            for t in ['6536', '6218']:
+                btn = MyButton(text='<' + mod_globals.language_dict[t] + '>', on_press=self.stop)
+                btn.bind(size=btn.setter('text_size'))
+                btn.ID = i
+                btn.bind(on_press=self.choice_done)
+                layout.add_widget(btn)         
         elif self.question == 'Mileage survey':
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
