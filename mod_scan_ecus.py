@@ -113,7 +113,9 @@ families = {'1':'13712',
  '96':'56540',
  '97':'56562',
  '98':'57970',
- '99':'58003'}
+ '99':'58003',
+ '213':'61146',
+ '215':'63907'}
 
 class ScanEcus():
     allecus = OrderedDict()
@@ -339,6 +341,7 @@ class ScanEcus():
                 listecu.append(line)
         else:
             for row in self.detectedEcus:
+                print(row['idf'])
                 if 'idf' not in list(row.keys()):
                     row['idf'] = ''
                 if row['dst'] not in list(m_elm.dnat.keys()):
