@@ -36,7 +36,6 @@ from mod_ply import *
 from mod_utils import *
 from kivy_garden.graph import Graph, MeshLinePlot
 from math import sin, ceil, floor
-from kivy_garden.matplotlib import FigureCanvasKivyAgg
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 F2A = {'01': '7A',
  '02': '01',
