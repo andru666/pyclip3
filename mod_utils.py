@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, sys, atexit, subprocess, string, signal, glob, re
 from kivy.app import App
-from kivy_garden.graph import Graph, MeshLinePlot
-from math import sin
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
@@ -27,6 +25,7 @@ widgetglobal = None
 choice_result = None
 resizeFont = False
 favouriteScreen = ecu_own_screen('FAV')
+graphicsScreen = ecu_gr_screen('GR')
 fmn = 2
 bmn = 2.5
 
@@ -334,7 +333,6 @@ class widgetChoiceLong(App):
 
     def choice_done(self, instance):
         global choice_result
-        print(self.Check)
         Checks = []
         if self.select:
             for k, v in self.Check.items():
@@ -372,15 +370,22 @@ class widgetChoiceLong(App):
         layout.add_widget(question)
         i = 1
         if self.select:
+            layout.size_hint = (1, 1)
+            lay = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, None))
+            lay.bind(minimum_height=lay.setter('height'))
             for entry in self.menu_entries:
-                layout.spacing=5
-                layout.add_widget(self.make_check(entry, entry.split(':')[0]))  
+                lay.spacing=5
+                lay.add_widget(self.make_check(entry, entry.split(':')[0]))  
+            r = ScrollView(size_hint=(1, 1))
+            r.add_widget(lay)
+            layout.add_widget(r)
             for t in ['6536', '6218']:
                 btn = MyButton(text='<' + mod_globals.language_dict[t] + '>', on_press=self.stop)
                 btn.bind(size=btn.setter('text_size'))
                 btn.ID = i
                 btn.bind(on_press=self.choice_done)
                 layout.add_widget(btn)         
+            return layout
         elif self.question == 'Mileage survey':
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))

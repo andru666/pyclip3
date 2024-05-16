@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import sys, threading
+import sys, threading, random
 import time
 import xml.dom.minidom
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from xml.dom.minidom import parse
 from kivy import base
 from kivy.app import App
@@ -18,6 +18,7 @@ from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.properties import NumericProperty
 from kivy.utils import platform
+from kivy.properties import ObjectProperty, StringProperty, ListProperty
 import mod_globals
 import mod_zip
 from mod_ecu_command import *
@@ -33,7 +34,9 @@ from mod_elm import dnat
 from mod_elm import snat
 from mod_ply import *
 from mod_utils import *
-
+from kivy_garden.graph import Graph, MeshLinePlot
+from math import sin, ceil, floor
+from kivy_garden.matplotlib import FigureCanvasKivyAgg
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 F2A = {'01': '7A',
  '02': '01',
@@ -133,6 +136,7 @@ class showDatarefGui(App):
         self.ecu = ecu
         self.blue_part_size = 0.7
         self.datarefs = datarefs
+        self.p_graf = {}
         self.labels = {}
         self.params = {}
         self.needupdate = True
@@ -192,6 +196,8 @@ class showDatarefGui(App):
     def finish(self, instance):
         if self.path[:3] == 'FAV':
             self.ecu.saveFavList()
+        if self.ecu.GRAF:
+            self.ecu.GRAF = False
         self.needupdate = False
         self.running = False
         if mod_globals.opt_csv and self.csvf!=0:
@@ -208,7 +214,10 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.window.mainloop()
+            try:
+                EventLoop.window.mainloop()
+            except:
+                pass
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -222,8 +231,12 @@ class showDatarefGui(App):
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
                 else:
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True)
-                key = '%s - %s' % (codeMR, label)
-                val = '%s %s' % (value, unit)
+                if self.ecu.GRAF:
+                    key = '%s - %s' % (codeMR, label)
+                    val = str(value).strip()
+                else:
+                    key = '%s - %s' % (codeMR, label)
+                    val = '%s %s' % (value, unit)
                 dct[name] = str(val)
                 self.paramsLabels[name] = key
             if dr.type == 'Identification':
@@ -237,18 +250,20 @@ class showDatarefGui(App):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
         self.params = dct
-        #return dct
-    
+
+
     def updates_values(self):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
         self.get_ecu_values()
-        for param, val in self.params.items():
-            if val != 'Text' and val != 'DTCText':
-                if self.ecu.GRAF:
-                    print(val)
-                else:
+        
+        if self.ecu.GRAF:
+            self.params
+            #self.plots()
+        else:
+            for param, val in self.params.items():
+                if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
@@ -265,17 +280,52 @@ class showDatarefGui(App):
             self.finish(self)
             return True
 
+    def plots(self, dt=None):
+        s0 = datetime.now()
+        s1 = timedelta(seconds=15)
+        cle = False
+        if self.Xmax < float(s0.strftime("%S.%f")):
+            self.graph.xmin = self.Xmin = self.Xmin+1
+            self.graph.xmax = self.Xmax = self.Xmax+1
+            cle = True
+        if self.Xmax:
+            s0
+        l = {}
+        i = 15
+        for k, v in self.params.items():
+            if cle:
+                self.p_graf[k].pop(0)
+            self.p_graf[k].append((d, float(v)))
+            #self.p_graf[k] = [(x+i, sin(x / 10.)) for x in range(0, 101)]
+            self.labels[k].points = self.p_graf[k]
+            self.labels[k].draw()
+            i += 20
+           
+
+    def MM(self, min, max, v):
+        if min == '0' or min == 0:
+            if float(v) < 0:
+                min = float(v)
+        elif float(v) < min:
+            min = float(v)
+        if max == '0' or max == 0:
+            if float(v) > 0:
+                max = float(v)
+        elif float(v) > max:
+            max = float(v)
+        return floor(min), ceil(max)
+
     def build(self):
         if mod_globals.opt_perform:
             self.ecu.elm.currentScreenDataIds = []
         if mod_globals.opt_csv and mod_globals.ext_cur_DTC == '000000':
             self.csvf, self.csvline = self.ecu.prepareCSV(self.datarefs, self.path)
-        layout = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
-        layout.bind(minimum_height=layout.setter('height'))
+        self.layout = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
+        self.layout.bind(minimum_height=self.layout.setter('height'))
         fs = mod_globals.fontSize
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
-        layout.add_widget(MyLabel(text=header))
+        self.layout.add_widget(MyLabel(text=header))
         if len(self.params) == 0:
             self.get_ecu_values()
         max_str = ''
@@ -283,30 +333,41 @@ class showDatarefGui(App):
             len_str = len(param)
             if len_str > len(max_str):
                 max_str = param
-
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
         if self.ecu.GRAF:
-            print(self.params)
-            layout.size_hint = (1, 1)
-            self.graph = Graph(xlabel='Time(sec)', x_ticks_major=5, y_ticks_major=5, y_grid_label=True, x_grid_label=True, padding=5, x_grid=True, y_grid=True, ymin=0, ymax=25, xmin=0, xmax=25)
-            i = 1
-            u = 2
-            pr = {}
-            for paramName, val in self.params.items():
-                data_to_graph = [(x, sin(x/u)) for x in range(0, 51)]
-                color = [1-i/5, 1-i/5, 1, 1]
-                self.plot = MeshLinePlot(color=color)
-                i += 1
-                u += 2
-                pr[paramName] = color
-                self.plot.points = data_to_graph
-                self.graph.add_plot(self.plot)
-            layout.add_widget(self.graph)
+            self.layout.size_hint = (1, 1)
+            self.graph = Graph(size = (600, 400), x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, y_grid_label=True, x_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=15, ymin=-4, ymax=4)
+            i = 0
+            min = 0
+            max = 0
+            s0 = datetime.now()
+            s1 = timedelta(seconds=15)
+            self.Xmin = self.graph.xmin = float(s0.strftime("%S.%f"))
+            self.Xmax = self.graph.xmax = float((s0+s1).strftime("%S.%f"))
+            i = 0
+            for k, v in self.params.items():
+                self.p_graf[k] = []
+                self.p_graf[k].append((s0, float(v)))
+                plot = MeshLinePlot(color=[1, i/10, 0, 1])
+                plot.points = self.p_graf[k]
+                self.graph.add_plot(plot)
+                self.labels[k] = plot
+                i += 5
+                mn = self.ecu.Parameters[k].min
+                mx = self.ecu.Parameters[k].max
+                if min > float(mn):
+                    min = mn
+                if max < float(mx):
+                    max = mx
+                min, max = self.graph.ymin, self.graph.ymax = self.MM(min, max, v)
+            
+            self.layout.add_widget(self.graph)
+            self.layout.add_widget(MyButton(text='PLOTS', size_hint=(1, None), on_press=self.plots))
         else:
             for paramName, val in self.params.items():
                 if val == 'Text':
-                    layout.add_widget(MyLabel(text=paramName))
+                    self.layout.add_widget(MyLabel(text=paramName))
                 elif val == 'DTCText':
                     lines = len(paramName.split('\n'))
                     simb = len(paramName)
@@ -319,14 +380,14 @@ class showDatarefGui(App):
                     if fs >= 40:
                         lines += 1
                     prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
-                    layout.add_widget(prelabel)
+                    self.layout.add_widget(prelabel)
                 else:
-                    layout.add_widget(self.make_box_params(paramName, val))
+                    self.layout.add_widget(self.make_box_params(paramName, val))
         quitbutton = MyButton(text='<' + mod_globals.language_dict['6218'] + '>', size_hint=(1, None), on_press=self.finish)
-        layout.add_widget(quitbutton)
+        self.layout.add_widget(quitbutton)
         root = ScrollView(size_hint=(None, None), size=Window.size, do_scroll_x=True, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
-        root.add_widget(layout)
+        root.add_widget(self.layout)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
         return root
@@ -666,22 +727,22 @@ class ECU():
             csvf = open(mod_globals.csv_dir + pyren_encode(csv_filename), "wt")
         return csvf, csvline
 
-    def grafic(self):
+    def grafic(self, path):
+        graphicsScreen.datarefs = []
         menu = []
         for k, v in self.Parameters.items():
             if not v.agcdRef.endswith('FF'):
                 menu.append(v.codeMR + ':' + v.label)
-            #menu.append(v)
         menu.sort()
         choice = ChoiceSelect(menu, 'Choose :')
         if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
             return
+        choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
         if choice[2]:
             for i in choice[2]:
-                print(i)
-                self.addElem(i)
+                self.addGraf(i)
             self.GRAF = True
-            self.show_screen(favouriteScreen)
+            self.show_screen(graphicsScreen)
 
     def show_datarefs(self, datarefs, path):
         print('show_datarefs')
@@ -723,8 +784,6 @@ class ECU():
         while 1:
             gui = showDatarefGui(self, datarefs, path)
             gui.run()
-            if self.GRAF:
-                self.GRAF = False
             if not resizeFont:
                 return
             resizeFont = False
@@ -967,6 +1026,7 @@ class ECU():
 
     def show_screens(self):
         print('show_screens')
+        self.screens.append(graphicsScreen)
         self.screens.append(favouriteScreen)
         while 1:
             clearScreen()
@@ -1000,6 +1060,9 @@ class ECU():
                         l.name = 'SCS : Security configuration scenarios'
                 if l.name == 'EZ':
                     l.name = 'EZ : EZSTEP'
+                if l.name == 'GR':
+                    if mod_globals.test:
+                        l.name = 'GR: График'
                 if l.name == 'FAV':
                     l.name = 'FAV : ' + mod_globals.language_dict['26330']
                 if l.name == 'ED':
@@ -1007,8 +1070,8 @@ class ECU():
                     l.name = 'ED : ' + mod_globals.language_dict['638']
                     continue
                 menu.append(l.name)
-            if mod_globals.test:
-                menu.append('GR: График')
+            
+            
             if mod_globals.opt_cmd:
                 if mod_globals.opt_lang == 'RU':
                     menu.append('ECM : Расширенный набор команд')
@@ -1029,9 +1092,10 @@ class ECU():
                 choice = Choice(menu, 'Choose :')
             if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 favouriteScreen.datarefs = []
+                graphicsScreen.datarefs = []
                 return
             if choice[0][:2] == 'GR':
-                self.grafic()
+                self.grafic(choice)
                 continue
             if choice[0][:2] == 'DE':
                 if self.ecudata['stdType'] == 'STD_A':
@@ -1096,6 +1160,43 @@ class ECU():
                     self.show_screen(favouriteScreen)
                 continue
             self.show_screen(self.screens[int(choice[1]) - 1])
+
+    def addGraf(self, elem):
+        if elem[:2] == 'PR':
+            for pr in list(self.Parameters.keys()):
+                if self.Parameters[pr].agcdRef == elem:
+                    if not any(pr == dr.name for dr in graphicsScreen.datarefs):
+                        graphicsScreen.datarefs.append(ecu_screen_dataref('',pr,'Parameter'))
+                        return False
+                    else:
+                        for dr in graphicsScreen.datarefs:
+                            if pr == dr.name:
+                                graphicsScreen.datarefs.remove(dr)
+                                clearScreen()
+        elif elem[:2] == 'ET':
+            for st in list(self.States.keys()):
+                if self.States[st].agcdRef == elem:
+                    if not any(st == dr.name for dr in graphicsScreen.datarefs):
+                        graphicsScreen.datarefs.append(ecu_screen_dataref('',st,'State'))
+                        return False
+                    else:
+                        for dr in graphicsScreen.datarefs:
+                            if st == dr.name:
+                                graphicsScreen.datarefs.remove(dr)
+                                clearScreen()
+        elif elem[:2] == 'ID':
+            for idk in list(self.Identifications.keys()):
+                if self.Identifications[idk].agcdRef == elem:
+                    if not any(idk == dr.name for dr in graphicsScreen.datarefs):
+                        graphicsScreen.datarefs.append(ecu_screen_dataref("",idk,"Identification"))
+                        return False
+                    else:
+                        for dr in graphicsScreen.datarefs:
+                            if idk == dr.name:
+                                graphicsScreen.datarefs.remove(dr)
+                                clearScreen()
+        else:
+            return False
 
     def addElem(self, elem):
         if elem[:2] == 'PR':

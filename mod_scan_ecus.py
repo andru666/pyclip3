@@ -325,12 +325,13 @@ class ScanEcus():
         listecu = []
         if mod_globals.os == 'android':
             for row in self.detectedEcus:
-                if families[row['idf']] in list(mod_globals.language_dict.keys()):
-                    fmlyn = mod_globals.language_dict[families[row['idf']]]
-                    if mod_globals.opt_scan:
-                        line = '%-20s %s' % (fmlyn, row['rerr'])
-                    else:
-                        line = '%-20s %s' % (fmlyn, row['stdType'])
+                if row['idf'] in list(families.keys()):
+                    if families[row['idf']] in list(mod_globals.language_dict.keys()):
+                        fmlyn = mod_globals.language_dict[families[row['idf']]]
+                        if mod_globals.opt_scan:
+                            line = '%-20s %s' % (fmlyn, row['rerr'])
+                        else:
+                            line = '%-20s %s' % (fmlyn, row['stdType'])
                 elif mod_globals.opt_scan:
                     line = '%-20s %s' % (row['doc'].strip(), row['rerr'])
                 else:

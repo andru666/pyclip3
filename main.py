@@ -162,7 +162,6 @@ from mod_ecu_default import *
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 argv_glob = sys.argv
 sys.argv = sys.argv[0:1]
-
 def my_excepthook(excType, excValue, tb):
     message = traceback.format_exception(excType, excValue, tb)
     string = ''

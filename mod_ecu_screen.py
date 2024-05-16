@@ -19,6 +19,14 @@ class ecu_own_screen:
     def __init__(self, n):
         self.name = n
 
+class ecu_gr_screen:
+    datarefs = []
+    functions = []
+    name = ''
+
+    def __init__(self, n):
+        self.name = n
+
 class ecu_screen_subfunction:
     datarefs = []
     name = ''
