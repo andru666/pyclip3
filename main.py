@@ -26,7 +26,7 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.06'
+__version__ = '0.02.08'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -484,6 +484,8 @@ class screenConfig(App):
                           "91": "NR: Сцепление Гидротрансформатора заблокировано",
                           "92": "NR: Напряжение слишком высокое",
                           "93": "NR: Напряжение слишком низкое"}
+            else:
+                negrsp = {}
             negrsp1 = {"11": "NR: " + mod_globals.language_dict['24749'],
                        "93": "NR: " + mod_globals.language_dict['19689']
                       }

@@ -1025,7 +1025,7 @@ class ECU():
 
     def show_screens(self):
         print('show_screens')
-        self.screens.append(graphicsScreen)
+        if mod_globals.test: self.screens.append(graphicsScreen)
         self.screens.append(favouriteScreen)
         while 1:
             clearScreen()
@@ -1059,8 +1059,8 @@ class ECU():
                         l.name = 'SCS : Security configuration scenarios'
                 if l.name == 'EZ':
                     l.name = 'EZ : EZSTEP'
-                if l.name == 'GR':
-                    if mod_globals.test:
+                if mod_globals.test:
+                    if l.name == 'GR':
                         l.name = 'GR: График'
                 if l.name == 'FAV':
                     l.name = 'FAV : ' + mod_globals.language_dict['26330']

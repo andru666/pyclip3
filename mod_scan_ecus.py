@@ -245,7 +245,6 @@ class ScanEcus():
         tot = ''
         for l in self.detectedEcus:
             if l['idf']=='1':
-                print("### Connecting to Engine ###")
                 ecu = self.chooseEcu(l['ecuname'])
                 tot += "%-15s : " % "Engine    PR025" 
                 num, string = ecu.get_pr('PR025')
@@ -255,16 +254,12 @@ class ScanEcus():
                 tot += str(num); tot += '\n'
                 num, string = ecu.get_pr('PR391')
                 num, string = ecu.get_pr('PR412')
-                print()
             if l['idf']=='2':    #family 02
-                print("### Connecting to ABS ###") 
                 ecu = self.chooseEcu(l['ecuname'])
                 tot += "%-15s : " % "ABS             PR121" 
                 num, string = ecu.get_pr('PR121')
                 tot += str(num); tot += '\n'
-                print()
             if l['idf']=='3':    #family 03
-                print("### Connecting to TDB ###") 
                 ecu = self.chooseEcu(l['ecuname'])
                 tot += "%-15s : " % "TDB             PR009" 
                 num, string = ecu.get_pr('PR009')
@@ -341,7 +336,6 @@ class ScanEcus():
                 listecu.append(line)
         else:
             for row in self.detectedEcus:
-                print(row['idf'])
                 if 'idf' not in list(row.keys()):
                     row['idf'] = ''
                 if row['dst'] not in list(m_elm.dnat.keys()):

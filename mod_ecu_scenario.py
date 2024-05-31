@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re, os, mod_globals, sys
+from mod_utils import *
 
 if mod_globals.os == 'android':
     from jnius import autoclass
@@ -17,20 +18,21 @@ else:
 def playScenario(command, ecu, elm):
     services = ecu.Services
     scenarioName, scenarioData = command.scenario.split('#')
-    if scenarioName.lower().startswith('scm'):
+    if scenarioName.startswith('scm'):
         scenarioName = scenarioName.split(':')[1]
         ecuNumberPattern = re.compile(r'_\d{5}')
         ecuNumberIndex = ecuNumberPattern.search(scenarioData)
-        scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))].lower()
-        scenarioData = scenarioData.lower()
+        scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))]
+        scenarioData = scenarioData
     else:
         scenarioData = scenarioData[5:].replace('=', '_').replace('.xml', '').replace('&', '_')+'.xml'
         scenarioName = scenarioName.split(':')[1]
         ecuNumberPattern = re.compile(r'_\d{5}')
         ecuNumberIndex = ecuNumberPattern.search(scenarioData)
-        scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))].lower()
-        scenarioData = 'ecudata/'+scenarioData.lower()
-    if mod_globals.os != 'android': print(scenarioName)
+        scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))]
+        scenarioData = 'ecudata/'+scenarioData
+    if mod_globals.os != 'android':
+        print(scenarioName)
     try:
         if scenarioName.endswith('_ecu'):
             name = scenarioName[:len(scenarioName)-4]
@@ -38,10 +40,14 @@ def playScenario(command, ecu, elm):
             name = scenarioName[:len(scenarioName)-6]
         else:
             name = scenarioName
-        scen = __import__(name)
+        print(name)
+        scen = __import__(name.lower())
         scen.run(elm, ecu, command, scenarioData)
         return True
-    except ModuleNotFoundError:
+    except:
         scen = __import__('show_scen')
-        scen.run(elm, ecu, command, scenarioData)
+        try:
+            scen.run(elm, ecu, command, scenarioData)
+        except:
+            return False
         return True
