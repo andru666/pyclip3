@@ -37,6 +37,7 @@ from mod_utils import *
 from kivy_garden.graph import Graph, MeshLinePlot
 from math import sin, ceil, floor
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
+
 F2A = {'01': '7A',
  '02': '01',
  '03': '51',
@@ -130,6 +131,19 @@ F2A = {'01': '7A',
 ecudump = {}
 resizeFont = False
 
+class Plot(BoxLayout):
+    def __init__(self, dt, **kwargs):
+        self.dt = dt
+        self.labels = {}
+        super(Plot, self).__init__(**kwargs)
+        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, x_grid_label=True, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=30, ymin=-4, ymax=4)
+        for k, v in self.dt.items():
+            self.plot = MeshLinePlot(color=v['color'])
+            self.plot.points = v['plot']
+            self.labels[k] = self.plot
+            self.graph.add_plot(self.plot)
+        self.add_widget(self.graph)
+        
 class showDatarefGui(App):
     def __init__(self, ecu, datarefs, path):
         self.ecu = ecu
@@ -250,7 +264,6 @@ class showDatarefGui(App):
                 self.csvline += ","
         self.params = dct
 
-
     def updates_values(self):
         if not self.running:
             return
@@ -258,8 +271,8 @@ class showDatarefGui(App):
         self.get_ecu_values()
         
         if self.ecu.GRAF:
-            self.params
-            #self.plots()
+            self.plots()
+            pass
         else:
             for param, val in self.params.items():
                 if val != 'Text' and val != 'DTCText':
@@ -280,26 +293,21 @@ class showDatarefGui(App):
             return True
 
     def plots(self, dt=None):
-        s0 = datetime.now()
-        s1 = timedelta(seconds=15)
         cle = False
-        if self.Xmax < float(s0.strftime("%S.%f")):
-            self.graph.xmin = self.Xmin = self.Xmin+1
-            self.graph.xmax = self.Xmax = self.Xmax+1
-            cle = True
-        if self.Xmax:
-            s0
         l = {}
-        i = 15
+        if self.Xmin < 29: self.Xmin += 1
         for k, v in self.params.items():
-            if cle:
-                self.p_graf[k].pop(0)
-            self.p_graf[k].append((d, float(v)))
-            #self.p_graf[k] = [(x+i, sin(x / 10.)) for x in range(0, 101)]
-            self.labels[k].points = self.p_graf[k]
-            self.labels[k].draw()
-            i += 20
-           
+            if len(self.p_graf[k]['plot']) >= 29:
+                prd = []
+                i = 1
+                for kk, vv in self.p_graf[k]['plot']:
+                    if kk == 1:
+                        continue
+                    prd.append((i, vv))
+                    i += 1
+                self.p_graf[k]['plot'] = prd
+            self.p_graf[k]['plot'].append((self.Xmin, float(v)))
+            self.graph.labels[k].points = self.p_graf[k]['plot']
 
     def MM(self, min, max, v):
         if min == '0' or min == 0:
@@ -313,6 +321,13 @@ class showDatarefGui(App):
         elif float(v) > max:
             max = float(v)
         return floor(min), ceil(max)
+
+    def graf_lab(self, k, col):
+        box1 = BoxLayout(orientation='horizontal',size_hint = (1, None), height=fs)
+        name = self.paramsLabels[k].split('-', 1)
+        box1.add_widget(MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1)))
+        box1.add_widget(MyLabel(text=name[1], size_hint = (0.85, 1)))
+        return box1
 
     def build(self):
         if mod_globals.opt_perform:
@@ -335,33 +350,33 @@ class showDatarefGui(App):
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
         if self.ecu.GRAF:
+            self.Xmin = 1
             self.layout.size_hint = (1, 1)
-            self.graph = Graph(size = (600, 400), x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, y_grid_label=True, x_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=15, ymin=-4, ymax=4)
-            i = 0
             min = 0
             max = 0
-            s0 = datetime.now()
-            s1 = timedelta(seconds=15)
-            self.Xmin = self.graph.xmin = float(s0.strftime("%S.%f"))
-            self.Xmax = self.graph.xmax = float((s0+s1).strftime("%S.%f"))
             i = 0
+            rrt = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
+            rrt.bind(minimum_height=rrt.setter('height'))
             for k, v in self.params.items():
-                self.p_graf[k] = []
-                self.p_graf[k].append((s0, float(v)))
-                plot = MeshLinePlot(color=[1, i/10, 0, 1])
-                plot.points = self.p_graf[k]
-                self.graph.add_plot(plot)
-                self.labels[k] = plot
-                i += 5
                 mn = self.ecu.Parameters[k].min
                 mx = self.ecu.Parameters[k].max
                 if min > float(mn):
                     min = mn
                 if max < float(mx):
                     max = mx
-                min, max = self.graph.ymin, self.graph.ymax = self.MM(min, max, v)
-            
+                min, max = self.MM(float(min), float(max), float(v))
+                col = [1, i/10, 0, 1]
+                self.p_graf[k] = {'color':col, 'plot':[]}
+                self.p_graf[k]['plot'].append((self.Xmin, float(v)))
+                i += 3
+                rrt.add_widget(self.graf_lab(k, col))
+            self.graph = Plot(size_hint=(1, 1), dt=self.p_graf)
+            self.graph.graph.ymin = min-1
+            self.graph.graph.ymax = max+1
             self.layout.add_widget(self.graph)
+            rt = ScrollView(size_hint=(1, 0.2))
+            rt.add_widget(rrt)
+            self.layout.add_widget(rt)
             self.layout.add_widget(MyButton(text='PLOTS', size_hint=(1, None), on_press=self.plots))
         else:
             for paramName, val in self.params.items():
@@ -736,7 +751,7 @@ class ECU():
         choice = ChoiceSelect(menu, 'Choose :')
         if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
             return
-        choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
+        #choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
         if choice[2]:
             for i in choice[2]:
                 self.addGraf(i)
