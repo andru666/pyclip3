@@ -347,7 +347,7 @@ class widgetChoiceLong(App):
 
     def make_check(self, str1, active, callback = None):
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        label = MyLabelBlue(text=str1, halign='left',  size_hint=(0.8, None))
+        label = MyLabelBlue(text=str1, halign='left',  size_hint=(0.8, None), font_size=fs*0.7)
         checkbox = CheckBox(size_hint=(0.2, None))
         self.Check[active] = checkbox
         checkbox.height = label.height

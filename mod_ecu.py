@@ -34,7 +34,7 @@ from mod_elm import dnat
 from mod_elm import snat
 from mod_ply import *
 from mod_utils import *
-from kivy_garden.graph import Graph, MeshLinePlot
+from kivy_garden.graph import Graph, LinePlot
 from math import sin, ceil, floor
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 
@@ -136,9 +136,9 @@ class Plot(BoxLayout):
         self.dt = dt
         self.labels = {}
         super(Plot, self).__init__(**kwargs)
-        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=30, ymin=-10, ymax=10)# x_grid_label=True,
+        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=1, y_ticks_major=1, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=10, ymin=-10, ymax=10)# x_grid_label=True,
         for k, v in self.dt.items():
-            self.plot = MeshLinePlot(color=v['color'])
+            self.plot = LinePlot(line_width=2, color=v['color'])
             self.plot.points = v['plot']
             self.labels[k] = self.plot
             self.graph.add_plot(self.plot)
@@ -295,10 +295,10 @@ class showDatarefGui(App):
     def plots(self, dt=None):
         cle = False
         l = {}
-        if self.Xmin < 29: self.Xmin += 1
+        if self.Xmin < 9: self.Xmin += 1
         for k, v in self.params.items():
             v = float(v)
-            if len(self.p_graf[k]['plot']) >= 29:
+            if len(self.p_graf[k]['plot']) >= 9:
                 prd = []
                 i = 1
                 for kk, vv in self.p_graf[k]['plot']:
@@ -1088,7 +1088,7 @@ class ECU():
                     l.name = 'EZ : EZSTEP'
                 if mod_globals.test:
                     if l.name == 'GR':
-                        l.name = 'GR: График'
+                        l.name = 'GR: ' + mod_globals.language_dict['4283']
                 if l.name == 'FAV':
                     l.name = 'FAV : ' + mod_globals.language_dict['26330']
                 if l.name == 'ED':
