@@ -527,6 +527,7 @@ class screenConfig(App):
         layout.bind(minimum_height=layout.setter('height'))
         pycl = MyLabel(text='PyClip3', height=(fs*3), font_size=fs*2, bgcolor = (0.5, 0.5, 0, 1))
         layout.add_widget(pycl)
+        layout.add_widget(MyLabel(text='Version : ' + __version__, font_size=(fs*0.5), height=(fs*0.7), multiline=True, bgcolor = (0.5, 0.4, 0, 1)))
         layout.add_widget(MyLabel(text='Data directory : ' + mod_globals.user_data_dir, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         get_zip()
         try:
@@ -559,7 +560,7 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
         layout.add_widget(MyButton(text='DONATE', height=fs*2, on_release=self.donate))
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    31-05-2024', font_size=(fs*0.5), height=(fs*0.7)))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    19-06-2024', font_size=(fs*0.5), height=(fs*0.7)))
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root.add_widget(layout)

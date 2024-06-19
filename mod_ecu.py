@@ -136,7 +136,7 @@ class Plot(BoxLayout):
         self.dt = dt
         self.labels = {}
         super(Plot, self).__init__(**kwargs)
-        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, x_grid_label=True, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=30, ymin=-4, ymax=4)
+        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=3, y_ticks_major=1, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=30, ymin=-10, ymax=10)# x_grid_label=True,
         for k, v in self.dt.items():
             self.plot = MeshLinePlot(color=v['color'])
             self.plot.points = v['plot']
@@ -297,6 +297,7 @@ class showDatarefGui(App):
         l = {}
         if self.Xmin < 29: self.Xmin += 1
         for k, v in self.params.items():
+            v = float(v)
             if len(self.p_graf[k]['plot']) >= 29:
                 prd = []
                 i = 1
@@ -306,6 +307,11 @@ class showDatarefGui(App):
                     prd.append((i, vv))
                     i += 1
                 self.p_graf[k]['plot'] = prd
+            p = 1
+            while v > 10:
+                v = v / 10.0
+                p += 1
+            self.labels[k].text = self.labels[k].text[:-1] + str(p)
             self.p_graf[k]['plot'].append((self.Xmin, float(v)))
             self.graph.labels[k].points = self.p_graf[k]['plot']
 
@@ -322,10 +328,13 @@ class showDatarefGui(App):
             max = float(v)
         return floor(min), ceil(max)
 
-    def graf_lab(self, k, col):
+    def graf_lab(self, k, col, p = 1):
         box1 = BoxLayout(orientation='horizontal',size_hint = (1, None), height=fs)
         name = self.paramsLabels[k].split('-', 1)
-        box1.add_widget(MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1)))
+        if p > 1:
+            name[0] = name[0] + '*' + str(p)
+        self.labels[k] = MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1))
+        box1.add_widget(self.labels[k])
         box1.add_widget(MyLabel(text=name[1], size_hint = (0.85, 1)))
         return box1
 
@@ -358,6 +367,11 @@ class showDatarefGui(App):
             rrt = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
             rrt.bind(minimum_height=rrt.setter('height'))
             for k, v in self.params.items():
+                v = float(v)
+                p = 1
+                while v > 10:
+                    v = v / 10.0
+                    p += 1
                 mn = self.ecu.Parameters[k].min
                 mx = self.ecu.Parameters[k].max
                 if min > float(mn):
@@ -369,10 +383,8 @@ class showDatarefGui(App):
                 self.p_graf[k] = {'color':col, 'plot':[]}
                 self.p_graf[k]['plot'].append((self.Xmin, float(v)))
                 i += 3
-                rrt.add_widget(self.graf_lab(k, col))
+                rrt.add_widget(self.graf_lab(k, col, p))
             self.graph = Plot(size_hint=(1, 1), dt=self.p_graf)
-            self.graph.graph.ymin = min-1
-            self.graph.graph.ymax = max+1
             self.layout.add_widget(self.graph)
             rt = ScrollView(size_hint=(1, 0.2))
             rt.add_widget(rrt)
