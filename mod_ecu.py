@@ -300,7 +300,7 @@ class showDatarefGui(App):
             v = float(v)
             if len(self.p_graf[k]['plot']) >= 9:
                 prd = []
-                i = 1
+                i = 0
                 for kk, vv in self.p_graf[k]['plot']:
                     if kk == 1:
                         continue
@@ -311,7 +311,7 @@ class showDatarefGui(App):
             while v > 10:
                 v = v / 10.0
                 p += 1
-            self.labels[k].text = self.labels[k].text[:-1] + str(p)
+            self.labels[k].text = '*' + str(p)
             self.p_graf[k]['plot'].append((self.Xmin, float(v)))
             self.graph.labels[k].points = self.p_graf[k]['plot']
 
@@ -331,11 +331,12 @@ class showDatarefGui(App):
     def graf_lab(self, k, col, p = 1):
         box1 = BoxLayout(orientation='horizontal',size_hint = (1, None), height=fs)
         name = self.paramsLabels[k].split('-', 1)
-        if p > 1:
-            name[0] = name[0] + '*' + str(p)
-        self.labels[k] = MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1))
+        box1.add_widget(MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1)))
+        self.labels[k] = MyLabel(text='*' + str(p), bgcolor=[1, 0.2, 0.5, 1], size_hint = (0.1, 1))
         box1.add_widget(self.labels[k])
-        box1.add_widget(MyLabel(text=name[1], size_hint = (0.85, 1)))
+        l = MyLabel(text=name[1], size_hint = (0.75, None))
+        self.labels[k].height = box1.height = l.height
+        box1.add_widget(l)
         return box1
 
     def build(self):
@@ -359,10 +360,8 @@ class showDatarefGui(App):
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
         if self.ecu.GRAF:
-            self.Xmin = 1
+            self.Xmin = 0
             self.layout.size_hint = (1, 1)
-            min = 0
-            max = 0
             i = 0
             rrt = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
             rrt.bind(minimum_height=rrt.setter('height'))
@@ -372,13 +371,7 @@ class showDatarefGui(App):
                 while v > 10:
                     v = v / 10.0
                     p += 1
-                mn = self.ecu.Parameters[k].min
-                mx = self.ecu.Parameters[k].max
-                if min > float(mn):
-                    min = mn
-                if max < float(mx):
-                    max = mx
-                min, max = self.MM(float(min), float(max), float(v))
+                
                 col = [1, i/10, 0, 1]
                 self.p_graf[k] = {'color':col, 'plot':[]}
                 self.p_graf[k]['plot'].append((self.Xmin, float(v)))
