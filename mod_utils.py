@@ -305,7 +305,7 @@ class widgetChoiceLong(App):
         self.select = select
         self.header = header
         self.question = question
-        self.Check = {}
+        self.Check = []
         self.choice_result = None
         super(widgetChoiceLong, self).__init__()
         Window.bind(on_keyboard=self.key_handler)
@@ -335,10 +335,7 @@ class widgetChoiceLong(App):
         global choice_result
         Checks = []
         if self.select:
-            for k, v in self.Check.items():
-                if v.active:
-                    Checks.append(k)
-            choice_result = [instance.text, instance.ID, Checks]
+            choice_result = [instance.text, instance.ID, self.Check]
         else:
             choice_result = [instance.txt, instance.ID]
         self.stop()
@@ -347,13 +344,13 @@ class widgetChoiceLong(App):
 
     def make_check(self, str1, active, callback = None):
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        label = MyLabelBlue(text=str1, halign='left',  size_hint=(0.8, None), font_size=fs*0.6)
-        checkbox = CheckBox(size_hint=(0.2, None))
-        self.Check[active] = checkbox
-        checkbox.height = label.height
+        label = MyLabelBlue(text=str1, halign='left',  size_hint=(0.8, None), font_size=fs*0.6, on_press= lambda *args:self.Check.append(active))
+        #checkbox = CheckBox(size_hint=(0.2, 1))
+        #self.Check[active] = checkbox
+        #checkbox.height = label.height
         glay.height = label.height
         glay.add_widget(label)
-        glay.add_widget(checkbox)
+        #glay.add_widget(checkbox)
         return glay
 
     def build(self):

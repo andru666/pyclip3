@@ -334,7 +334,7 @@ class showDatarefGui(App):
         box1.add_widget(MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1)))
         self.labels[k] = MyLabel(text='*' + str(p), bgcolor=[1, 0.2, 0.5, 1], size_hint = (0.1, 1))
         box1.add_widget(self.labels[k])
-        l = MyLabel(text=name[1], size_hint = (0.75, None))
+        l = MyLabel(text=name[1], font_size=fs*0.8, size_hint = (0.75, None))
         self.labels[k].height = box1.height = l.height
         box1.add_widget(l)
         return box1
