@@ -735,7 +735,12 @@ def main():
                 se.detectedEcus.append(se.allecus[i])
         
     elif mod_globals.opt_demo and len(mod_globals.opt_ecuid) > 0 and mod_globals.opt_ecuid_on:
-        se.read_Uces_file(all=True)
+        if 'tcom' in mod_globals.opt_ecuid.lower() or len(mod_globals.opt_ecuid)<4:
+            tcomid = ''.join([i for i in mod_globals.opt_ecuid if i.isdigit()])
+            se.load_model_ECUs('Vehicles/TCOM_'+tcomid+'.xml')
+            mod_globals.opt_ecuid = ','.join(sorted(se.allecus.keys()))
+        else:
+            se.read_Uces_file(all=True)
         se.detectedEcus = []
         for i in mod_globals.opt_ecuid.split(','):
             if i in list(se.allecus.keys()):
