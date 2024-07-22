@@ -26,7 +26,7 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.08'
+__version__ = '0.02.09'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -717,7 +717,12 @@ def main():
         SEFname = mod_globals.user_data_dir + '/' + mod_globals.savedEcus
 
     if (mod_globals.opt_port == '127.0.0.1:35000' or mod_globals.opt_port.lower() == 'com7') and mod_globals.opt_ecuid_on:
-        se.read_Uces_file(all=True)
+        if 'tcom' in mod_globals.opt_ecuid.lower() or len(mod_globals.opt_ecuid)<4:
+            tcomid = ''.join([i for i in mod_globals.opt_ecuid if i.isdigit()])
+            se.load_model_ECUs('Vehicles/TCOM_'+tcomid+'.xml')
+            mod_globals.opt_ecuid = ','.join(sorted(se.allecus.keys()))
+        else:
+            se.read_Uces_file(all=True)
         se.detectedEcus = []
         for i in mod_globals.opt_ecuid.split(','):
             if i in list(se.allecus.keys()):

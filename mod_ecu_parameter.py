@@ -228,5 +228,8 @@ class ecu_parameters:
         Parameters = mdoc.getElementsByTagName('Parameter')
         if Parameters:
             for pr in Parameters:
-                parameter = ecu_parameter(pr, opt, tran)
-                parameter_list[parameter.name] = parameter
+                try:
+                    parameter = ecu_parameter(pr, opt, tran)
+                    parameter_list[parameter.name] = parameter
+                except:
+                    pass

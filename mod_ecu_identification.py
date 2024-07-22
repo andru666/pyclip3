@@ -116,5 +116,8 @@ class ecu_identifications:
         Identifications = mdoc.getElementsByTagName('Identification')
         if Identifications:
             for id in Identifications:
-                identification = ecu_identification(id, opt, tran)
-                identification_list[identification.name] = identification
+                try:
+                    identification = ecu_identification(id, opt, tran)
+                    identification_list[identification.name] = identification
+                except:
+                    pass

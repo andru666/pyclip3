@@ -145,8 +145,11 @@ class ecu_states:
         States = mdoc.getElementsByTagName('State')
         if States:
             for st in States:
-                state = ecu_state(st, opt, tran)
-                state_list[state.name] = state
+                try:
+                    state = ecu_state(st, opt, tran)
+                    state_list[state.name] = state
+                except:
+                    pass
         Masks = mdoc.getElementsByTagName("MaskList")
         if Masks:
             for ms in Masks:

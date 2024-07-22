@@ -136,7 +136,7 @@ class Plot(BoxLayout):
         self.dt = dt
         self.labels = {}
         super(Plot, self).__init__(**kwargs)
-        self.graph = Graph(x_ticks_minor=3,  x_ticks_major=1, y_ticks_major=1, y_grid_label=True, padding=10, x_grid=True, y_grid=True, xmin=-0, xmax=10, ymin=-10, ymax=10)# x_grid_label=True,
+        self.graph = Graph(x_ticks_minor=1,  x_ticks_major=1, y_ticks_major=1, y_grid_label=True, padding=2, x_grid=True, y_grid=True, xmin=-0, xmax=10, ymin=-10, ymax=10)# x_grid_label=True,
         for k, v in self.dt.items():
             self.plot = LinePlot(line_width=2, color=v['color'])
             self.plot.points = v['plot']
@@ -152,6 +152,7 @@ class showDatarefGui(App):
         self.p_graf = {}
         self.labels = {}
         self.params = {}
+        self.params_graf = {}
         self.needupdate = True
         self.running = True
         self.path = path
@@ -295,10 +296,14 @@ class showDatarefGui(App):
     def plots(self, dt=None):
         cle = False
         l = {}
-        if self.Xmin < 9: self.Xmin += 1
+        if self.Xmin < self.graph.graph.xmax: self.Xmin += 1
         for k, v in self.params.items():
+            if not k in self.params_graf: self.params_graf[k] = []
+            self.params_graf[k].append(v)
+            if len(self.params_graf[k]) > 30:
+                self.params_graf[k].pop(0)
             v = float(v)
-            if len(self.p_graf[k]['plot']) >= 9:
+            if len(self.p_graf[k]['plot']) >= self.graph.graph.xmax-1:
                 prd = []
                 i = 0
                 for kk, vv in self.p_graf[k]['plot']:
@@ -307,6 +312,7 @@ class showDatarefGui(App):
                     prd.append((i, vv))
                     i += 1
                 self.p_graf[k]['plot'] = prd
+                self.Xmin = self.graph.graph.xmax-1
             p = 1
             while v > 10:
                 v = v / 10.0
@@ -315,7 +321,7 @@ class showDatarefGui(App):
             self.p_graf[k]['plot'].append((self.Xmin, float(v)))
             self.graph.labels[k].points = self.p_graf[k]['plot']
 
-    def MM(self, min, max, v):
+    '''def MM(self, min, max, v):
         if min == '0' or min == 0:
             if float(v) < 0:
                 min = float(v)
@@ -326,18 +332,36 @@ class showDatarefGui(App):
                 max = float(v)
         elif float(v) > max:
             max = float(v)
-        return floor(min), ceil(max)
+        return floor(min), ceil(max)'''
 
     def graf_lab(self, k, col, p = 1):
         box1 = BoxLayout(orientation='horizontal',size_hint = (1, None), height=fs)
         name = self.paramsLabels[k].split('-', 1)
-        box1.add_widget(MyLabel(text=name[0], bgcolor=col, size_hint = (0.15, 1)))
-        self.labels[k] = MyLabel(text='*' + str(p), bgcolor=[1, 0.2, 0.5, 1], size_hint = (0.1, 1))
+        box1.add_widget(MyLabel(text=name[0], font_size=fs*0.5, bgcolor=col, size_hint = (0.15, None)))
+        self.labels[k] = MyLabel(text='*' + str(p), font_size=fs*0.5, bgcolor=[1, 0.2, 0.5, 1], size_hint = (0.1, None))
         box1.add_widget(self.labels[k])
-        l = MyLabel(text=name[1], font_size=fs*0.8, size_hint = (0.75, None))
-        self.labels[k].height = box1.height = l.height
+        l = MyLabel(text=name[1], font_size=fs*0.5, size_hint = (0.75, None))
+        box1.height = l.height*0.7
         box1.add_widget(l)
         return box1
+
+    def zoom_y(self, d):
+        if d == 1:
+            self.graph.graph.ymax = self.graph.graph.ymax+1
+            self.graph.graph.ymin = self.graph.graph.ymin-1
+        if d == 0:
+            self.graph.graph.ymax = self.graph.graph.ymax-1
+            self.graph.graph.ymin = self.graph.graph.ymin+1
+        
+    def zoom_x(self, d):
+        if d == 1:
+            self.graph.graph.xmax = self.graph.graph.xmax+1
+            self.Xmin = self.graph.graph.xmax
+        if d == 0:
+            self.graph.graph.xmax = self.graph.graph.xmax-1
+            self.Xmin = self.graph.graph.xmax
+            for k, v in self.p_graf.items():
+                self.p_graf[k]['plot'].pop(0)
 
     def build(self):
         if mod_globals.opt_perform:
@@ -362,6 +386,16 @@ class showDatarefGui(App):
         if self.ecu.GRAF:
             self.Xmin = 0
             self.layout.size_hint = (1, 1)
+            b = BoxLayout(orientation='horizontal', size_hint=(1, 0.1), spacing=5)
+            b.add_widget(MyLabel(text='Axe X', bgcolor=(1,0,0,1)))
+            b.add_widget(MyLabel(text='Axe Y', bgcolor=(1,0,0,1)))
+            b_xy = BoxLayout(orientation='horizontal', size_hint=(1, 0.1), spacing=5)
+            b_xy.add_widget(MyButton(text='+', size_hint=(1, None), on_press=lambda *args: self.zoom_x(1)))
+            b_xy.add_widget(MyButton(text='-', size_hint=(1, None), on_press=lambda *args: self.zoom_x(0)))
+            b_xy.add_widget(MyButton(text='+', size_hint=(1, None), on_press=lambda *args: self.zoom_y(1)))
+            b_xy.add_widget(MyButton(text='-', size_hint=(1, None), on_press=lambda *args: self.zoom_y(0)))
+            self.layout.add_widget(b)
+            self.layout.add_widget(b_xy)
             i = 0
             rrt = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
             rrt.bind(minimum_height=rrt.setter('height'))
@@ -756,7 +790,7 @@ class ECU():
         choice = ChoiceSelect(menu, 'Choose :')
         if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
             return
-        #choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
+        choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
         if choice[2]:
             for i in choice[2]:
                 self.addGraf(i)
