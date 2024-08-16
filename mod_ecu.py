@@ -790,7 +790,7 @@ class ECU():
         choice = ChoiceSelect(menu, 'Choose :')
         if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
             return
-        choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
+        #choice[2] = ['PR364', 'PR365', 'PR405', 'PR406']
         if choice[2]:
             for i in choice[2]:
                 self.addGraf(i)

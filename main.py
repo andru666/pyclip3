@@ -26,7 +26,7 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.09'
+__version__ = '0.02.10'
 
 mod_globals.os = platform
 if mod_globals.os == 'android':
