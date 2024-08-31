@@ -26,8 +26,8 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.10'
-
+__version__ = '0.02.11'
+data_update = '31-08-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -541,6 +541,7 @@ class screenConfig(App):
             return popup
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
+        #layout.add_widget(termbtn)
         check = MyButton(text='Check ELM327', height=(fs*4), on_press=self.check_elm)
         layout.add_widget(MyButton(text='START', height=(fs*2.5), on_press=self.finish))
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
@@ -560,7 +561,7 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('Use CFC0', mod_globals.opt_cfc0))
         layout.add_widget(termbtn)
         layout.add_widget(MyButton(text='DONATE', height=fs*2, on_release=self.donate))
-        layout.add_widget(MyLabel(text='PyClip3 by andru666    16-08-2024', font_size=(fs*0.5), height=(fs*0.7)))
+        layout.add_widget(MyLabel(text='PyClip3 by andru666    '+data_update, font_size=(fs*0.5), height=(fs*0.7)))
         root = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,
          'center_y': 0.5})
         root.add_widget(layout)
