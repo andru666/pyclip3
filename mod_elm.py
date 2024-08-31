@@ -535,17 +535,12 @@ class ELM:
         elm_rsp = self.cmd("STI")
         if elm_rsp and '?' not in elm_rsp:
             firmware_version = elm_rsp.split(" ")[-1]
-            try:
-                firmware_version = firmware_version.split(".")
-                version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
-                stpx_introduced_in_version_number = 420 #STN1110 got STPX last in version v4.2.0
-                if version_number >= stpx_introduced_in_version_number:
-                    mod_globals.opt_obdlink = True
-            except:
-                input("\nCannot determine OBDLink version.\n" +
-                "OBDLink performance may be decreased.\n" + 
-                "Press any key to continue...\n")
-
+            firmware_version = firmware_version.split(".")
+            version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
+            stpx_introduced_in_version_number = 420 #STN1110 got STPX last in version v4.2.0
+            if version_number >= stpx_introduced_in_version_number:
+                mod_globals.opt_obdlink = True
+            
             # check STN
             elm_rsp = self.cmd("STP 53")
             if '?' not in elm_rsp:
