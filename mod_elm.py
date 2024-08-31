@@ -273,17 +273,18 @@ class Port:
             elif self.portType == 2:
                 if self.recv_stream.available():
                     byte = chr(self.recv_stream.read())
-            elif self.portType == 3:
-                inInputBuffer = self.hdr.inWaiting()
-                if inInputBuffer:
-                    byte = self.hdr.read(inInputBuffer)
             else:
                 inInputBuffer = self.hdr.inWaiting()
                 if inInputBuffer:
                     if mod_globals.opt_obdlink:
                         byte = self.hdr.read(inInputBuffer)
                     else:
-                        byte = self.hdr.read()
+                        byte = self.hdr.read(1)
+            '''elif self.portType == 3:
+                inInputBuffer = self.hdr.inWaiting()
+                if inInputBuffer:
+                    byte = self.hdr.read(inInputBuffer)'''
+            
         except:
             pass
         if type(byte) == str:
