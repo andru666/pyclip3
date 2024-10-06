@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# -*- coding: utf-8 -*-
 import os as sysos
 import pickle
 opt_debug = True
@@ -19,6 +18,7 @@ opt_log = ''
 #test = False
 test = True
 opt_ecuid_on = False
+opt_caf = False
 #opt_ecuid_on = True
 opt_obdlink = False
 opt_demo = False
