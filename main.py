@@ -711,7 +711,7 @@ def main():
     base.EventLoop.window.canvas.clear()
     while 1:
         clearScreen()
-        choosen_ecu = se.chooseECU(mod_globals.opt_ecuid)
+        choosen_ecu, dump = se.chooseECU(mod_globals.opt_ecuid)
         mod_globals.opt_ecuid = ''
         if choosen_ecu == -1:
             continue
@@ -734,7 +734,8 @@ def main():
             popup_init.dismiss()
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
-        elif mod_globals.opt_dump:
+        elif mod_globals.opt_dump or dump:
+            print('saveDump')
             ecu.saveDump()
         ecu.show_screens()
 

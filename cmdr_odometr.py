@@ -78,7 +78,7 @@ def chooseEcu( ecu_number ):
     global se
     global lang
     
-    choosen_ecu = se.chooseECU( ecu_number ) 
+    choosen_ecu, dump = se.chooseECU( ecu_number ) 
     if choosen_ecu==-1:
         print("#\n"*3,"#     Unknown ECU defined!!!\n","#\n"*3)
         exit(1)

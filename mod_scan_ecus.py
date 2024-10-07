@@ -366,7 +366,7 @@ class ScanEcus():
         listecu.append('Mileage survey')
         listecu.append('Rescan errors')
         listecu.append('<Exit>')
-        choice = Choice(listecu, 'Choose ECU :')
+        choice = Choice(listecu, 'Choose ECU :', 'dump')
         if choice[0] == 'Rescan errors':
             self.reScanErrors()
             return -1
@@ -377,7 +377,7 @@ class ScanEcus():
             exit(1)
         i = int(choice[1]) - 1
         self.selectedEcu = i
-        return self.detectedEcus[self.selectedEcu]
+        return self.detectedEcus[self.selectedEcu], choice[2]
 
     def getselectedEcu(self):
         return self.detectedEcus[self.selectedEcu]

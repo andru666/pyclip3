@@ -138,7 +138,7 @@ class MyButton(Button):
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 1.5
-            self.height = lines * self.font_size * 1.5
+            self.height = lines * self.font_size * 1.6
         if mod_globals.os == 'android':
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
@@ -303,6 +303,10 @@ class widgetChoiceLong(App):
     def __init__(self, list, question, header = '', select=False):
         self.menu_entries = list
         self.select = select
+        self.dump = False
+        if self.select == 'dump':
+            self.dump = True
+            self.select = False
         self.header = header
         self.question = question
         self.Check = []
@@ -334,10 +338,12 @@ class widgetChoiceLong(App):
     def choice_done(self, instance):
         global choice_result
         Checks = []
-        if self.select:
+        if instance.text == 'Dump':
+            choice_result = [instance.txt, instance.ID, True]
+        elif self.select:
             choice_result = [instance.text, instance.ID, self.Check]
         else:
-            choice_result = [instance.txt, instance.ID]
+            choice_result = [instance.txt, instance.ID, False]
         self.stop()
         InfoPopup()
         base.EventLoop.window.canvas.clear()
@@ -387,13 +393,23 @@ class widgetChoiceLong(App):
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
         else:
-            for entry in self.menu_entries:
+            for entry in self.menu_entries: 
+                box = BoxLayout(orientation='horizontal', size_hint=(1.0, None))
                 btn = MyButton(text=' ' + (entry), size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
                 btn.bind(size=btn.setter('text_size'))
                 btn.txt = entry
                 btn.ID = i
                 btn.bind(on_press=self.choice_done)
-                layout.add_widget(btn)
+                box.height = btn.height
+                box.add_widget(btn)
+                if self.dump:
+                    d = MyButton(text='Dump', size_hint=(0.15, None), halign='center', valign='middle', font_name='RobotoMono-Regular', font_size=15)
+                    d.height = btn.height
+                    d.ID = i
+                    d.txt = entry
+                    d.bind(on_press=self.choice_done)
+                    box.add_widget(d)
+                layout.add_widget(box)
                 i += 1
 
         root = ScrollView(size_hint=(1, 1), pos_hint={'center_x': 0.5,
@@ -509,8 +525,8 @@ def kivyChoiceLong(list, question, header = '', select=False):
         resizeFont = False
 
 
-def Choice(list, question):
-    return kivyChoiceLong(list, question)
+def Choice(list, question, select=False):
+    return kivyChoiceLong(list, question, select=select)
 
 
 def ChoiceSelect(list, question):
