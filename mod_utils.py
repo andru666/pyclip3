@@ -393,7 +393,7 @@ class widgetChoiceLong(App):
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
             layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
         else:
-            for entry in self.menu_entries: 
+            for entry in self.menu_entries:
                 box = BoxLayout(orientation='horizontal', size_hint=(1.0, None))
                 btn = MyButton(text=' ' + (entry), size_hint=(1.0, None), halign='left', valign='middle', font_name='RobotoMono-Regular')
                 btn.bind(size=btn.setter('text_size'))
@@ -402,8 +402,10 @@ class widgetChoiceLong(App):
                 btn.bind(on_press=self.choice_done)
                 box.height = btn.height
                 box.add_widget(btn)
-                if self.dump:
-                    d = MyButton(text='Dump', size_hint=(0.15, None), halign='center', valign='middle', font_name='RobotoMono-Regular', font_size=15)
+                if entry == 'Mileage survey' or entry == '<Exit>' or entry == 'Rescan errors':
+                    pass
+                elif self.dump:
+                    d = MyButton(text='Dump', size_hint=(0.2, None), halign='center', valign='middle', font_name='RobotoMono-Regular', font_size=15)
                     d.height = btn.height
                     d.ID = i
                     d.txt = entry

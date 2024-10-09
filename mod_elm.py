@@ -346,6 +346,7 @@ class Port:
     def check_elm(self):
         self.hdr.timeout = 2
         for s in [38400, 115200, 230400, 500000, 1000000, 2000000]:
+            print(s)
             sys.stdout.flush()
             try:
                 self.hdr.baudrate = s
