@@ -337,7 +337,6 @@ class widgetChoiceLong(App):
 
     def choice_done(self, instance):
         global choice_result
-        Checks = []
         if instance.text == 'Dump':
             choice_result = [instance.txt, instance.ID, True]
         elif self.select:
@@ -383,15 +382,21 @@ class widgetChoiceLong(App):
             r.add_widget(lay)
             layout.add_widget(r)
             for t in ['6536', '6218']:
-                btn = MyButton(text='<' + mod_globals.language_dict[t] + '>', on_press=self.stop)
+                btn = MyButton(text='<' + mod_globals.language_dict[t] + '>')
                 btn.bind(size=btn.setter('text_size'))
                 btn.ID = i
+                btn.txt = '<' + mod_globals.language_dict[t] + '>'
                 btn.bind(on_press=self.choice_done)
                 layout.add_widget(btn)         
             return layout
         elif self.question == 'Mileage survey':
             layout.add_widget(MyLabel(text=self.menu_entries, font_size=fs, bgcolor=(0.3,0.1,1,1)))
-            layout.add_widget(MyButton(text='<' + mod_globals.language_dict['6218'] + '>', on_press=self.stop))
+            btn = MyButton(text='<' + mod_globals.language_dict['6218'] + '>')
+            btn.bind(size=btn.setter('text_size'))
+            btn.ID = i
+            btn.txt = '<' + mod_globals.language_dict['6218'] + '>'
+            btn.bind(on_press=self.choice_done)
+            layout.add_widget(btn)
         else:
             for entry in self.menu_entries:
                 box = BoxLayout(orientation='horizontal', size_hint=(1.0, None))

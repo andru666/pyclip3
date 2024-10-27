@@ -226,7 +226,7 @@ class ScanEcus():
         del popup_scan
 
     def chooseEcu(self, ecu_number):
-        choosen_ecu = self.chooseECU(ecu_number)
+        choosen_ecu, dump = self.chooseECU(ecu_number)
         if choosen_ecu==-1:
             return "#\n"*3,"#   Unknown ECU defined!!!\n","#\n"*3
         ecucashfile = mod_globals.cache_dir + choosen_ecu['ModelId'] + '_' + mod_globals.opt_lang + ".p"
@@ -316,7 +316,7 @@ class ScanEcus():
             for row in self.detectedEcus:
                 if ecuid in row['ecuname']:
                     self.selectedEcu = i
-                    return self.detectedEcus[self.selectedEcu]
+                    return self.detectedEcus[self.selectedEcu], False
                 i = i + 1
 
         listecu = []
@@ -369,14 +369,15 @@ class ScanEcus():
         choice = Choice(listecu, 'Choose ECU :', 'dump')
         if choice[0] == 'Rescan errors':
             self.reScanErrors()
-            return -1
+            return -1, False
         if choice[0] == 'Mileage survey':
-            Choice(self.prepareECUs(), 'Mileage survey')
-            return -1
+            choice = Choice(self.prepareECUs(), 'Mileage survey')
+            return -1, False
         if choice[0].lower() == '<exit>' or choice[0].lower() == '<up>':
             exit(1)
         i = int(choice[1]) - 1
         self.selectedEcu = i
+        print(choice)
         return self.detectedEcus[self.selectedEcu], choice[2]
 
     def getselectedEcu(self):
