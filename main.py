@@ -26,8 +26,8 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.12'
-data_update = '27-10-2024'
+__version__ = '0.02.13'
+data_update = '28-10-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass

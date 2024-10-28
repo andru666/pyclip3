@@ -591,6 +591,8 @@ class ELM:
         
         elm_rsp = self.cmd("STI")
         if elm_rsp and '?' not in elm_rsp:
+            if 'TIMEOUT' in elm_rsp:
+                elm_rsp = self.cmd("STI")
             firmware_version = elm_rsp.split(" ")[-1]
             firmware_version = firmware_version.split(".")
             version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
