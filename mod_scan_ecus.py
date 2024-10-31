@@ -377,7 +377,6 @@ class ScanEcus():
             exit(1)
         i = int(choice[1]) - 1
         self.selectedEcu = i
-        print(choice)
         return self.detectedEcus[self.selectedEcu], choice[2]
 
     def getselectedEcu(self):

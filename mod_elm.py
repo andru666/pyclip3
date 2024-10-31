@@ -191,6 +191,8 @@ class Port:
         portName = portName.strip()
         MAC = None
         upPortName = portName.upper()
+        if len(mod_globals.opt_log)>0: # and mod_globals.opt_demo==False:
+            self.lf = open(mod_globals.log_dir + "elm_" + mod_globals.opt_log, "at")
         if re.match(r"^[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$", upPortName) or \
            re.match(r"^[0-9A-F]{4}.[0-9A-F]{4}.[0-9A-F]{4}$", upPortName) or \
            re.match(r"^[0-9A-F]{12}$", upPortName):
@@ -346,7 +348,8 @@ class Port:
     def check_elm(self):
         self.hdr.timeout = 2
         for s in [38400, 115200, 230400, 500000, 1000000, 2000000]:
-            sys.stdout.flush()
+            self.lf.write(log_tmstr() + ' : Checking port speed:' + str(s)  + '\n')
+            self.lf.flush()
             try:
                 self.hdr.baudrate = s
                 self.hdr.flushInput()
@@ -365,6 +368,8 @@ class Port:
                 tc = time.time()
                 if '>' in self.buff:
                     mod_globals.opt_speed = s
+                    self.lf.write(log_tmstr() + ' : Start COM speed: ' +  str(s) + '\n')
+                    self.lf.flush()
                     self.hdr.timeout = self.portTimeout
                     return
                 if(tc - tb) > 1:
@@ -601,7 +606,6 @@ class ELM:
             elm_rsp = self.cmd("STP 53")
             if '?' not in elm_rsp:
                 mod_globals.opt_stn = True
-        
         
         if mod_globals.opt_csv and not mod_globals.opt_demo:
             if mod_globals.opt_obdlink:

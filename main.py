@@ -26,8 +26,8 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.13'
-data_update = '28-10-2024'
+__version__ = '0.02.14'
+data_update = '31-10-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -368,7 +368,7 @@ class screenConfig(App):
         glay.add_widget(self.langbutton)
         return glay
 
-    def finish(self, instance):
+    def finish(self, dt):
         InfoPopup(1)
         mod_globals.opt_port = ''
         mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
@@ -388,8 +388,9 @@ class screenConfig(App):
         except:
             mod_globals.fontSize = 20
         mod_globals.opt_demo = self.button['Demo mode'].active
-        mod_globals.opt_scan = self.button['Scan vehicle'].active
-        #mod_globals.opt_scan = True
+        #mod_globals.opt_scan = self.button['Scan vehicle'].active
+        if dt.text == 'SCAN VEHICLE':
+            mod_globals.opt_scan = True
         mod_globals.opt_csv = self.button['CSV Log'].active
         mod_globals.opt_csv_only = False
         mod_globals.opt_csv_human = False
@@ -400,7 +401,7 @@ class screenConfig(App):
         mod_globals.opt_cfc0 = self.button['Use CFC0'].active
         mod_globals.opt_n1c = False
         mod_globals.opt_exp = False
-        mod_globals.opt_dump = self.button['DUMP'].active
+        #mod_globals.opt_dump = self.button['DUMP'].active
         mod_globals.opt_can2 = self.button['CAN2 (Multimedia CAN)'].active
         if self.mainbutton.text:
             if 'com9' in self.mainbutton.text.lower() or 'com8' in self.mainbutton.text.lower():
@@ -484,14 +485,15 @@ class screenConfig(App):
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
         #layout.add_widget(termbtn)
         check = MyButton(text='Check ELM327', height=(fs*4), on_press=self.check_elm)
-        layout.add_widget(MyButton(text='START', height=(fs*2.5), on_press=self.finish))
+        layout.add_widget(MyButton(text='START', height=(fs*2), on_press=self.finish))
+        layout.add_widget(MyButton(text='SCAN VEHICLE', height=(fs*2), on_press=self.finish))
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
         layout.add_widget(self.make_bt_device_entry())
         layout.add_widget(self.make_language_entry())
-        layout.add_widget(self.make_box_switch('Scan vehicle', mod_globals.opt_scan))
+        #layout.add_widget(self.make_box_switch('Scan vehicle', mod_globals.opt_scan))
         layout.add_widget(self.make_box_switch('Demo mode', mod_globals.opt_demo))
-        layout.add_widget(self.make_box_switch('DUMP', mod_globals.opt_dump))
+        #layout.add_widget(self.make_box_switch('DUMP', mod_globals.opt_dump))
         layout.add_widget(self.make_box_switch('Orientation landscape', mod_globals.screen_orient, self.change_orientation))
         layout.add_widget(self.make_box_switch('Generate logs', True if len(mod_globals.opt_log) > 0 else False))
         layout.add_widget(self.make_input('Log name', mod_globals.opt_log))

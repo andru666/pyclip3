@@ -224,7 +224,7 @@ class showDatarefGui(App):
             self.csvline = self.csvline.replace(';','\t')
             self.csvf.write(self.csvline if mod_globals.opt_csv_human else self.csvline)
             self.csvf.flush()
-            self.csvline = datetime.now().strftime("%H:%M:%S.%f")
+            self.csvline = datetime.now().strftime("%H:%M:%S.%f,")
             
         dct = OrderedDict()
         for dr in self.datarefs:
@@ -755,8 +755,8 @@ class ECU():
     
     def prepareCSV(self, datarefs, path):
         csvf = 0
-        #csvline = "sep=\\t\n"
-        csvline = "Time,"
+        csvline = "sep=,\n"
+        csvline += "Time,"
         nparams = 0
         for dr in datarefs:
             if dr.type=='State':
@@ -768,7 +768,6 @@ class ECU():
             " [" + self.Parameters[dr.name].unit + "]")
                 csvline += ","
                 nparams += 1
-        csvline = pyren_encode(csvline)
         if nparams:
             csv_filename = datetime.now().strftime("%y_%m_%d_%H_%M_%S")
             csv_filename = csv_filename+'_'+self.ecudata['ecuname']+'_'+path
@@ -777,7 +776,7 @@ class ECU():
             csv_filename = csv_filename.replace(' : ','_')
             csv_filename = csv_filename.replace(' -> ','_')
             csv_filename = csv_filename.replace(' ','_')
-            csvf = open(mod_globals.csv_dir + pyren_encode(csv_filename), "wt")
+            csvf = open(mod_globals.csv_dir + csv_filename, "w")
         return csvf, csvline
 
     def grafic(self, path):
@@ -854,7 +853,7 @@ class ECU():
                 csvline = csvline.replace(';', '\t')
                 csvf.write(pyren_decode(csvline).encode('utf8') if mod_globals.opt_csv_human else csvline)
                 csvf.flush()
-                csvline = datetime.now().strftime('%H:%M:%S,%f')
+                csvline = datetime.now().strftime('%H:%M:%S,%f,')
             self.elm.clear_cache()
             if mod_globals.opt_csv and mod_globals.opt_csv_only:
                 clearScreen()
