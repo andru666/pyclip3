@@ -276,7 +276,7 @@ class screenConfig(App):
 
     def select_usb(self, dt=None):
         self.bt_dropdown.select(dt.text)
-        Port(portName='USB', mod_globals.opt_speed, 5).getConnected()
+        Port('USB', mod_globals.opt_speed, 5).getConnected()
 
     def make_bt_device_entry(self):
         ports = get_devices()
