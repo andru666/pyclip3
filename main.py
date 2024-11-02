@@ -26,8 +26,8 @@ import glob, logging
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.14'
-data_update = '31-10-2024'
+__version__ = '0.02.15'
+data_update = '02-11-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -152,7 +152,7 @@ else:
     except:
         pass
 
-from mod_elm import ELM, get_devices
+from mod_elm import ELM, get_devices, Port
 from mod_zip import *
 from mod_scan_ecus import ScanEcus
 from mod_ecu import ECU
@@ -274,6 +274,10 @@ class screenConfig(App):
         glay.add_widget(ti)
         return glay
 
+    def select_usb(self, dt=None):
+        self.bt_dropdown.select(dt.text)
+        Port(mod_globals.opt_port, mod_globals.opt_speed, 5).getConnected()
+
     def make_bt_device_entry(self):
         ports = get_devices()
         label = MyLabel(text='ELM port', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
@@ -297,7 +301,10 @@ class screenConfig(App):
                 btn = MyButton(text=str(name) + '>' + str(address), size_hint=(0.65, None))
             btn.height = label.height*1.5
             btn.font_size = label.font_size
-            btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
+            if name == 'USB' and address:
+                btn.bind(on_release=self.select_usb)
+            else:
+                btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
             self.bt_dropdown.add_widget(btn)
         self.mainbutton = MyButton(text='Select', size_hint=(0.65, None))
         self.mainbutton.height = label.height

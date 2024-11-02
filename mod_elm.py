@@ -9,6 +9,7 @@ import socket
 from datetime import datetime
 from collections import OrderedDict
 from kivy.utils import platform
+
 import logging
 log = logging.getLogger("kivy")
 if platform != 'android':
@@ -151,7 +152,7 @@ def get_devices():
         iterator = sorted(list(list_ports.comports()))
         for port, desc, hwid in iterator:
             devs[desc] = port
-
+        #devs['USB'] = 'device'
         return devs
     device = get_usb_socket_stream()
     
