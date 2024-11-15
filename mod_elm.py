@@ -229,7 +229,7 @@ class Port:
             except:
                 iterator = sorted(list(list_ports.comports()))
                 exit()
-            self.check_elm()
+            #if self.speed == 38400: self.check_elm()
 
     def __del__(self):
         pass
@@ -261,7 +261,7 @@ class Port:
             self.portType = 3
             device = get_usb_socket_stream()
             self.hdr = serial4a.get_serial_port(device, self.speed, timeout=self.portTimeout)
-            self.check_elm()
+            #if self.speed == 38400: self.check_elm()
         else:
             self.portType = 2
             self.socket, self.recv_stream, self.send_stream = get_bt_socket_stream()
@@ -593,7 +593,8 @@ class ELM:
         self.ATCFC0 = mod_globals.opt_cfc0
 
         if self.lf != 0:
-            self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n" + '#' * 60 + "\n")
+            self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n")
+            self.lf.write("Port Speed: " + str(speed) +"\n" + '#' * 60 + "\n")
             self.lf.flush()
         
         elm_rsp = self.cmd("STI")

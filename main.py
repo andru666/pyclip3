@@ -22,12 +22,12 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.switch import Switch
 from kivy import base
 from kivy.core.clipboard import Clipboard
-import glob, logging
+import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.15'
-data_update = '02-11-2024'
+__version__ = '0.02.16'
+data_update = '15-11-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -124,8 +124,7 @@ if mod_globals.os == 'android':
     mod_globals.dumps_dir = user_datadir + '/dumps/'
     mod_globals.macro_dir = user_datadir + '/macro/'
     mod_globals.csv_dir = user_datadir + '/csv/'
-    import sys
-    mod_globals.scen_dir = user_datadir + '/pyren/scen3/'
+    mod_globals.scen_dir = user_datadir + '/scen3/'
     sys.path.append(mod_globals.scen_dir)
 
 elif mod_globals.os == 'nt':
@@ -324,6 +323,28 @@ class screenConfig(App):
         setattr(self.langbutton, 'background_normal', '')
         setattr(self.langbutton, 'background_color', (0.345,0.345,0.345,1))
 
+    def make_opt_rate(self):
+        glay = MyGridLayout(cols=2)
+        label = MyLabel(text='Port SPEED', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
+        self.opt_speed_dropdown = DropDown()
+        for s_ecus in ['38400', '115200', '230400', '500000', '1000000', '2000000']:
+            btn= MyButton(text=s_ecus)
+            btn.height = label.height
+            btn.font_size = label.font_size
+            btn.bind(on_release=lambda btn: self.opt_speed_dropdown.select(btn.text))
+            self.opt_speed_dropdown.add_widget(btn)
+        self.ecus_opt_speed = MyButton(text='', size_hint=(0.65, None))
+        self.ecus_opt_speed.bind(on_release=self.opt_speed_dropdown.open)
+        self.opt_speed_dropdown.bind(on_select=lambda instance, x: setattr(self.ecus_opt_speed, 'text', x))
+        self.opt_speed_dropdown.select(str(mod_globals.opt_speed))
+        self.ecus_opt_speed.height = label.height
+        self.ecus_opt_speed.font_size = label.font_size
+        glay.height = 1.2 * label.height
+        glay.padding = glay.spacing = glay.height / 12
+        glay.add_widget(label)
+        glay.add_widget(self.ecus_opt_speed)
+        return glay
+
     def make_savedEcus(self):
         ecus = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'saved3Ecus*.p')))
         label = MyLabel(text='saved3Ecus', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
@@ -382,7 +403,10 @@ class screenConfig(App):
         mod_globals.opt_ecu = str(self.textInput['OPT ecuid'].text)
         mod_globals.opt_ecuid = str(self.textInput['OPT ecuid'].text)
         mod_globals.opt_ecuid_on = self.button['OPT ecuid'].active
-        mod_globals.opt_speed = 38400
+        if self.ecus_opt_speed:
+            mod_globals.opt_speed = int(self.ecus_opt_speed.text)
+        else:
+            mod_globals.opt_speed = 38400
         mod_globals.opt_rate = 38400
         mod_globals.savedEcus = self.ecusbutton.text
         mod_globals.opt_lang = self.langbutton.text
@@ -497,6 +521,7 @@ class screenConfig(App):
         layout.add_widget(MyButton(text='SCAN VEHICLE', height=(fs*2), on_press=self.finish))
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
+        layout.add_widget(self.make_opt_rate())
         layout.add_widget(self.make_bt_device_entry())
         layout.add_widget(self.make_language_entry())
         #layout.add_widget(self.make_box_switch('Scan vehicle', mod_globals.opt_scan))

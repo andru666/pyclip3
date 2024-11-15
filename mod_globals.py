@@ -60,6 +60,7 @@ fontSize = 20
 screen_orient = False
 
 class Settings:
+    opt_speed = 38400
     opt_ecuid = ''
     savedEcus = ''
     opt_ecu = ''
@@ -80,6 +81,7 @@ class Settings:
         global savedEcus
         global opt_ecuid
         global opt_ecu
+        global opt_speed
         global opt_lang
         global opt_si
         global opt_log
@@ -92,6 +94,7 @@ class Settings:
         global opt_csv
         global opt_dev_address
         self.load()
+        opt_speed = self.opt_speed
         opt_ecu = self.opt_ecu
         savedEcus = self.savedEcus
         opt_port = self.port
@@ -123,6 +126,7 @@ class Settings:
         self.__dict__.update(tmp_dict)
 
     def save(self):
+        self.opt_speed = opt_speed
         self.opt_ecu = opt_ecu
         self.port = opt_port
         self.lang = opt_lang
