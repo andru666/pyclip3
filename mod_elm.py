@@ -1,29 +1,21 @@
 # -*- coding: utf-8 -*-
-import mod_globals
-import sys
-import re
-import time
-import string
-import threading
-import socket
+import mod_globals, sys, re, time, string, threading, socket
 from datetime import datetime
 from collections import OrderedDict
 from kivy.utils import platform
-
 import logging
+
 log = logging.getLogger("kivy")
 if platform != 'android':
     import serial
     from serial.tools import list_ports
 else:
     from jnius import autoclass, cast
-    
     mod_globals.os = 'android'
     BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
     BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
     BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
     UUID = autoclass('java.util.UUID')
-    
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
     
 # List of commands which may require to open another Developer session(option --dev)
@@ -403,7 +395,10 @@ class Port:
                 self.write("at brd 11\r")
             elif boudrate == 500000:
                 self.write("at brd 8\r")
-        
+            elif boudrate ==1000000:
+                self.write("at brd 4\r")
+            elif boudrate == 2000000:
+                self.write("at brd 2\r")
         # search OK
         tb = time.time()  # start time
         self.buff = ""
@@ -460,22 +455,17 @@ class Port:
 
 
 # noinspection PyUnusedLocal
-class ELM:
-    """ELM327 class"""
-    
+class ELM:    
     port = 0
     lf = 0
     vf = 0
-    
-    keepAlive = 4  # send startSession to CAN after silence if startSession defined
-    busLoad = 0  # I am sure than it should be zero
-    srvsDelay = 0  # the delay next command requested by service
-    lastCMDtime = 0  # time when last command was sent to bus
-    portTimeout = 5  # timeout of port(com or tcp)
-    elmTimeout = 'FF'  # timeout set by ATST
-    performanceModeLevel = 1 # number of dataids, that can be sent in one 22 request
-    
-    # error counters
+    keepAlive = 4
+    busLoad = 0
+    srvsDelay = 0
+    lastCMDtime = 0
+    portTimeout = 5
+    elmTimeout = 'FF'
+    performanceModeLevel = 1
     error_frame = 0
     error_bufferfull = 0
     error_question = 0
@@ -483,10 +473,8 @@ class ELM:
     error_timeout = 0
     error_rx = 0
     error_can = 0
-    
     response_time = 0
     screenRefreshTime = 0
-
     buff = ""
     currentprotocol = ""
     currentsubprotocol = ""

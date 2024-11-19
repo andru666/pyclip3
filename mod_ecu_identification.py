@@ -9,6 +9,8 @@ def get_identification(id, mn, se, elm, calc, raw = False):
     comp = comp.replace('&amp;', '&')
     for m in sorted(id.mnemolist, key=len, reverse=True):
         hex_val = get_mnemonic(mn[m], se, elm)
+        if hex_val == 'None':
+            return (id.name, id.codeMR, id.label, 'None')
         comp = comp.replace(m, hex_val)
 
     id.value = calc.calculate(comp)

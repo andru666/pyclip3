@@ -26,8 +26,8 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.16'
-data_update = '15-11-2024'
+__version__ = '0.02.17'
+data_update = '19-11-2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -119,7 +119,7 @@ if mod_globals.os == 'android':
     user_datadir = Environment.getExternalStorageDirectory().getAbsolutePath() + '/pyren/'
     mod_globals.user_data_dir = user_datadir
     mod_globals.cache_dir = user_datadir + '/cache3/'
-    mod_globals.crash_dir = user_datadir + '/crashs/'
+    mod_globals.crash_dir = user_datadir + '/crashs3/'
     mod_globals.log_dir = user_datadir + '/logs/'
     mod_globals.dumps_dir = user_datadir + '/dumps/'
     mod_globals.macro_dir = user_datadir + '/macro/'
@@ -205,16 +205,19 @@ class screenConfig(App):
         if resizeFont:
             return True
         if (keycode1 == 45 or keycode1 == 269) and mod_globals.fontSize > 10:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize - 1
             resizeFont = True
             self.stop()
             return True
         if (keycode1 == 61 or keycode1 == 270) and mod_globals.fontSize < 40:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize + 1
             resizeFont = True
             self.stop()
             return True
         if keycode1 == 27:
+            MyPopup()
             exit()
         return False
 

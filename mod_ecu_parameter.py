@@ -13,6 +13,8 @@ def get_parameter(pr, mn, se, elm, calc, no_formatting = False, dataids = {}):
             val = get_SnapShotMnemonic(mn[m], se, elm, dataids)
         else:
             val = get_mnemonic(mn[m], se, elm)
+        if val == 'None':
+            return (pr.name, pr.codeMR, pr.label, 'None', pr.unit, 'None')
         if mn[m].type == 'SNUM8' and int(val, 16) > 0x7f:
             val = str(int(val, 16) - 0x100)
         elif mn[m].type == 'SNUM16' and int(val, 16) > 0x7fff:

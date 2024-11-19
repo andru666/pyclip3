@@ -16,12 +16,11 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.popup import Popup
 from kivy import base
 from kivy.lang import Builder
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.filechooser import FileChooserListView
 from kivy.clock import Clock
 import sys, os, re, string, time, mod_globals, mod_elm, mod_utils, main
 from mod_utils import *
-
+import urllib.request
 
 __all__ = 'install_android'
 
@@ -87,6 +86,7 @@ class MyApp(App):
 
     def __init__(self, opt_port, opt_speed, opt_log):
         self.macros = True
+        self.LINK = False
         mod_globals.opt_port = opt_port
         mod_globals.opt_speed = opt_speed
         mod_globals.opt_log = opt_log
@@ -116,9 +116,30 @@ class MyApp(App):
         root = GridLayout(cols=1, size_hint=(1, 1))
         self.fichoo = FileChooserListView(path=self.dir_macro)
         root.add_widget(self.fichoo)
+        root.add_widget(MyButton(text='Open Links', on_release=self.popp_links, size_hint=(1, None)))
         root.add_widget(MyButton(text='Open', on_release=self.popp, size_hint=(1, None)))
-        self.popup_macro = MyPopup_close(title='SELECT macro', cont=root, cl=1, op=None)#Popup(title='SELECT macro', font_size=fs, content='', size=(600, 600))
+        self.popup_macro = MyPopup_close(title='SELECT macro', cont=root, cl=1, op=None)
         self.popup_macro.open()
+
+    def open_link(self, instance):
+        self.popup_links.dismiss()
+        data = urllib.request.urlopen(self.links.text)
+        print(data)
+        self.data_link = []
+        for line in data:
+            self.data_link.append(line.decode('utf-8'))
+        self.LINK = True
+        Clock.schedule_once(self.macro_start, 1)
+        
+    def popp_links(self, instance):
+        self.popup_macro.dismiss()
+        box = BoxLayout(orientation='vertical', size_hint=(1, 1))
+        self.links = MyTextInput(size_hint=(1, 1))
+        box.add_widget(self.links)
+        box.add_widget(MyButton(text='Open', on_release=self.open_link, size_hint=(1, None)))
+        self.popup_links = MyPopup_close(title='Links', cont=box, cl=1, op=None)
+        self.popup_links.open()
+        
 
     def popp(self, instance):
         self.popup_macro.dismiss()
@@ -138,7 +159,7 @@ class MyApp(App):
                 file_macro = str(self.fichoo.selection[0].rsplit('/', 1)[1])
         except:
             self.MaLabel('Not select macro')
-            self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*5, on_release=self.exits))
+            self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*3, on_release=self.exits))
             return 
         self.label.text = str('File macro select: ' + file_macro)
         mod_globals.opt_log = file_macro.replace('.cmd', '.txt')
@@ -191,11 +212,14 @@ class MyApp(App):
         cmd_lines = []
         cmd_ref = 0
         if auto_dia:
-            fname = self.fichoo.selection[0]
-            if len(fname)>0:
-                with open(fname, 'rt') as f:
-                    cmd_lines = f.readlines()
-                
+            if self.LINK:
+                cmd_lines = self.data_link
+            else:
+                fname = self.fichoo.selection[0]
+                if len(fname)>0:
+                    with open(fname, 'rt') as f:
+                        cmd_lines = f.readlines()
+        
         if debug_mode:
             mod_globals.opt_demo = True
             self.elm.loadDump('./dumps/term_test.txt')
@@ -212,7 +236,7 @@ class MyApp(App):
                 self.popup.open()
 
         while self.macros:
-            label = MyLabel(text=str(var['$addr']+':'+var['$txa']+':'+var['$prompt'] + '#'), bgcolor=(0.5,0.5,0,1))
+            label = MyLabel(text=str(var['$addr']+':'+var['$txa']+':'+var['$prompt'] + '#'), bgcolor=(0.5,0.5,0,1), size_hint=(1, None))
             self.roots.add_widget(label)
             
             if len(cmd_lines)==0:
@@ -226,8 +250,6 @@ class MyApp(App):
                     l = "# end of command file"
                     self.macros = False
                 if l != '': label.text += str(l)
-                
-            
             goto = self.proc_line(l, self.elm)
 
             if goto and len(cmd_lines):
@@ -238,7 +260,9 @@ class MyApp(App):
                             cmd_ref = c_str
                             break
                     c_str += 1
-        self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*5, on_release=self.exits))
+        label = MyLabel(text='', bgcolor=(0.5,0.5,0,1), size_hint=(1, None))
+        self.roots.add_widget(label)
+        self.roots.add_widget(MyButton(text='CLOSE', size_hint=(1, None), height=fs*3, on_release=self.exits))
         
     def open_pop(self, instance):
         lbltxt = MyLabel(text=instance)

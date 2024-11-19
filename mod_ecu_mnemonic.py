@@ -38,6 +38,8 @@ def get_mnemonic(m, se, elm):
             resp = executeService(service, elm, [], '', True)
     else:
         resp = elm.request(m.request, m.positive, True, m.delay)
+    if not resp:
+        return 'None'
     resp = resp.strip().replace(' ', '')
     if not all((c in string.hexdigits for c in resp)):
         resp = ''
@@ -61,8 +63,9 @@ def get_SnapShotMnemonic(m, se, elm, dataids):
             snapshotService = se[sid]
 
     if not snapshotService:
-        return "00"
+        return "None"
     resp = executeService( snapshotService, elm, [], "", True )
+    
     if ((mod_globals.opt_demo and not resp) or not resp.startswith(snapshotService.simpleRsp) or len(resp)//2 == 6):
         return '00'
     resp = resp.strip().replace(' ', '')

@@ -167,6 +167,7 @@ class showDatarefGui(App):
         if resizeFont:
             return True
         if keycode1 == 45 and mod_globals.fontSize > 10:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize - 1
             resizeFont = True
             self.needupdate = False
@@ -174,6 +175,7 @@ class showDatarefGui(App):
             self.stop()
             return True
         if keycode1 == 61 and mod_globals.fontSize < 40:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize + 1
             resizeFont = True
             self.needupdate = False
@@ -181,6 +183,7 @@ class showDatarefGui(App):
             self.stop()
             return True
         if keycode1 == 27:
+            MyPopup()
             choice_result = ['<' + mod_globals.language_dict['6218'] + '>', -1]
             self.stop()
             return True
@@ -247,10 +250,16 @@ class showDatarefGui(App):
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True)
                 if self.ecu.GRAF:
                     key = '%s - %s' % (codeMR, label)
-                    val = str(value).strip()
+                    if value == 'None':
+                        val = 'None'
+                    else:
+                        val = str(value).strip()
                 else:
                     key = '%s - %s' % (codeMR, label)
-                    val = '%s %s' % (value, unit)
+                    if value == 'None':
+                        val = 'None'
+                    else:
+                        val = '%s %s' % (value, unit)
                 dct[name] = str(val)
                 self.paramsLabels[name] = key
             if dr.type == 'Identification':
@@ -974,12 +983,12 @@ class ECU():
                 menu.append(defstr[d])
 
             menu.append('<' + mod_globals.language_dict['6218'] + '>')
-            menu.append('<' + mod_globals.language_dict['52612'] + '>')
-            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            menu.append('<' + mod_globals.language_dict['256'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['256'] + '>:')
             if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
-            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
+            if choice[0] == '<' + mod_globals.language_dict['256'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             index = int(choice[1]) - 1
@@ -1019,12 +1028,12 @@ class ECU():
                 menu.append(defstr[d])
 
             menu.append('<' + mod_globals.language_dict['6218'] + '>')
-            menu.append('<' + mod_globals.language_dict['52612'] + '>')
-            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            menu.append('<' + mod_globals.language_dict['256'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['256'] + '>:')
             if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 mod_globals.ext_cur_DTC = '000000'
                 return
-            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
+            if choice[0] == '<' + mod_globals.language_dict['256'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             index = int(choice[1]) - 1
@@ -1063,11 +1072,11 @@ class ECU():
             for d in sorted(defstr.keys()):
                 menu.append(defstr[d])
             menu.append('<' + mod_globals.language_dict['6218'] + '>')
-            menu.append('<' + mod_globals.language_dict['52612'] + '>')
-            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['52612'] + '>:')
+            menu.append('<' + mod_globals.language_dict['256'] + '>')
+            choice = Choice(menu, 'Choose one for detailed view or <' + mod_globals.language_dict['256'] + '>:')
             if choice[0] == '<' + mod_globals.language_dict['6218'] + '>':
                 return
-            if choice[0] == '<' + mod_globals.language_dict['52612'] + '>':
+            if choice[0] == '<' + mod_globals.language_dict['256'] + '>':
                 executeCommand(self.Commands[self.resetDTCcommand], self, self.elm, header)
                 return
             dtchex = dtcs[int(choice[1]) - 1]

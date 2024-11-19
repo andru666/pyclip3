@@ -64,7 +64,45 @@ def MyPopup_close(title='', cont='', l=True, op=True, cl=None):
         pop.open()
     else:
         return pop
-    
+  
+class MyLabel(Label):
+    def __init__(self, **kwargs):
+        fs = mod_globals.fontSize
+        self.bgcolor = ''
+        if 'bgcolor' in kwargs:
+            self.bgcolor = kwargs['bgcolor']
+            del kwargs['bgcolor']
+        if 'multiline' in kwargs:
+            del kwargs['multiline']
+        super(MyLabel, self).__init__(**kwargs)
+        self.bind(size=self.setter('text_size'))
+        self.text = self.text.replace('\n\n', '\n')
+        if 'halign' not in kwargs:
+            self.halign = 'center'
+        if 'valign' not in kwargs:
+            self.valign = 'middle'
+        if 'size_hint' not in kwargs:
+            self.size_hint = (1, None)
+        if 'font_size' not in kwargs:
+            self.font_size = fs*0.8
+        if 'height' not in kwargs:
+            lines = len(self.text.split('\n'))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            if lines < simb: lines = simb + lines / 1.5
+            if lines <= 1.9: lines = 1.9
+            if 1.9 < lines <= 3: lines = 3
+            self.height = lines * self.font_size * 1.2
+        self.height = kivy.metrics.dp(self.height)
+        self.font_size = kivy.metrics.dp(self.font_size)
+
+    def on_size(self, *args):
+        if not self.canvas:
+            return
+        self.canvas.before.clear()
+        if self.bgcolor:
+            with self.canvas.before:
+                Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
+                Rectangle(pos=self.pos, size=self.size)  
 
 class MyTextInput(TextInput):
     def __init__(self, **kwargs):
@@ -143,6 +181,7 @@ class MyButton(Button):
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
+    MyPopup()
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
@@ -165,45 +204,6 @@ class MyGridLayout(GridLayout):
         with self.canvas.before:
             Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
             Rectangle(pos=(self.pos[0],self.pos[1]), size=(self.size[0], self.size[1]))
-
-class MyLabel(Label):
-    def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
-        self.bgcolor = ''
-        if 'bgcolor' in kwargs:
-            self.bgcolor = kwargs['bgcolor']
-            del kwargs['bgcolor']
-        if 'multiline' in kwargs:
-            del kwargs['multiline']
-        super(MyLabel, self).__init__(**kwargs)
-        self.bind(size=self.setter('text_size'))
-        self.text = self.text.replace('\n\n', '\n')
-        if 'halign' not in kwargs:
-            self.halign = 'center'
-        if 'valign' not in kwargs:
-            self.valign = 'middle'
-        if 'size_hint' not in kwargs:
-            self.size_hint = (1, None)
-        if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
-        if 'height' not in kwargs:
-            lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
-            if lines < simb: lines = simb + lines / 1.5
-            if lines <= 1.9: lines = 1.9
-            if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size * 1.2
-        self.height = kivy.metrics.dp(self.height)
-        self.font_size = kivy.metrics.dp(self.font_size)
-
-    def on_size(self, *args):
-        if not self.canvas:
-            return
-        self.canvas.before.clear()
-        if self.bgcolor:
-            with self.canvas.before:
-                Color(self.bgcolor[0], self.bgcolor[1], self.bgcolor[2], self.bgcolor[3])
-                Rectangle(pos=self.pos, size=self.size)
 
 class MyLabelGreen(ButtonBehavior, Label):
     global fs
@@ -320,16 +320,19 @@ class widgetChoiceLong(App):
         if resizeFont:
             return True
         if keycode1 == 45 and mod_globals.fontSize > 10:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize - 1
             resizeFont = True
             self.stop()
             return True
         if keycode1 == 61 and mod_globals.fontSize < 40:
+            MyPopup()
             mod_globals.fontSize = mod_globals.fontSize + 1
             resizeFont = True
             self.stop()
             return True
         if keycode1 == 27:
+            MyPopup()
             choice_result = ['<' + mod_globals.language_dict['6218'] + '>', -1]
             self.stop()
             return True
