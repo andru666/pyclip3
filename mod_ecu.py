@@ -646,7 +646,7 @@ class ECU():
     def get_pr(self, name, no_formatting = False):
         if name not in list(self.Parameters.keys()):
             for i in list(self.Parameters.keys()):
-                if name == self.Parameters[i].codeMR:
+                if name == self.Parameters[i].codeMR and not self.Parameters[i].agcdRef.endswith('FF'):
                     name = i
                     break
 

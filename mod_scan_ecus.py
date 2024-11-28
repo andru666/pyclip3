@@ -246,30 +246,26 @@ class ScanEcus():
         for l in self.detectedEcus:
             if l['idf']=='1':
                 ecu = self.chooseEcu(l['ecuname'])
-                tot += "%-15s : " % "Engine    PR025" 
                 num, string = ecu.get_pr('PR025')
-                tot += str(num); tot += '\n'
-                tot += "%-15s : " % "Engine    PR992" 
+                tot += "Engine PR025: %s\n\n" % string
                 num, string = ecu.get_pr('PR992')
-                tot += str(num); tot += '\n'
+                tot += "Engine PR992: %s\n\n" % string
                 num, string = ecu.get_pr('PR391')
+                tot += "Engine PR391: %s\n\n" % string
                 num, string = ecu.get_pr('PR412')
+                tot += "Engine PR412: %s\n\n" % string
             if l['idf']=='2':    #family 02
                 ecu = self.chooseEcu(l['ecuname'])
-                tot += "%-15s : " % "ABS             PR121" 
                 num, string = ecu.get_pr('PR121')
-                tot += str(num); tot += '\n'
+                tot += "ABS PR121: %s\n\n" % string
             if l['idf']=='3':    #family 03
                 ecu = self.chooseEcu(l['ecuname'])
-                tot += "%-15s : " % "TDB             PR009" 
                 num, string = ecu.get_pr('PR009')
-                tot += str(num); tot += '\n'
-                tot += "%-15s : " % "TDB (km)    PR025" 
+                tot += "TDB PR009: %s\n\n" % string
                 num, string = ecu.get_pr('PR025')
-                tot += str(num); tot += '\n'
-                tot += "%-15s : " % "TDB (mil) PR026" 
+                tot += "TDB (km)    PR025: %s\n\n" % string
                 num, string = ecu.get_pr('PR026')
-                tot += str(num); tot += '\n'
+                tot += "TDB (mil) PR026: %s\n\n" % string
         return tot
     
     def reScanErrors(self):
