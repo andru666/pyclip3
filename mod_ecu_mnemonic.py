@@ -21,7 +21,6 @@ def get_mnemonicDTC(m, resp):
         hexval = str(val)
     return hexval
 
-
 def get_mnemonic(m, se, elm):
     if not m.serviceID and mod_globals.ext_cur_DTC != '000000':
         for sid in list(se.keys()):
@@ -38,9 +37,10 @@ def get_mnemonic(m, se, elm):
             resp = executeService(service, elm, [], '', True)
     else:
         resp = elm.request(m.request, m.positive, True, m.delay)
-    if not resp:
-        return 'None'
     resp = resp.strip().replace(' ', '')
+
+    if len(resp) == 0:
+        return 'None'
     if not all((c in string.hexdigits for c in resp)):
         resp = ''
     resp = ' '.join((a + b for a, b in zip(resp[::2], resp[1::2])))
@@ -63,12 +63,14 @@ def get_SnapShotMnemonic(m, se, elm, dataids):
             snapshotService = se[sid]
 
     if not snapshotService:
-        return "None"
+        return 'None'
     resp = executeService( snapshotService, elm, [], "", True )
-    
+    resp = resp.strip().replace(' ', '')
+    if len(resp) == 0:
+        return 'None'
     if ((mod_globals.opt_demo and not resp) or not resp.startswith(snapshotService.simpleRsp) or len(resp)//2 == 6):
         return '00'
-    resp = resp.strip().replace(' ', '')
+    
     if not all((c in string.hexdigits for c in resp)):
         resp = ''
     resp = ' '.join((a + b for a, b in zip(resp[::2], resp[1::2])))

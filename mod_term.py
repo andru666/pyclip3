@@ -95,9 +95,7 @@ class MyApp(App):
         super(MyApp, self).__init__()
     
     def build(self):
-
         Clock.schedule_once(self.select_macro, 0.1)
-        
         self.label = MyLabel(text='', bgcolor=(1, 1, 0, 0.3), font_size=fs, size_hint=(1, None), height=fs*1.5)
         self.roots = GridLayout(cols=1, padding=fs*1.5, spacing=fs*1.5, size_hint=(1, None), size_hint_y=None)
         self.roots.bind(minimum_height=self.roots.setter('height'))
@@ -105,7 +103,6 @@ class MyApp(App):
         self.roots.add_widget(self.label)
         layout = ScrollView(size_hint=(1, 1), do_scroll_x=False, pos_hint={'center_x': 0.5,'center_y': 0.5})
         layout.add_widget(self.roots)
-        
         return layout
     
     def MaLabel(self, text):
@@ -116,15 +113,15 @@ class MyApp(App):
         root = GridLayout(cols=1, size_hint=(1, 1))
         self.fichoo = FileChooserListView(path=self.dir_macro)
         root.add_widget(self.fichoo)
-        root.add_widget(MyButton(text='Open Links', on_release=self.popp_links, size_hint=(1, None)))
-        root.add_widget(MyButton(text='Open', on_release=self.popp, size_hint=(1, None)))
+        #root.add_widget(MyButton(text='Open Links', on_release=self.popp_links, size_hint=(1, None), height=fs*2))
+        root.add_widget(MyButton(text='Open', on_release=self.popp, size_hint=(1, None), height=fs*2))
         self.popup_macro = MyPopup_close(title='SELECT macro', cont=root, cl=1, op=None)
         self.popup_macro.open()
 
     def open_link(self, instance):
         self.popup_links.dismiss()
         data = urllib.request.urlopen(self.links.text)
-        print(data)
+        #print(data)
         self.data_link = []
         for line in data:
             self.data_link.append(line.decode('utf-8'))
@@ -229,7 +226,9 @@ class MyApp(App):
                     cmd_lines = f.readlines()
 
         if auto_macro != '':
-            if auto_macro in list(macro.keys()):
+            if len(auto_macro) > 2 and auto_macro[0:3] in ["ini", "can", "slo", "fas"]:
+                self.run_init_function(auto_macro, elm)
+            elif auto_macro in list(macro.keys()):
                 self.play_macro(auto_macro, self.elm)
             else:
                 self.popup = Popup(title='ERROR', content=MyLabel(text=str('Error: unknown macro name: ' + auto_macro)), size=(400, 400), size_hint=(None, None))
@@ -313,7 +312,7 @@ class MyApp(App):
                     return macro, var
             if '}' in l:
                 if macroname!='':
-                    literals =    l.split('}')
+                    literals = l.split('}')
                     cmd = literals[0].strip()
                     if cmd!='':
                         macrostrings.append(cmd)
@@ -366,6 +365,24 @@ class MyApp(App):
             self.proc_line(l, elm)
 
         stack.remove(mname)
+
+    def run_init_function(self, mname, elm):
+        global var
+
+        if mname in ["init_can_250", "can250", "init_can_500", "can500"]:
+            elm.init_can()
+            if mname in ["init_can_250", "can250"]:
+                elm.set_can_addr(var['$addr'], {'brp': '1'})
+            else:
+                elm.set_can_addr(var['$addr'], {})
+        elif mname in ["init_iso_slow", "slow", "init_iso_fast", "fast"]:
+            elm.init_iso()
+            if mname in ["init_iso_slow", "slow"]:
+                elm.set_iso_addr(var['$addr'], {'protocol': 'PRNA2000'})
+            else:
+                elm.set_iso_addr(var['$addr'], {})
+        else:
+            self.MaLabel(("Unrecognized init command: ", mname))
 
     def term_cmd(self, c, elm):
         global var
@@ -618,12 +635,34 @@ class MyApp(App):
             self.macros = False
             return
 
+        if l in ['var']:
+            self.MaLabel("\n###### Variables #####")
+            for v in var.keys():
+                self.MaLabel( f'# {v:20} = {var[v]}')
+            return
+
         if l in ['cls']:
             mod_utils.clearScreen()
             return
-        if l in list(macro.keys()):
+        if len(l) > 2 and l[0:3] in ["ini", "can", "slo", "fas"]:
+            self.run_init_function(l, elm)
+            return
+        elif l in list(macro.keys()):
             self.play_macro(l, elm)
             return
+
+        m = re.search('.+(\$\S+)', l)
+        if m:
+            while m:
+                vu = m.group(0)
+                if vu in list(var.keys()):
+                    l = re.sub("\\" + vu, var[vu], l)
+                else:
+                    self.MaLabel('Error: unknown variable '+vu)
+                    
+                    return
+                m = re.search('\$\S+', l)
+            self.MaLabel("#(subst)", l)
 
         m = re.search('\$\S+\s*=\s*\S+', l)
         if m:
@@ -639,17 +678,7 @@ class MyApp(App):
             return
 
         # find veriable usage
-        m = re.search('\$\S+', l)
-        while m:
-            vu = m.group(0)
-            if vu in list(var.keys()):
-                l = re.sub("\\" + vu, var[vu], l)
-            else:
-                self.MaLabel('Error: unknown variable '+vu)
-                
-                return
-            m = re.search('\$\S+', l)
-
+        
         l_parts = l.split()
         if len(l_parts) > 0 and l_parts[0] in ['wait', 'sleep']:
             try:

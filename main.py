@@ -26,8 +26,8 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.17'
-data_update = '19-11-2024'
+__version__ = '0.02.18'
+data_update = '13/12/2024'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -248,7 +248,7 @@ class screenConfig(App):
             iText = mod_globals.opt_ecu
         else:
             iText = ''
-        ti = MyTextInput(text=iText, font_size=fs, size_hint=(0.45, None), multiline=False)
+        ti = MyTextInput(text=iText, size_hint=(0.45, None), multiline=False)
         self.textInput[str1] = ti
         sw = Switch(active=active, size_hint=(0.2, None))
         if callback:
@@ -266,7 +266,7 @@ class screenConfig(App):
     def make_input(self, str1, iText):
         global fs
         label = MyLabel(text=str1, halign='left', bgcolor = (0.5, 0.5, 0, 1))
-        ti = MyTextInput(text=iText, font_size=fs, multiline=False)
+        ti = MyTextInput(text=iText, multiline=False)
         self.textInput[str1] = ti
         ti.height = label.height
         glay = MyGridLayout(cols=2)

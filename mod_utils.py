@@ -52,7 +52,7 @@ def MyPopup_close(title='', cont='', l=True, op=True, cl=None):
         t = 'CLOSE'
     else:
         t = get_message_by_id('16831')
-    btn = MyButton(text=t, size_hint=(1, None), font_size=fs*2)
+    btn = MyButton(text=t, size_hint=(1, None), font_size=fs*1.5)
     layout.add_widget(cont)
     layout.add_widget(btn)
     pop = MyPopup(title=title, content=layout)
@@ -133,7 +133,8 @@ class MyTextInput(TextInput):
             self.font_size = self.font_size * 0.9
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
-        self.padding = str(self.font_size / self.height) + 'sp'
+        self.padding[1] = (self.height-self.font_size)/2
+        
 
 class MyPopup(Popup):
     close = ''

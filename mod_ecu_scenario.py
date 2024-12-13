@@ -40,7 +40,6 @@ def playScenario(command, ecu, elm):
             name = scenarioName[:len(scenarioName)-6]
         else:
             name = scenarioName
-        print(name)
         scen = __import__(name.lower())
         scen.run(elm, ecu, command, scenarioData)
         return True

@@ -817,7 +817,7 @@ class ECU():
             if st.startswith('MAS'):
                 mask = True
                 get_state( self.States[st], self.Mnemonics, self.Services, self.elm, self.calc )
-                if int(self.States[st].value):
+                if self.States[st].value.strip().isdigit():
                     masks.append(self.States[st].name)
         
         if mask:
