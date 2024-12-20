@@ -144,7 +144,6 @@ def get_devices():
         iterator = sorted(list(list_ports.comports()))
         for port, desc, hwid in iterator:
             devs[desc] = port
-        #devs['USB'] = 'device'
         return devs
     device = get_usb_socket_stream()
     
@@ -162,6 +161,11 @@ def get_devices():
 def log_tmstr():
     return datetime.now().strftime("%x %H:%M:%S.%f")[:21].ljust(21,'0')
 
+def pyren_time():
+    if (sys.version_info[0]*100 + sys.version_info[1]) > 306:
+        return time.perf_counter_ns() / 1e9
+    else:
+        return time.time()
 
 class Port:
     portType = 0  # 0-serial 1-tcp/bt 2-androidBlueTooth
@@ -198,6 +202,7 @@ class Port:
                 self.channel = 1
                 self.portType = 1
                 self.hdr = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+                self.hdr.settimeout(10)
                 self.hdr.connect((self.macaddr, self.channel))
                 self.hdr.setblocking(True)
             except Exception as e:
@@ -209,6 +214,7 @@ class Port:
             self.portType = 1
             self.hdr = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.hdr.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            self.hdr.settimeout(3)
             self.hdr.connect((self.ipaddr, self.tcpprt))
             self.hdr.setblocking(True)
         elif mod_globals.os == 'android':
@@ -276,16 +282,10 @@ class Port:
                         byte = self.hdr.read(inInputBuffer)
                     else:
                         byte = self.hdr.read(1)
-            '''elif self.portType == 3:
-                inInputBuffer = self.hdr.inWaiting()
-                if inInputBuffer:
-                    byte = self.hdr.read(inInputBuffer)'''
-            
         except:
             pass
         if type(byte) == str:
             byte = byte.encode()
-
         return byte.decode('utf-8','ignore')
     
     def write(self, data):
@@ -311,9 +311,8 @@ class Port:
             return self.hdr.write(data)
     
     def expect(self, pattern, time_out=1):
-        
-        tb = time.time()  # start time
-        self.buff = ""
+        tb = pyren_time()  # start time
+        self.buff = ''
         try:
             while True:
                 if not mod_globals.opt_demo:
@@ -322,19 +321,19 @@ class Port:
                     byte = '>'
                 if '\r' in byte: byte = byte.replace('\r', '\n')
                 self.buff += byte
-                tc = time.time()
+                tc = pyren_time()
                 if pattern in self.buff:
-                    self.lastReadTime = time.time()
+                    self.lastReadTime = pyren_time()
                     self.rwLock = False
                     return self.buff
                 if(tc - tb) > time_out:
-                    self.lastReadTime = time.time()
+                    self.lastReadTime = pyren_time()
                     self.rwLock = False
                     return self.buff + "TIMEOUT"
         except:
             self.rwLock = False
             pass
-        self.lastReadTime = time.time()
+        self.lastReadTime = pyren_time()
         self.rwLock = False
         return ''
     
@@ -351,7 +350,7 @@ class Port:
                 continue
             self.write("\r")
             # search > string
-            tb = time.time()  # start time
+            tb = pyren_time()  # start time
             self.buff = ""
             while True:
                 if not mod_globals.opt_demo:
@@ -359,7 +358,7 @@ class Port:
                 else:
                     byte = '>'
                 self.buff += byte
-                tc = time.time()
+                tc = pyren_time()
                 if '>' in self.buff:
                     mod_globals.opt_speed = s
                     if len(mod_globals.opt_log)>0:
@@ -369,7 +368,7 @@ class Port:
                     return
                 if(tc - tb) > 1:
                     break
-        
+        sys.exit()
     
     def soft_boudrate(self, boudrate):
         
@@ -400,8 +399,8 @@ class Port:
             elif boudrate == 2000000:
                 self.write("at brd 2\r")
         # search OK
-        tb = time.time()  # start time
-        self.buff = ""
+        tb = pyren_time()  # start time
+        self.buff = ''
         while True:
             if not mod_globals.opt_demo:
                 byte = self.read()
@@ -411,7 +410,7 @@ class Port:
                 self.buff = ""
                 continue
             self.buff += byte
-            tc = time.time()
+            tc = pyren_time()
             if 'OK' in self.buff:
                 break
             if(tc - tb) > 1:
@@ -424,8 +423,8 @@ class Port:
         self.write("\r")
         
         # search >
-        tb = time.time()  # start time
-        self.buff = ""
+        tb = pyren_time()  # start time
+        self.buff = ''
         while True:
             if not mod_globals.opt_demo:
                 byte = self.read()
@@ -435,7 +434,7 @@ class Port:
                 self.buff = ""
                 continue
             self.buff += byte
-            tc = time.time()
+            tc = pyren_time()
             if '>' in self.buff:
                 mod_globals.opt_rate = mod_globals.opt_speed
                 break
@@ -584,20 +583,20 @@ class ELM:
             self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n")
             self.lf.write("Port Speed: " + str(speed) +"\n" + '#' * 60 + "\n")
             self.lf.flush()
-        
-        elm_rsp = self.cmd("STI")
-        if elm_rsp and '?' not in elm_rsp and 'TIMEOUT' not in elm_rsp:
-            firmware_version = elm_rsp.split(" ")[-1]
-            firmware_version = firmware_version.split(".")
-            version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
-            stpx_introduced_in_version_number = 420 #STN1110 got STPX last in version v4.2.0
-            if version_number >= stpx_introduced_in_version_number:
-                mod_globals.opt_obdlink = True
-            
-            # check STN
-            elm_rsp = self.cmd("STP 53")
-            if '?' not in elm_rsp:
-                mod_globals.opt_stn = True
+        if not portName.startswith('127.0.0'):
+            elm_rsp = self.cmd("STI")
+            if elm_rsp and '?' not in elm_rsp and 'TIMEOUT' not in elm_rsp:
+                firmware_version = elm_rsp.split(" ")[-1]
+                firmware_version = firmware_version.split(".")
+                version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
+                stpx_introduced_in_version_number = 420 #STN1110 got STPX last in version v4.2.0
+                if version_number >= stpx_introduced_in_version_number:
+                    mod_globals.opt_obdlink = True
+                
+                # check STN
+                elm_rsp = self.cmd("STP 53")
+                if '?' not in elm_rsp:
+                    mod_globals.opt_stn = True
         
         if mod_globals.opt_csv and not mod_globals.opt_demo:
             if mod_globals.opt_obdlink:
@@ -658,7 +657,7 @@ class ELM:
         coalescing_time = c_t
         coalescing_frames = c_f
         
-        lst = time.time()  # last send time
+        lst = pyren_time()  # last send time
         frameBuff = ""
         frameBuffLen = 0
         buff = ""
@@ -678,7 +677,7 @@ class ELM:
                 byte = self.port.read()
             else:
                 byte = self.debugMonitor()
-            ct = time.time()  # current time
+            ct = pyren_time()  # current time
             if(ct - lst) > coalescing_time:  # and frameBuffLen>0:
                 if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                     self.monitorSendAllow.set()
@@ -768,7 +767,7 @@ class ELM:
         coalescing_time = c_t
         coalescing_frames = c_f
 
-        lst = time.time()  # last send time
+        lst = pyren_time()  # last send time
         frameBuff = ""
         frameBuffLen = 0
         buff = ""
@@ -785,7 +784,7 @@ class ELM:
 
             byte = self.port.read()
 
-            ct = time.time()  # current time
+            ct = pyren_time()  # current time
             if(ct - lst) > coalescing_time:  # and frameBuffLen>0:
                 if self.monitorSendAllow is None or not self.monitorSendAllow.isSet():
                     self.monitorSendAllow.set()
@@ -892,9 +891,9 @@ class ELM:
         sendAllow.clear()
         self.nr78_startMonitor(self.waitFramesCallBack, sendAllow, 0.1, 1)
 
-        beg = time.time()
+        beg = pyren_time()
 
-        while not self.endWaitingFrames and (time.time()-beg < timeout):
+        while not self.endWaitingFrames and (pyren_time()-beg < timeout):
             time.sleep(0.01)
         self.nr78_stopMonitor()
         return self.waitedFrames
@@ -962,16 +961,16 @@ class ELM:
         command = command.upper()
         if command in list(self.notSupportedCommands.keys()):
             return self.notSupportedCommands[command]
-        tb = time.time()
+        tb = pyren_time()
         devmode = False
         if((tb - self.lastCMDtime) <(self.busLoad + self.srvsDelay)) and command.upper()[:2] not in ['AT','ST']:
             time.sleep(self.busLoad + self.srvsDelay - tb + self.lastCMDtime)
-        tb = time.time()
+        tb = pyren_time()
         saveSession = self.startSession
         if mod_globals.opt_dev and command[0:2] in DevList:
             devmode = True
             self.start_session(mod_globals.opt_devses)
-            self.lastCMDtime = time.time()
+            self.lastCMDtime = pyren_time()
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "Switch to dev mode\n")
                 self.lf.flush()
@@ -980,13 +979,13 @@ class ELM:
                 self.lf.write("#[" + log_tmstr() + "]" + "KeepAlive\n")
                 self.lf.flush()
             self.send_cmd(self.startSession)
-            self.lastCMDtime = time.time()
+            self.lastCMDtime = pyren_time()
         cmdrsp = ""
         rep_count = 3
         while rep_count > 0:
             rep_count = rep_count - 1
             no_negative_wait_response = True
-            self.lastCMDtime = tc = time.time()
+            self.lastCMDtime = tc = pyren_time()
             cmdrsp = self.send_cmd(command)
             self.checkIfCommandUnsupported(command, cmdrsp)
             for line in cmdrsp.split('\n'):
@@ -1002,7 +1001,7 @@ class ELM:
                 elif nr in ['78']:
                     self.send_raw('at at 0')
                     self.send_raw('at st ff')
-                    self.lastCMDtime = tc = time.time()
+                    self.lastCMDtime = tc = pyren_time()
                     cmdrsp = self.send_cmd(command)
                     self.send_raw('at at 1')
                     break
@@ -1013,7 +1012,7 @@ class ELM:
         if devmode:
             self.startSession = saveSession
             self.start_session(self.startSession)
-            self.lastCMDtime = time.time()
+            self.lastCMDtime = pyren_time()
             if self.lf != 0:
                 self.lf.write("#[" + log_tmstr() + "]" + "Switch back from dev mode\n")
                 self.lf.flush()
@@ -1269,7 +1268,7 @@ class ELM:
     
 
         while Fc < Fn:
-            tb = time.time()  # time of sending(ff)
+            tb = pyren_time()  # time of sending(ff)
 
             if raw_command[Fc][:1] != '2':
                 Fc = Fc + 1
@@ -1319,11 +1318,11 @@ class ELM:
                     burst_size_request = 'STPX D:' + burst_size_command + ",R:1"
                     
                 # Ensure time gap between frames according to FlowControl
-                tc = time.time()  # current time
+                tc = pyren_time()  # current time
                 self.screenRefreshTime += ST /1000.
                 if(tc - tb) * 1000. < ST:
-                    target_time = time.time() +(ST / 1000. -(tc - tb))
-                    while time.time() < target_time:
+                    target_time = pyren_time() +(ST / 1000. -(tc - tb))
+                    while pyren_time() < target_time:
                         pass
                 tb = tc
 
@@ -1457,7 +1456,7 @@ class ELM:
             if not self.ATR1:
                 frsp = self.send_raw('AT R1')
                 self.ATR1 = True
-            tb = time.time()
+            tb = pyren_time()
             if Fn > 1 and Fc ==(Fn-1):
                 self.send_raw('ATSTFF')
                 self.send_raw('ATAT1')
@@ -1505,12 +1504,14 @@ class ELM:
             
             while cf > 0:
                 cf = cf - 1
-                tc = time.time()
+                tc = pyren_time()
                 if(tc - tb) * 1000. < ST:
                     time.sleep(ST / 1000. -(tc - tb))
                 tb = tc
                 frsp = self.send_raw(raw_command[Fc])
                 Fc = Fc + 1
+        if len(responses) != 1:
+            return 'WRONG RESPONSE'
         result = ""
         noErrors = True
         PC = False
@@ -1612,18 +1613,18 @@ class ELM:
     
     def send_raw(self, command):
         command = command.upper()
-        tb = time.time()
+        tb = pyren_time()
         if self.lf != 0:
             self.lf.write(">[" + log_tmstr() + "]" + command + "\n")
             self.lf.flush()
         if not mod_globals.opt_demo:
             self.port.write(str(command + "\r").encode("utf-8"))
         while True:
-            tc = time.time()
+            tc = pyren_time()
             if mod_globals.opt_demo:
                 break
             self.buff = self.port.expect('>', self.portTimeout)
-            tc = time.time()
+            tc = pyren_time()
             if(tc - tb) > self.portTimeout and "TIMEOUT" not in self.buff:
                 self.buff += "TIMEOUT"
             if "TIMEOUT" in self.buff:
@@ -1708,7 +1709,7 @@ class ELM:
         self.check_answer(self.cmd("at h0"))
         self.check_answer(self.cmd("at l0"))
         self.check_answer(self.cmd("at al"))
-
+        
         if mod_globals.opt_obdlink and mod_globals.opt_caf and not self.ATCFC0:
             self.check_answer(self.cmd("AT CAF1"))
             self.check_answer(self.cmd("STCSEGR 1"))
@@ -1973,3 +1974,6 @@ class ELM:
         refreshRate = 1 // self.screenRefreshTime
         self.screenRefreshTime = 0
         return refres
+        
+    def reset_elm(self):
+        self.cmd('at z')

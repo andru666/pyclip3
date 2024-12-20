@@ -2,7 +2,7 @@
 # QR25 Idle speed correction
 $addr = 7A
 
-init_can_500 # init can macro
+can500  # init can macro
 
 # check ECU
 
