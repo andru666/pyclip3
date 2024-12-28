@@ -22,7 +22,10 @@ def playScenario(command, ecu, elm):
         scenarioName = scenarioName.split(':')[1]
         ecuNumberPattern = re.compile(r'_\d{5}')
         ecuNumberIndex = ecuNumberPattern.search(scenarioData)
-        scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))]
+        if ecuNumberIndex:
+            scenarioName = scenarioData[:scenarioData.find(ecuNumberIndex.group(0))]
+        else:
+            scenarioName = scenarioData
         scenarioData = scenarioData
     else:
         scenarioData = scenarioData[5:].replace('=', '_').replace('.xml', '').replace('&', '_')+'.xml'
