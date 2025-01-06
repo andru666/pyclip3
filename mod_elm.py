@@ -585,7 +585,10 @@ class ELM:
             self.lf.flush()
         if not portName.startswith('127.0.0'):
             elm_rsp = self.cmd("STI")
-            if elm_rsp and '?' not in elm_rsp and 'TIMEOUT' not in elm_rsp:
+            if 'TIMEOUT' in elm_rsp:
+                self.port.check_elm()
+                elm_rsp = self.cmd("STI")
+            if elm_rsp and '?' not in elm_rsp:
                 firmware_version = elm_rsp.split(" ")[-1]
                 firmware_version = firmware_version.split(".")
                 version_number = int(''.join([re.sub('\D', '', version) for version in firmware_version]))
