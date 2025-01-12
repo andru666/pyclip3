@@ -258,7 +258,7 @@ class MyLabelBlue(ButtonBehavior, Label):
             if lines < simb: lines = simb
             if lines <= 1.9: lines = 2
             if 2 < lines <= 3: lines = 3
-            self.height = self.font_size * lines * 1.4
+            self.height = self.font_size * lines * 1.5
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.clicked = False
