@@ -87,7 +87,7 @@ class MyLabel(Label):
             self.font_size = fs*0.9
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
             if lines < simb: lines = simb
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
@@ -173,7 +173,7 @@ class MyButton(Button):
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
             if lines < simb: lines = simb
             if lines < 2: lines = lines * 1.5
             self.height = lines * self.font_size * 1.6
@@ -220,7 +220,7 @@ class MyLabelGreen(ButtonBehavior, Label):
             self.font_size = fs
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
             if lines < simb: lines = simb
             if 1.9 < lines <= 3: lines = 3
             if lines <= 1.9: lines = 1.9
@@ -249,16 +249,16 @@ class MyLabelBlue(ButtonBehavior, Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs
+            self.font_size = fs*0.9
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
             if lines < simb: lines = simb
             if lines <= 1.9: lines = 2
             if 2 < lines <= 3: lines = 3
-            self.height = self.font_size * lines * 1.5
+            self.height = self.font_size * lines * 1.6
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.clicked = False
