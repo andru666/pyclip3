@@ -199,12 +199,12 @@ class showDatarefGui(App):
     def make_box_params(self, parameter_name, val):
         fs = mod_globals.fontSize
         glay = BoxLayout(orientation='horizontal', size_hint=(1, None))
-        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], size_hint_x=(self.blue_part_size), on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
-        label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, 1))
+        label1 = MyLabelBlue(text=self.paramsLabels[parameter_name], size_hint=(self.blue_part_size, None), on_press= lambda *args: self.ecu.addElem(self.paramsLabels[parameter_name].split(' ')[0]), param_name=parameter_name)
+        label2 = MyLabelGreen(text=val, size_hint=(1 - self.blue_part_size, None))
         if label1.height > label2.height:
-            glay.height = label1.height
+            glay.height = label2.height = label1.height
         else:
-            glay.height = label2.height
+            glay.height = label1.height = label2.height
         glay.add_widget(label1)
         glay.add_widget(label2)
         self.labels[parameter_name] = label2

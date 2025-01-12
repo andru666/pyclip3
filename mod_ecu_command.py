@@ -158,8 +158,8 @@ class kivyExecCommand(App):
     #     self.ecu.elm.send_cmd(self.ecu.ecudata['startDiagReq'])
 
     def make_box(self, str1, str2):
-        label1 = MyLabelBlue(text=str1, halign='left', valign='middle', size_hint=(0.35, 1))
-        label2 = MyLabelGreen(text=str2, halign='center', valign='middle', size_hint=(0.65, 1))
+        label1 = MyLabelBlue(text=str1, halign='left', valign='middle', size_hint=(0.35, None))
+        label2 = MyLabelGreen(text=str2, halign='center', valign='middle', size_hint=(0.65, None))
         glay = GridLayout(cols=2, height=mod_globals.fontSize * fmn, size_hint=(1, None), spacing=(5, 5))
         if label1.height > label2.height:
             glay.height = label2.height = label1.height

@@ -26,8 +26,8 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.21'
-data_update = '06/01/2025'
+__version__ = '0.02.22'
+data_update = '12/01/2025'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -191,13 +191,13 @@ def set_orientation_portrait():
 
 class screenConfig(App):
     global fs
-    fs = mod_globals.fontSize
     def __init__(self):
         self.button = {}
         self.textInput = {}
         self.Donate = {}
         super(screenConfig, self).__init__()
         self.settings = mod_globals.Settings()
+        fs = mod_globals.fontSize
         Window.bind(on_keyboard=self.key_handler)
 
     def key_handler(self, window, keycode1, keycode2, text, modifiers):
@@ -519,9 +519,9 @@ class screenConfig(App):
         layout.add_widget(MyLabel(text='DB archive : ' + self.archive, font_size=(fs*0.5), height=(fs), multiline=True, bgcolor = (0.5, 0.5, 0, 1)))
         termbtn = MyButton(text='MACRO', height=fs*2, on_press=self.term)
         #layout.add_widget(termbtn)
-        check = MyButton(text='Check ELM327', height=(fs*4), on_press=self.check_elm)
-        layout.add_widget(MyButton(text='START', height=(fs*2), on_press=self.finish))
-        layout.add_widget(MyButton(text='SCAN VEHICLE', height=(fs*2), on_press=self.finish))
+        check = MyButton(text='Check ELM327', on_press=self.check_elm)
+        layout.add_widget(MyButton(text='START', height=(fs*3), on_press=self.finish))
+        layout.add_widget(MyButton(text='SCAN VEHICLE', height=(fs*3), on_press=self.finish))
         layout.add_widget(self.make_opt_ecuid(mod_globals.opt_ecuid_on))
         layout.add_widget(self.make_savedEcus())
         layout.add_widget(self.make_opt_rate())

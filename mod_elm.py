@@ -339,7 +339,7 @@ class Port:
     
     def check_elm(self):
         self.hdr.timeout = 2
-        for s in [38400, 115200, 230400, 500000, 1000000, 2000000]:
+        for s in [2000000, 1000000, 500000, 230400, 115200, 38400]:
             if len(mod_globals.opt_log)>0:
                 self.lf.write(log_tmstr() + ' : Checking port speed:' + str(s)  + '\n')
                 self.lf.flush()

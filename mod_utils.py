@@ -28,14 +28,14 @@ favouriteScreen = ecu_own_screen('FAV')
 graphicsScreen = ecu_gr_screen('GR')
 fmn = 2
 bmn = 2.5
-
+fs = mod_globals.fontSize
 try:
     import webbrowser
 except:
     pass
 
 def InfoPopup(bas=None):
-    fs = mod_globals.fontSize
+    global fs
     pop = MyPopup(content=MyLabel(text='LOADING', size_hint = (1, 1), font_size=fs*3, halign = 'center'))
     if not bas:
         base.runTouchApp(embedded=True)
@@ -46,7 +46,7 @@ def InfoPopup(bas=None):
         base.stopTouchApp()
 
 def MyPopup_close(title='', cont='', l=True, op=True, cl=None):
-    fs = mod_globals.fontSize
+    global fs
     layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1, 1))
     if not l:
         t = 'CLOSE'
@@ -66,8 +66,8 @@ def MyPopup_close(title='', cont='', l=True, op=True, cl=None):
         return pop
   
 class MyLabel(Label):
+    global fs
     def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
         self.bgcolor = ''
         if 'bgcolor' in kwargs:
             self.bgcolor = kwargs['bgcolor']
@@ -84,14 +84,14 @@ class MyLabel(Label):
         if 'size_hint' not in kwargs:
             self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
+            self.font_size = fs*0.9
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
-            if lines < simb: lines = simb + lines / 1.5
+            if lines < simb: lines = simb
             if lines <= 1.9: lines = 1.9
             if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size * 1.2
+            self.height = lines * self.font_size * 1.4
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
 
@@ -105,8 +105,8 @@ class MyLabel(Label):
                 Rectangle(pos=self.pos, size=self.size)  
 
 class MyTextInput(TextInput):
+    global fs
     def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
         font = None
         id = ''
         if 'id' in kwargs:
@@ -134,13 +134,11 @@ class MyTextInput(TextInput):
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.padding[1] = (self.height-self.font_size)/2
-        
-        
 
 class MyPopup(Popup):
     close = ''
+    global fs
     def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
         super(MyPopup, self).__init__(**kwargs)
         if 'title' not in kwargs:
             self.title='INFO'
@@ -157,8 +155,8 @@ class MyPopup(Popup):
             self.size=(Window.size[0]*0.95, Window.size[1]*0.95)
 
 class MyButton(Button):
+    global fs
     def __init__(self, **kwargs):
-        fs = mod_globals.fontSize
         id = ''
         if 'id' in kwargs:
             self.id = kwargs['id']
@@ -209,7 +207,6 @@ class MyGridLayout(GridLayout):
 
 class MyLabelGreen(ButtonBehavior, Label):
     global fs
-    fs = mod_globals.fontSize
     def __init__(self, **kwargs):
         super(MyLabelGreen, self).__init__(**kwargs)
         self.bind(size=self.setter('text_size'))
@@ -217,15 +214,17 @@ class MyLabelGreen(ButtonBehavior, Label):
             self.halign = 'center'
         if 'valign' not in kwargs:
             self.valign = 'middle'
+        if 'size_hint' not in kwargs:
+            self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
+            self.font_size = fs
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = ((len(self.text.strip()) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
             if 1.9 < lines <= 3: lines = 3
             if lines <= 1.9: lines = 1.9
-            self.height = lines * self.font_size * 1.3
+            self.height = lines * self.font_size * 1.4
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         
@@ -237,7 +236,6 @@ class MyLabelGreen(ButtonBehavior, Label):
 
 class MyLabelBlue(ButtonBehavior, Label):
     global fs
-    fs = mod_globals.fontSize
     param_name = ''
     def __init__(self, mfs = None, **kwargs):
         if 'param_name' in kwargs:
@@ -248,17 +246,19 @@ class MyLabelBlue(ButtonBehavior, Label):
         self.bind(text=self.on_text_changed)
         if 'halign' not in kwargs:
             self.halign = 'left'
+        if 'size_hint' not in kwargs:
+            self.size_hint = (1, None)
         if 'font_size' not in kwargs:
-            self.font_size = fs*0.8
+            self.font_size = fs
         if 'valign' not in kwargs:
             self.valign = 'middle'
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
-            simb = ((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]))
+            simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 2)
             if lines < simb: lines = simb
-            if lines <= 1.9: lines = 1.9
-            if 1.9 < lines <= 3: lines = 3
-            self.height = lines * self.font_size * 1.3
+            if lines <= 1.9: lines = 2
+            if 2 < lines <= 3: lines = 3
+            self.height = self.font_size * lines * 1.4
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
         self.clicked = False
@@ -266,9 +266,7 @@ class MyLabelBlue(ButtonBehavior, Label):
     def on_size(self, widget, size):
         self.text_size = (size[0], None)
         self.texture_update()
-        if self.size_hint_y is None and self.size_hint_x is not None:
-            self.height = fs * fmn
-        elif self.size_hint_x is None and self.size_hint_y is not None:
+        if self.size_hint_x is None and self.size_hint_y is not None:
             self.width = self.texture_size[0]
         self.toNormal()
         for dr in favouriteScreen.datarefs:
@@ -364,6 +362,7 @@ class widgetChoiceLong(App):
         return glay
 
     def build(self):
+        global fs
         fs = mod_globals.fontSize
         layout = GridLayout(cols=1, padding=5, spacing=10, size_hint=(1.0, None))
         layout.bind(minimum_height=layout.setter('height'))
