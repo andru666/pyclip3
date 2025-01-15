@@ -579,9 +579,9 @@ class ECU():
             pb.value = i
             i += 1
             if service.startReq[:2] in AllowedList:
-                if request.SentBytes[:2] == '19' and request.SentBytes[:2] != '1902':
+                if service.startReq[:2] == '19' and service.startReq[:2] != '1902':
                     continue
-                if request.SentBytes[:2] == '22' and len(request.SentBytes) < 6:
+                if service.startReq[:2] == '22' and len(service.startReq) < 6:
                     continue
                 pos = chr(ord(service.startReq[0]) + 4) + service.startReq[1]
                 rsp = self.elm.request(service.startReq, pos, False)

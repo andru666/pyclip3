@@ -26,8 +26,8 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.22'
-data_update = '12/01/2025'
+__version__ = '0.02.23'
+data_update = '15/01/2025'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -291,6 +291,8 @@ class screenConfig(App):
         btn.font_size = label.font_size
         btn.bind(on_release=lambda btn: self.bt_dropdown.select(btn.text))
         self.bt_dropdown.add_widget(btn)
+        if mod_globals.os != 'android':
+            ports['127.0.0.1:35000'] = '127.0.0.1:35000'
         try:
             porte = iter(ports.items())
         except:
@@ -751,7 +753,6 @@ def main():
             base.stopTouchApp()
             base.EventLoop.window.canvas.clear()
         elif mod_globals.opt_dump or dump:
-            print('saveDump')
             ecu.saveDump()
         ecu.show_screens()
 
