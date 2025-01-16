@@ -291,14 +291,15 @@ class showDatarefGui(App):
                 if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
-        if mod_globals.opt_csv:
+        '''if mod_globals.opt_csv:
             self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
         else:
             self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
-        '''if self.needupdate:
+        '''
+        if self.needupdate:
             threading.Thread(target=self.updates_values).start()
             if mod_globals.opt_demo:
-                self.needupdate = False'''
+                self.needupdate = False
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -457,8 +458,8 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            #threading.Thread(target=self.updates_values).start()
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
+            threading.Thread(target=self.updates_values).start()
+            #self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 
