@@ -26,7 +26,7 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.23'
+__version__ = '0.02.24'
 data_update = '16/01/2025'
 mod_globals.os = platform
 if mod_globals.os == 'android':
@@ -170,6 +170,8 @@ def my_excepthook(excType, excValue, tb):
     if mod_globals.os == 'android':
         with open(os.path.join(mod_globals.crash_dir, 'crash_'+str(time.strftime("%Y-%m-%d-%H.%M.%S", time.localtime()))+'.txt'), 'w') as fout:
             fout.write(str(string))
+    else:
+        print(string)
     popup = MyPopup(title='Crash', content=error, size=(Window.size[0]*0.9, Window.size[1]*0.9), size_hint=(None, None), on_dismiss=exit)
     popup.open()
     base.runTouchApp()
