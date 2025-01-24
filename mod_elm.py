@@ -583,7 +583,7 @@ class ELM:
             self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n")
             self.lf.write("Port Speed: " + str(speed) +"\n" + '#' * 60 + "\n")
             self.lf.flush()
-        if not portName.startswith('127.0.0'):
+        '''if not portName.startswith('127.0.0'):
             elm_rsp = self.cmd("STI")
             if 'TIMEOUT' in elm_rsp:
                 self.port.check_elm()
@@ -599,7 +599,7 @@ class ELM:
                 # check STN
                 elm_rsp = self.cmd("STP 53")
                 if '?' not in elm_rsp:
-                    mod_globals.opt_stn = True
+                    mod_globals.opt_stn = True'''
         
         if mod_globals.opt_csv and not mod_globals.opt_demo:
             if mod_globals.opt_obdlink:

@@ -154,7 +154,6 @@ class showDatarefGui(App):
         self.params = {}
         self.params_graf = {}
         self.needupdate = True
-        self.clock_event = None
         self.running = True
         self.path = path
         self.paramsLabels = OrderedDict()
@@ -171,8 +170,6 @@ class showDatarefGui(App):
             MyPopup()
             mod_globals.fontSize = mod_globals.fontSize - 1
             resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
             self.needupdate = False
             self.running = False
             self.stop()
@@ -181,8 +178,6 @@ class showDatarefGui(App):
             MyPopup()
             mod_globals.fontSize = mod_globals.fontSize + 1
             resizeFont = True
-            if self.clock_event is not None:
-                self.clock_event.cancel()
             self.needupdate = False
             self.running = False
             self.stop()
@@ -236,7 +231,10 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            EventLoop.window.mainloop()
+            try:
+                EventLoop.window.mainloop()
+            except:
+                pass
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -274,14 +272,13 @@ class showDatarefGui(App):
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
-        #self.params = dct
-        return dct
+        self.params = dct
 
-    def updates_values(self, dt=None):
+    def updates_values(self):
         if not self.running:
             return
         self.ecu.elm.clear_cache()
-        self.params = self.get_ecu_values()
+        self.get_ecu_values()
         
         if self.ecu.GRAF:
             self.plots()
@@ -291,11 +288,6 @@ class showDatarefGui(App):
                 if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
-        '''if mod_globals.opt_csv:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.02)
-        else:
-            self.clock_event = Clock.schedule_once(self.updates_values, 0.05)
-        '''
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
             if mod_globals.opt_demo:
@@ -391,7 +383,8 @@ class showDatarefGui(App):
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
         self.layout.add_widget(MyLabel(text=header))
-        self.params = self.get_ecu_values()
+        if len(self.params) == 0:
+            self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
             len_str = len(param)
@@ -459,7 +452,6 @@ class showDatarefGui(App):
         root.add_widget(self.layout)
         if self.needupdate:
             threading.Thread(target=self.updates_values).start()
-            #self.clock_event = Clock.schedule_once(self.updates_values, 0.5)
         return root
 
 
