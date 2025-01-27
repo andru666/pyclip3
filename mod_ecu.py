@@ -278,6 +278,7 @@ class showDatarefGui(App):
         self.params = dct
 
     def updates_values(self):
+        print('updates_values')
         if not self.running:
             return
         self.ecu.elm.clear_cache()
