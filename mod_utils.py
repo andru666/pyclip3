@@ -107,7 +107,6 @@ class MyLabel(Label):
 class MyTextInput(TextInput):
     global fs
     def __init__(self, **kwargs):
-        font = None
         id = ''
         if 'id' in kwargs:
             self.id = kwargs['id']
@@ -119,7 +118,6 @@ class MyTextInput(TextInput):
             self.halign='center'
         if 'font_size' not in kwargs:
             self.font_size = fs
-            font = True
         if 'height' not in kwargs:
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
@@ -133,7 +131,8 @@ class MyTextInput(TextInput):
             self.font_size = self.font_size * 0.9
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
-        self.padding[1] = (self.height-self.font_size)/2
+        if 'padding' not in kwargs:
+            self.padding[1] = (self.height-self.font_size)/2
 
 class MyPopup(Popup):
     close = ''

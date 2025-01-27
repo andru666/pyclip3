@@ -339,7 +339,7 @@ class Port:
     
     def check_elm(self):
         self.hdr.timeout = 2
-        for s in [2000000, 1000000, 500000, 230400, 115200, 38400]:
+        for s in [2000000, 1500000, 1000000, 500000, 230400, 115200, 38400]:
             if len(mod_globals.opt_log)>0:
                 self.lf.write(log_tmstr() + ' : Checking port speed:' + str(s)  + '\n')
                 self.lf.flush()
@@ -380,7 +380,9 @@ class Port:
         
         self.rwLock = False
         self.kaLock = False
-        
+        if self.lf != 0:
+            self.lf.write("Switch Baudrate to: " + str(boudrate) +"\n" + '#' * 60 + "\n")
+            self.lf.flush()
         if mod_globals.opt_obdlink:
             self.write("ST SBR " + str(boudrate) + "\r")
         else:
@@ -396,6 +398,8 @@ class Port:
                 self.write("at brd 8\r")
             elif boudrate ==1000000:
                 self.write("at brd 4\r")
+            elif boudrate == 1500000:
+                self.write("at brd 3\r")
             elif boudrate == 2000000:
                 self.write("at brd 2\r")
         # search OK
@@ -583,7 +587,7 @@ class ELM:
             self.lf.write('#' * 60 + "\n#[" + log_tmstr() + "] Check ELM type\n")
             self.lf.write("Port Speed: " + str(speed) +"\n" + '#' * 60 + "\n")
             self.lf.flush()
-        '''if not portName.startswith('127.0.0'):
+        if not portName.startswith('127.0.0'):
             elm_rsp = self.cmd("STI")
             if 'TIMEOUT' in elm_rsp:
                 self.port.check_elm()
@@ -599,13 +603,18 @@ class ELM:
                 # check STN
                 elm_rsp = self.cmd("STP 53")
                 if '?' not in elm_rsp:
-                    mod_globals.opt_stn = True'''
+                    mod_globals.opt_stn = True
         
         if mod_globals.opt_csv and not mod_globals.opt_demo:
             if mod_globals.opt_obdlink:
-                self.port.soft_boudrate(2000000)
+                if mod_globals.os == 'android':
+                    self.port.soft_boudrate(150000)
+                else:
+                    self.port.soft_boudrate(2000000)
             elif self.port.portType == 0:
                 self.port.soft_boudrate(230400)
+            elif self.port.portType == 3:
+                self.port.soft_boudrate(500000)
 
     def __del__(self):
         if not mod_globals.opt_demo and not isinstance(self.port, int):

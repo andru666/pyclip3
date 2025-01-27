@@ -155,6 +155,7 @@ class showDatarefGui(App):
         self.params_graf = {}
         self.needupdate = True
         self.running = True
+        self.clock_event = None
         self.path = path
         self.paramsLabels = OrderedDict()
         self.csvf = 0
@@ -215,6 +216,7 @@ class showDatarefGui(App):
             self.ecu.saveFavList()
         if self.ecu.GRAF:
             self.ecu.GRAF = False
+        self.clock_event = None
         self.needupdate = False
         self.running = False
         if mod_globals.opt_csv and self.csvf!=0:
@@ -231,10 +233,11 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
-            try:
+            EventLoop.window.mainloop()
+            '''try:
                 EventLoop.window.mainloop()
             except:
-                pass
+                pass'''
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -289,7 +292,9 @@ class showDatarefGui(App):
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
-            threading.Thread(target=self.updates_values).start()
+            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event.start()
+            self.clock_event.join()
             if mod_globals.opt_demo:
                 self.needupdate = False
 
@@ -441,7 +446,7 @@ class showDatarefGui(App):
                         lines += 1
                     if fs >= 40:
                         lines += 1
-                    prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1])
+                    prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1], padding=[0, 0])
                     self.layout.add_widget(prelabel)
                 else:
                     self.layout.add_widget(self.make_box_params(paramName, val))
@@ -451,7 +456,8 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            threading.Thread(target=self.updates_values).start()
+            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event.start()
         return root
 
 

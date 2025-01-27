@@ -26,8 +26,8 @@ import glob, logging, sys
 log = logging.getLogger("kivy")
 
 __all__ = 'install_android'
-__version__ = '0.02.23'
-data_update = '24/01/2025'
+__version__ = '0.02.24'
+data_update = '27/01/2025'
 mod_globals.os = platform
 if mod_globals.os == 'android':
     from jnius import cast, autoclass
@@ -334,7 +334,7 @@ class screenConfig(App):
         glay = MyGridLayout(cols=2)
         label = MyLabel(text='Port SPEED', halign='left', size_hint=(0.35, None), bgcolor = (0.5, 0.5, 0, 1))
         self.opt_speed_dropdown = DropDown()
-        for s_ecus in ['38400', '115200', '230400', '500000', '1000000', '2000000']:
+        for s_ecus in ['38400', '115200', '230400', '500000', '1000000', '1500000', '2000000']:
             btn= MyButton(text=s_ecus)
             btn.height = label.height
             btn.font_size = label.font_size
@@ -412,9 +412,10 @@ class screenConfig(App):
         mod_globals.opt_ecuid_on = self.button['OPT ecuid'].active
         if self.ecus_opt_speed:
             mod_globals.opt_speed = int(self.ecus_opt_speed.text)
+            mod_globals.opt_rate = int(self.ecus_opt_speed.text)
         else:
             mod_globals.opt_speed = 38400
-        mod_globals.opt_rate = 38400
+            mod_globals.opt_rate = 38400
         mod_globals.savedEcus = self.ecusbutton.text
         mod_globals.opt_lang = self.langbutton.text
         mod_globals.opt_car = 0
