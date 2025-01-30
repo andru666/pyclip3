@@ -651,7 +651,7 @@ def main():
             zip_file.extractall(os.path.join(mod_globals.user_data_dir, 'macro'))
     mod_globals.Settings()
     kivyScreenConfig()
-    #elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
+    elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     try:
         elm = ELM(mod_globals.opt_port, mod_globals.opt_speed, mod_globals.opt_log)
     except:
