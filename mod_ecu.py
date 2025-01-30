@@ -198,7 +198,6 @@ class showDatarefGui(App):
     def on_resume(self):
         self.running = True
         pass
-        # self.ecu.elm.send_cmd(self.ecu.ecudata['startDiagReq'])
     
     def on_stop(self):
         self.running = False
@@ -255,7 +254,6 @@ class showDatarefGui(App):
                 dct[name] = str(value)
                 self.paramsLabels[name] = key
             if dr.type == 'Parameter':
-                #print(dr.name)
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
                 else:
@@ -287,7 +285,6 @@ class showDatarefGui(App):
         self.params = dct
 
     def updates_data(self):
-        print(self.UPDATE_DATA)
         if not self.running:
             return
         while self.running:
@@ -307,7 +304,6 @@ class showDatarefGui(App):
             for param, val in self.params.items():
                 if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
-        
 
     def updates_values(self):
         print('updates_values')

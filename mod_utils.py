@@ -155,6 +155,7 @@ class MyPopup(Popup):
 
 class MyButton(Button):
     global fs
+    MyPopup()
     def __init__(self, **kwargs):
         id = ''
         if 'id' in kwargs:
@@ -180,7 +181,7 @@ class MyButton(Button):
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
-    MyPopup()
+    
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
