@@ -198,7 +198,7 @@ class MyApp(App):
         
         auto_dia = True
         
-        if not mod_globals.opt_demo and self.elm.port and elm.port.portType==3:
+        if not mod_globals.opt_demo and self.elm.port and self.elm.port.portType==3:
             #self.elm.port.check_elm()
             if mod_globals.opt_speed < mod_globals.opt_rate:
                 self.elm.port.soft_boudrate(mod_globals.opt_rate)

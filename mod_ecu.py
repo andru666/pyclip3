@@ -153,6 +153,7 @@ class showDatarefGui(App):
         self.labels = {}
         self.params = {}
         self.params_graf = {}
+        self.UPDATE_DATA = []
         self.needupdate = True
         self.running = True
         self.clock_event = None
@@ -192,10 +193,15 @@ class showDatarefGui(App):
 
     def on_pause(self):
         self.running = False
+        return True
 
     def on_resume(self):
         self.running = True
+        pass
         # self.ecu.elm.send_cmd(self.ecu.ecudata['startDiagReq'])
+    
+    def on_stop(self):
+        self.running = False
 
     def make_box_params(self, parameter_name, val):
         fs = mod_globals.fontSize
@@ -212,11 +218,11 @@ class showDatarefGui(App):
         return glay
 
     def finish(self, instance):
+        print('finish')
         if self.path[:3] == 'FAV':
             self.ecu.saveFavList()
         if self.ecu.GRAF:
             self.ecu.GRAF = False
-        self.clock_event = None
         self.needupdate = False
         self.running = False
         if mod_globals.opt_csv and self.csvf!=0:
@@ -233,6 +239,8 @@ class showDatarefGui(App):
             
         dct = OrderedDict()
         for dr in self.datarefs:
+            if dr.name in self.UPDATE_DATA:
+                continue
             EventLoop.window.mainloop()
             '''try:
                 EventLoop.window.mainloop()
@@ -247,6 +255,7 @@ class showDatarefGui(App):
                 dct[name] = str(value)
                 self.paramsLabels[name] = key
             if dr.type == 'Parameter':
+                #print(dr.name)
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, unit, csvd = get_parameter(self.ecu.Parameters[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
                 else:
@@ -277,6 +286,29 @@ class showDatarefGui(App):
                 self.csvline += ","
         self.params = dct
 
+    def updates_data(self):
+        print(self.UPDATE_DATA)
+        if not self.running:
+            return
+        while self.running:
+            self.ecu.elm.clear_cache()
+            self.get_ecu_values()
+            if mod_globals.opt_csv:
+                Clock.schedule_once(self.update_label, 0.02)
+            else:
+                Clock.schedule_once(self.update_label, 0.05)
+            self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
+        
+    def update_label(self, dt):
+        if self.ecu.GRAF:
+            self.plots()
+            pass
+        else:
+            for param, val in self.params.items():
+                if val != 'Text' and val != 'DTCText':
+                    self.labels[param].text = val.strip()
+        
+
     def updates_values(self):
         print('updates_values')
         if not self.running:
@@ -293,9 +325,9 @@ class showDatarefGui(App):
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
-            self.clock_event = threading.Thread(target=self.updates_values)
-            self.clock_event.start()
-            self.clock_event.join()
+            #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
+            #self.clock_event.start()
+            #self.clock_event.join()
             if mod_globals.opt_demo:
                 self.needupdate = False
 
@@ -398,6 +430,8 @@ class showDatarefGui(App):
                 max_str = param
         tmp_label = MyLabel(text=max_str)
         tmp_label._label.render()
+        self.UPDATE_DATA = []
+        UPDATE = False
         if self.ecu.GRAF:
             self.Xmin = 0
             self.layout.size_hint = (1, 1)
@@ -435,6 +469,10 @@ class showDatarefGui(App):
         else:
             for paramName, val in self.params.items():
                 if val == 'Text':
+                    if mod_globals.language_dict['299'] in paramName:
+                        UPDATE = True
+                    else:
+                        UPDATE = False
                     self.layout.add_widget(MyLabel(text=paramName))
                 elif val == 'DTCText':
                     lines = len(paramName.split('\n'))
@@ -450,6 +488,8 @@ class showDatarefGui(App):
                     prelabel = MyTextInput(text=pyren_encode(paramName), size_hint=(1, None), multiline=True, readonly=True, foreground_color=[1,1,1,1], background_color=[0,0,1,1], padding=[0, 0])
                     self.layout.add_widget(prelabel)
                 else:
+                    if UPDATE:
+                        self.UPDATE_DATA.append(paramName)
                     self.layout.add_widget(self.make_box_params(paramName, val))
         quitbutton = MyButton(text='<' + mod_globals.language_dict['6218'] + '>', size_hint=(1, None), on_press=self.finish)
         self.layout.add_widget(quitbutton)
@@ -457,8 +497,10 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            self.clock_event = threading.Thread(target=self.updates_values)
+            self.clock_event = threading.Thread(target=self.updates_data, daemon=True)
             self.clock_event.start()
+            #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
+            #self.clock_event.join()
         return root
 
 
@@ -1014,16 +1056,18 @@ class ECU():
             mem_dtrf = []
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
-            if self.Defaults[dtchex[:4]].datarefs:
+            
+            '''if self.Defaults[dtchex[:4]].datarefs:
                 cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
                 mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
-                mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
+                mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs'''
             
             tmp_dtrf = helpString + mem_dtrf + cur_dtrf
             self.show_datarefs(tmp_dtrf, path)
 
     def show_defaults_std_b(self):
+        print('show_defaults_std_b')
         while 1:
             clearScreen()
             path = 'DE (STD_B)'
@@ -1059,13 +1103,13 @@ class ECU():
             ext_info_dtrf = []
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
-            if self.Defaults[dtchex[:4]].datarefs:
+            '''if self.Defaults[dtchex[:4]].datarefs:
                 cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
                 mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
                 mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
             if self.ext_de:
-                ext_info_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['1691'], 'Text')] + self.ext_de
+                ext_info_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['1691'], 'Text')] + self.ext_de'''
             tmp_dtrf = helpString + mem_dtrf + cur_dtrf + ext_info_dtrf   
             self.show_datarefs(tmp_dtrf, path)
 
