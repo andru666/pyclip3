@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, threading, random
+import sys, threading, random, asyncio
 import time
 import xml.dom.minidom
 from collections import OrderedDict
@@ -229,6 +229,7 @@ class showDatarefGui(App):
         self.stop()
     
     def get_ecu_values(self):
+        self.ecu.elm.clear_cache()
         if mod_globals.opt_csv and self.csvf!=0:
             self.csvline = self.csvline + "\n"
             self.csvline = self.csvline.replace(';','\t')
@@ -240,11 +241,10 @@ class showDatarefGui(App):
         for dr in self.datarefs:
             if dr.name in self.UPDATE_DATA:
                 continue
-            EventLoop.window.mainloop()
-            '''try:
+            try:
                 EventLoop.window.mainloop()
             except:
-                pass'''
+                pass
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -282,28 +282,42 @@ class showDatarefGui(App):
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
-        self.params = dct
+        #self.params = dct
+        self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
+        return dct
 
-    def updates_data(self):
+    async def fetch_and_update(self):
+        while True:
+            param = await self.get_ecu_values()
+            Clock.schedule_once(lambda dt: self.update_label(param))
+            
+    
+    def updates_data(self, dt=None):
         if not self.running:
             return
-        while self.running:
+        else:
             self.ecu.elm.clear_cache()
             self.get_ecu_values()
-            if mod_globals.opt_csv:
-                Clock.schedule_once(self.update_label, 0.02)
-            else:
-                Clock.schedule_once(self.update_label, 0.05)
+            Clock.schedule_once(self.update_label)
             self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         
-    def update_label(self, dt):
+    def update_label(self, dt=None):
+        print('update_label')
+        if mod_globals.opt_demo:
+            self.running = False
         if self.ecu.GRAF:
             self.plots()
             pass
         else:
-            for param, val in self.params.items():
+            for param, val in dt.items():
                 if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
+        #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
+        #self.clock_event.start()
+        '''if mod_globals.opt_csv:
+            Clock.schedule_once(self.updates_data, 0.02)
+        else:
+            Clock.schedule_once(self.updates_data, 0.05)'''
 
     def updates_values(self):
         print('updates_values')
@@ -321,6 +335,8 @@ class showDatarefGui(App):
                     self.labels[param].text = val.strip()
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         if self.needupdate:
+            #self.clock_event = asyncio.get_event_loop()
+            asyncio.create_task(self.fetch_and_update())
             #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
             #self.clock_event.start()
             #self.clock_event.join()
@@ -417,8 +433,7 @@ class showDatarefGui(App):
         defaultFS = float(fs)/30.0
         header = 'ECU : ' + self.ecu.ecudata['ecuname'] + '  ' + self.ecu.ecudata['doc']
         self.layout.add_widget(MyLabel(text=header))
-        if len(self.params) == 0:
-            self.get_ecu_values()
+        params = self.get_ecu_values()
         max_str = ''
         for param in list(self.paramsLabels.values()):
             len_str = len(param)
@@ -444,7 +459,7 @@ class showDatarefGui(App):
             i = 0
             rrt = GridLayout(cols=1, spacing=(4, 4), size_hint=(1.0, None))
             rrt.bind(minimum_height=rrt.setter('height'))
-            for k, v in self.params.items():
+            for k, v in params.items():
                 v = float(v)
                 p = 1
                 while v > 10:
@@ -463,7 +478,7 @@ class showDatarefGui(App):
             self.layout.add_widget(rt)
             self.layout.add_widget(MyButton(text='PLOTS', size_hint=(1, None), on_press=self.plots))
         else:
-            for paramName, val in self.params.items():
+            for paramName, val in params.items():
                 if val == 'Text':
                     if mod_globals.language_dict['299'] in paramName:
                         UPDATE = True
@@ -493,9 +508,11 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            self.clock_event = threading.Thread(target=self.updates_data, daemon=True)
-            self.clock_event.start()
+            self.clock_event = asyncio.get_event_loop()
+            self.clock_event.create_task(self.fetch_and_update())
+            #self.clock_event = threading.Thread(target=self.updates_data, daemon=True)
             #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
+            #self.clock_event.start()
             #self.clock_event.join()
         return root
 
@@ -624,7 +641,7 @@ class ECU():
             pb.value = i
             i += 1
             if service.startReq[:2] in AllowedList:
-                if service.startReq[:2] == '19' and service.startReq[:2] != '1902':
+                if service.startReq[:2] == '19' and service.startReq[:4] != '1902':
                     continue
                 if service.startReq[:2] == '22' and len(service.startReq) < 6:
                     continue
@@ -892,6 +909,8 @@ class ECU():
                 return
 
         while 1:
+            print('showDatarefGui')
+            loop = asyncio.get_event_loop()
             gui = showDatarefGui(self, datarefs, path)
             gui.run()
             if not resizeFont:
@@ -976,6 +995,7 @@ class ECU():
                 return
 
     def show_subfunction(self, subfunction, path):
+        print('show_subfunction')
         while 1:
             clearScreen()
             if len(subfunction.datarefs) != 0 and len(subfunction.datarefs) > 0:
@@ -1001,6 +1021,7 @@ class ECU():
                 return
 
     def show_screen(self, screen):
+        print('show_screen')
         while 1:
             clearScreen()
             menu = []
@@ -1016,7 +1037,8 @@ class ECU():
                 self.show_datarefs(screen.datarefs, screen.name)
                 return
 
-    def show_defaults_std_a(self):
+    def show_defaults_std_a(self, dt=None):
+        print('show_defaults_std_a')
         while 1:
             clearScreen()
             path = 'DE (STD_A)'
@@ -1053,11 +1075,11 @@ class ECU():
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
             
-            '''if self.Defaults[dtchex[:4]].datarefs:
+            if self.Defaults[dtchex[:4]].datarefs:
                 cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
                 mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
-                mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs'''
+                mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
             
             tmp_dtrf = helpString + mem_dtrf + cur_dtrf
             self.show_datarefs(tmp_dtrf, path)
@@ -1099,17 +1121,18 @@ class ECU():
             ext_info_dtrf = []
 
             helpString = [ecu_screen_dataref(0, tmp_helpString, 'DTCText')]
-            '''if self.Defaults[dtchex[:4]].datarefs:
+            if self.ext_de:
+                ext_info_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['1691'], 'Text')] + self.ext_de
+            if self.Defaults[dtchex[:4]].datarefs:
                 cur_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['300'], 'Text')] + self.Defaults[dtchex[:4]].datarefs
             if self.Defaults[dtchex[:4]].memDatarefs:
                 mem_dtrf_txt = mod_globals.language_dict['299'] + " DTC" + mod_globals.ext_cur_DTC
                 mem_dtrf = [ecu_screen_dataref(0, mem_dtrf_txt, 'Text')] + self.Defaults[dtchex[:4]].memDatarefs
-            if self.ext_de:
-                ext_info_dtrf = [ecu_screen_dataref(0, mod_globals.language_dict['1691'], 'Text')] + self.ext_de'''
-            tmp_dtrf = helpString + mem_dtrf + cur_dtrf + ext_info_dtrf   
+            tmp_dtrf = helpString + ext_info_dtrf + mem_dtrf + cur_dtrf   
             self.show_datarefs(tmp_dtrf, path)
 
     def show_defaults_failflag(self):
+        print('show_defaults_failflag')
         while 1:
             path = 'DE (FAILFLAG)'
             clearScreen()

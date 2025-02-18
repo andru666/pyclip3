@@ -644,7 +644,7 @@ def main():
         os.makedirs(mod_globals.scen_dir)
     
     
-    zip_macro = sorted(glob.glob(os.path.join('./', 'macro.zip')), reverse=True)
+    zip_macro = sorted(glob.glob(os.path.join(mod_globals.user_data_dir, 'macro.zip')), reverse=True)
     if len(zip_macro):
         import zipfile
         with zipfile.ZipFile(zip_macro[0], 'r') as zip_file:

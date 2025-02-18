@@ -118,7 +118,7 @@ class MyTextInput(TextInput):
             self.halign='center'
         if 'font_size' not in kwargs:
             self.font_size = fs
-        if 'height' not in kwargs:
+        if 'height' not in kwargs and not self.size_hint_y:
             lines = len(self.text.split('\n'))
             simb = round((len(self.text) * self.font_size) / (Window.size[0] * self.size_hint[0]), 1)
             if lines < simb:
@@ -127,9 +127,10 @@ class MyTextInput(TextInput):
             if 2 < lines < 3: lines = lines
             if lines < 2: lines = lines
             self.height = lines * self.font_size * 1.85
+            self.height = kivy.metrics.dp(self.height)
         if mod_globals.os == 'android':
             self.font_size = self.font_size * 0.9
-        self.height = kivy.metrics.dp(self.height)
+        
         self.font_size = kivy.metrics.dp(self.font_size)
         if 'padding' not in kwargs:
             self.padding[1] = (self.height-self.font_size)/2
@@ -155,7 +156,6 @@ class MyPopup(Popup):
 
 class MyButton(Button):
     global fs
-    MyPopup()
     def __init__(self, **kwargs):
         id = ''
         if 'id' in kwargs:
@@ -181,7 +181,7 @@ class MyButton(Button):
             self.font_size = self.font_size * 0.8
         self.height = kivy.metrics.dp(self.height)
         self.font_size = kivy.metrics.dp(self.font_size)
-    
+    MyPopup()
 
 class MyGridLayout(GridLayout):
     def __init__(self, **kwargs):
