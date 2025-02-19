@@ -280,7 +280,6 @@ class screenConfig(App):
 
     def select_usb(self, dt=None):
         self.bt_dropdown.select(dt.text)
-        mod_globals.opt_log = 'USB.txt'
         Port('USB', mod_globals.opt_speed, 5).getConnected()
 
     def make_bt_device_entry(self):
@@ -419,10 +418,11 @@ class screenConfig(App):
         mod_globals.savedEcus = self.ecusbutton.text
         mod_globals.opt_lang = self.langbutton.text
         mod_globals.opt_car = 0
-        if self.button['Generate logs'].active:
+        mod_globals.opt_log = 'log.txt'
+        '''if self.button['Generate logs'].active:
             mod_globals.opt_log = 'log.txt' if self.textInput['Log name'].text == '' else self.textInput['Log name'].text
         else:
-            mod_globals.opt_log = ''
+            mod_globals.opt_log = '''''
         try:
             mod_globals.fontSize = int(self.textInput['Font size'].text)
         except:
@@ -536,8 +536,8 @@ class screenConfig(App):
         layout.add_widget(self.make_box_switch('Demo mode', mod_globals.opt_demo))
         #layout.add_widget(self.make_box_switch('DUMP', mod_globals.opt_dump))
         layout.add_widget(self.make_box_switch('Orientation landscape', mod_globals.screen_orient, self.change_orientation))
-        layout.add_widget(self.make_box_switch('Generate logs', True if len(mod_globals.opt_log) > 0 else False))
-        layout.add_widget(self.make_input('Log name', mod_globals.opt_log))
+        #layout.add_widget(self.make_box_switch('Generate logs', True if len(mod_globals.opt_log) > 0 else False))
+        #layout.add_widget(self.make_input('Log name', mod_globals.opt_log))
         layout.add_widget(self.make_box_switch('CSV Log',mod_globals.opt_csv))
         layout.add_widget(self.make_box_switch('CAN2 (Multimedia CAN)', mod_globals.opt_can2))
         layout.add_widget(self.make_input('Font size', str(mod_globals.fontSize)))

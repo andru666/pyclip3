@@ -158,6 +158,9 @@ def get_devices():
             devs[deviceName] = deviceAddress
     return devs
 
+def log_n():
+    return '_'+datetime.now().strftime("%y_%m_%d_%H_%M_%S")+'_'
+
 def log_tmstr():
     return datetime.now().strftime("%x %H:%M:%S.%f")[:21].ljust(21,'0')
 
@@ -189,7 +192,7 @@ class Port:
         MAC = None
         upPortName = portName.upper()
         if len(mod_globals.opt_log)>0: # and mod_globals.opt_demo==False:
-            self.lf = open(mod_globals.log_dir + "elm_" + mod_globals.opt_log, "at")
+            self.lf = open(mod_globals.log_dir + log_n() + "elm_" + mod_globals.opt_log, "at")
         if re.match(r"^[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}$", upPortName) or \
            re.match(r"^[0-9A-F]{4}.[0-9A-F]{4}.[0-9A-F]{4}$", upPortName) or \
            re.match(r"^[0-9A-F]{12}$", upPortName):
@@ -578,8 +581,8 @@ class ELM:
             self.port = Port(portName, speed, self.portTimeout)
         
         if len(mod_globals.opt_log)>0: # and mod_globals.opt_demo==False:
-            self.lf = open(mod_globals.log_dir + "elm_" + mod_globals.opt_log, "at")
-            self.vf = open(mod_globals.log_dir + "ecu_" + mod_globals.opt_log, "at")
+            self.lf = open(mod_globals.log_dir + log_n() + "elm_" + mod_globals.opt_log, "at")
+            self.vf = open(mod_globals.log_dir + log_n() + "ecu_" + mod_globals.opt_log, "at")
         self.lastCMDtime = 0
         self.ATCFC0 = mod_globals.opt_cfc0
 

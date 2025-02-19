@@ -224,6 +224,9 @@ class showDatarefGui(App):
             self.ecu.GRAF = False
         self.needupdate = False
         self.running = False
+        if self.clock_event is not None:
+            self.clock_event.cancel()
+            self.clock_event = None
         if mod_globals.opt_csv and self.csvf!=0:
             self.csvf.close()
         self.stop()
@@ -282,27 +285,22 @@ class showDatarefGui(App):
             if mod_globals.opt_csv and self.csvf!=0 and (dr.type=='State' or dr.type=='Parameter'):
                 self.csvline += ";" + (pyren_encode(csvd) if mod_globals.opt_csv_human else str(csvd))
                 self.csvline += ","
-        #self.params = dct
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         return dct
 
     async def fetch_and_update(self):
-        while True:
-            param = await self.get_ecu_values()
-            Clock.schedule_once(lambda dt: self.update_label(param))
-            
-    
-    def updates_data(self, dt=None):
-        if not self.running:
-            return
-        else:
-            self.ecu.elm.clear_cache()
-            self.get_ecu_values()
-            Clock.schedule_once(self.update_label)
-            self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
-        
+        while self.running:
+            try:
+                param = self.get_ecu_values()
+                Clock.schedule_once(lambda dt: self.update_label(param))
+                if mod_globals.opt_csv:
+                    await asyncio.sleep(0.02)
+                else:
+                    await asyncio.sleep(0.05)
+            except asyncio.CancelledError:
+                break
+
     def update_label(self, dt=None):
-        print('update_label')
         if mod_globals.opt_demo:
             self.running = False
         if self.ecu.GRAF:
@@ -312,36 +310,6 @@ class showDatarefGui(App):
             for param, val in dt.items():
                 if val != 'Text' and val != 'DTCText':
                     self.labels[param].text = val.strip()
-        #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
-        #self.clock_event.start()
-        '''if mod_globals.opt_csv:
-            Clock.schedule_once(self.updates_data, 0.02)
-        else:
-            Clock.schedule_once(self.updates_data, 0.05)'''
-
-    def updates_values(self):
-        print('updates_values')
-        if not self.running:
-            return
-        self.ecu.elm.clear_cache()
-        self.get_ecu_values()
-        
-        if self.ecu.GRAF:
-            self.plots()
-            pass
-        else:
-            for param, val in self.params.items():
-                if val != 'Text' and val != 'DTCText':
-                    self.labels[param].text = val.strip()
-        self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
-        if self.needupdate:
-            #self.clock_event = asyncio.get_event_loop()
-            asyncio.create_task(self.fetch_and_update())
-            #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
-            #self.clock_event.start()
-            #self.clock_event.join()
-            if mod_globals.opt_demo:
-                self.needupdate = False
 
     def on_start(self):
         from kivy.base import EventLoop
@@ -379,19 +347,6 @@ class showDatarefGui(App):
             self.labels[k].text = '*' + str(p)
             self.p_graf[k]['plot'].append((self.Xmin, float(v)))
             self.graph.labels[k].points = self.p_graf[k]['plot']
-
-    '''def MM(self, min, max, v):
-        if min == '0' or min == 0:
-            if float(v) < 0:
-                min = float(v)
-        elif float(v) < min:
-            min = float(v)
-        if max == '0' or max == 0:
-            if float(v) > 0:
-                max = float(v)
-        elif float(v) > max:
-            max = float(v)
-        return floor(min), ceil(max)'''
 
     def graf_lab(self, k, col, p = 1):
         box1 = BoxLayout(orientation='horizontal',size_hint = (1, None), height=fs)
@@ -508,14 +463,12 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            self.clock_event = asyncio.get_event_loop()
-            self.clock_event.create_task(self.fetch_and_update())
-            #self.clock_event = threading.Thread(target=self.updates_data, daemon=True)
-            #self.clock_event = threading.Thread(target=self.updates_values, daemon=True)
-            #self.clock_event.start()
-            #self.clock_event.join()
+            threading.Thread(target=self.start_async_loop, daemon=True).start()
         return root
-
+    
+    def start_async_loop(self):
+        self.clock_event = asyncio.run(self.fetch_and_update())
+    
 
 class ECU():
     global fs
