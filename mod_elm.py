@@ -159,7 +159,7 @@ def get_devices():
     return devs
 
 def log_n():
-    return '_'+datetime.now().strftime("%y_%m_%d_%H_%M_%S")+'_'
+    return datetime.now().strftime("%y.%m.%d-%H.%M.%S")+'_'
 
 def log_tmstr():
     return datetime.now().strftime("%x %H:%M:%S.%f")[:21].ljust(21,'0')
