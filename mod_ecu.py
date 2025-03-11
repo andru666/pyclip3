@@ -244,10 +244,7 @@ class showDatarefGui(App):
         for dr in self.datarefs:
             if dr.name in self.UPDATE_DATA:
                 continue
-            try:
-                EventLoop.window.mainloop()
-            except:
-                pass
+            
             if dr.type == 'State':
                 if self.ecu.DataIds and "DTC" in self.path and dr in self.ecu.Defaults[mod_globals.ext_cur_DTC[:4]].memDatarefs:
                     name, codeMR, label, value, csvd = get_state(self.ecu.States[dr.name], self.ecu.Mnemonics, self.ecu.Services, self.ecu.elm, self.ecu.calc, True, self.ecu.DataIds)
@@ -287,6 +284,21 @@ class showDatarefGui(App):
                 self.csvline += ","
         self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(list(self.ecu.elm.rsp_cache.keys()), self.ecu.DataIds)
         return dct
+
+    def update_values(self, dt):
+        if not self.running:
+            return
+        self.ecu.elm.clear_cache()
+        params = self.get_ecu_values()
+        for param, val in params.items():
+            if val != 'Text' and val != 'DTCText':
+                self.labels[param].text = val.strip()
+        self.ecu.elm.currentScreenDataIds = self.ecu.getDataIds(self.ecu.elm.rsp_cache.keys(), self.ecu.DataIds)
+        
+        if mod_globals.opt_csv:
+            self.clock_event = Clock.schedule_once(self.update_values, 0.02)
+        else:
+            self.clock_event = Clock.schedule_once(self.update_values, 0.05)
 
     async def fetch_and_update(self):
         while self.running:
@@ -463,7 +475,8 @@ class showDatarefGui(App):
          'center_y': 0.5})
         root.add_widget(self.layout)
         if self.needupdate:
-            threading.Thread(target=self.start_async_loop, daemon=True).start()
+            self.clock_event = Clock.schedule_once(self.update_values, 0.5)
+            #threading.Thread(target=self.start_async_loop, daemon=True).start()
         return root
     
     def start_async_loop(self):
