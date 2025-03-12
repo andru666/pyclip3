@@ -159,4 +159,5 @@ pyrendata*.zip
 scen/
 mod_elm1.py
 scen3/
+bin/
 .buildozer/
