@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, threading, random, asyncio
+import sys, threading, random
 import time
 import xml.dom.minidom
 from collections import OrderedDict
@@ -300,18 +300,6 @@ class showDatarefGui(App):
         else:
             self.clock_event = Clock.schedule_once(self.update_values, 0.05)
 
-    async def fetch_and_update(self):
-        while self.running:
-            try:
-                param = self.get_ecu_values()
-                Clock.schedule_once(lambda dt: self.update_label(param))
-                if mod_globals.opt_csv:
-                    await asyncio.sleep(0.02)
-                else:
-                    await asyncio.sleep(0.05)
-            except asyncio.CancelledError:
-                break
-
     def update_label(self, dt=None):
         if mod_globals.opt_demo:
             self.running = False
@@ -476,11 +464,7 @@ class showDatarefGui(App):
         root.add_widget(self.layout)
         if self.needupdate:
             self.clock_event = Clock.schedule_once(self.update_values, 0.5)
-            #threading.Thread(target=self.start_async_loop, daemon=True).start()
         return root
-    
-    def start_async_loop(self):
-        self.clock_event = asyncio.run(self.fetch_and_update())
     
 
 class ECU():
@@ -876,7 +860,6 @@ class ECU():
 
         while 1:
             print('showDatarefGui')
-            loop = asyncio.get_event_loop()
             gui = showDatarefGui(self, datarefs, path)
             gui.run()
             if not resizeFont:
