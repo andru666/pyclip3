@@ -227,7 +227,7 @@ class MyApp(App):
 
         if auto_macro != '':
             if len(auto_macro) > 2 and auto_macro[0:3] in ["ini", "can", "slo", "fas"]:
-                self.run_init_function(auto_macro, elm)
+                self.run_init_function(auto_macro, self.elm)
             elif auto_macro in list(macro.keys()):
                 self.play_macro(auto_macro, self.elm)
             else:
