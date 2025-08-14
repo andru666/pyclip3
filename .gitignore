@@ -162,3 +162,4 @@ scen3/
 bin/
 .buildozer/
 kt819a.keystore
+*.apk
