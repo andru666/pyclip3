@@ -1347,6 +1347,7 @@ class ELM:
         return cmdrsp
     
     def send_cmd(self, command):
+        #print("send_cmd")
         command = command.upper()
         if not mod_globals.opt_obdlink and len(command) == 6 and command[:4] == '1902':
             command = '1902AF'
@@ -1369,6 +1370,7 @@ class ELM:
             return rsp
     
     def send_can(self, command):
+        #print("send_can")
         command = command.strip().replace(' ', '').upper()
         isCommandInCache = command in list(self.l1_cache.keys())
 
@@ -1484,6 +1486,7 @@ class ELM:
                 return "WRONG RESPONSE"
 
     def send_can_cfc_caf(self, command):
+        #print("send_can_cfc_caf")
         if len(command) == 0:
             return
         if len(command) % 2 != 0:
@@ -1538,7 +1541,7 @@ class ELM:
                 return "WRONG RESPONSE"
 
     def send_can_cfc(self, command):
-
+        #print("send_can_cfc")
         command = command.strip().replace(' ', '').upper()
         init_command = command
 
@@ -1735,6 +1738,7 @@ class ELM:
                 return "WRONG RESPONSE"
 
     def send_can_cfc0(self, command):
+        #print("send_can_cfc0")
         command = command.strip().replace(' ', '').upper()
         if len(command) == 0:
             return
@@ -1833,7 +1837,7 @@ class ELM:
         cFrame = 0  # frame counter
         nBytes = 0  # number bytes in response
         nFrames = 0  # numer frames in response
-        if mod_globals.opt_port == '127.0.0.1:35000':
+        if mod_globals.opt_port == '1271.0.0.1:35000':
             if len(responses) == 1:
                 PC = True
                 result = responses[0]
@@ -1860,7 +1864,7 @@ class ELM:
                 return "WRONG RESPONSE"
         elif len(responses) != 1:
             return "WRONG RESPONSE"
-
+        
         if PC:
             pass
         elif responses[0][:1] == '0':  # single frame(sf)
@@ -1910,7 +1914,6 @@ class ELM:
         else:  # wrong response(first frame omitted)
             self.error_frame += 1
             noErrors = False
-
         if len(result) // 2 >= nBytes and noErrors and result[:2] != '7F':
             result = result[:rspLen*2]            
             result = ' '.join(a + b for a, b in zip(result[::2], result[1::2]))
@@ -1927,6 +1930,7 @@ class ELM:
                 return "WRONG RESPONSE"
     
     def send_raw(self, command):
+        #print("send_raw")
         command = command.upper()
         tb = pyren_time()
         if self.lf != 0:

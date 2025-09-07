@@ -38,7 +38,6 @@ def get_mnemonic(m, se, elm):
     else:
         resp = elm.request(m.request, m.positive, True, m.delay)
     resp = resp.strip().replace(' ', '')
-
     if len(resp) == 0:
         return 'None'
     if not all((c in string.hexdigits for c in resp)):

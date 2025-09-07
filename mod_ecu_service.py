@@ -92,21 +92,22 @@ def executeService(service, elm, status = [], param = '', cache = False):
             flag = False
             break
 
-    if flag:
+    if not flag:
         return first_rsp
     commandToSend = service.repeatReq
     localDelay = service.delay
     if len(service.repeatNextDelay) > 1:
         localDelay = service.repeatNextDelay
     count = 0
+    
     while count < 100:
         count += 1
         rsp = elm.request(commandToSend, '', cache, localDelay)
         rsp = rspStrip(rsp, commandToSend)
         for rspk in list(service.responces.keys()):
             if rsp.startswith(rspk):
-                if rsp in list(service.responces.keys()) and service.responces[rsp].status in list(status.keys()):
-                    first_rsp = status[service.responces[rsp].status]
+                if rspk in list(service.responces.keys()) and service.responces[rspk].status in status:
+                    first_rsp = status[service.responces[rspk].status]
                 break
 
         flag = True
@@ -115,7 +116,7 @@ def executeService(service, elm, status = [], param = '', cache = False):
                 flag = False
                 break
 
-        if flag:
+        if not flag:
             return first_rsp
     return first_rsp
 
