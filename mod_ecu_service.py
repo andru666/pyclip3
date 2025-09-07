@@ -92,7 +92,7 @@ def executeService(service, elm, status = [], param = '', cache = False):
             flag = False
             break
 
-    if not flag:
+    if flag:
         return first_rsp
     commandToSend = service.repeatReq
     localDelay = service.delay
