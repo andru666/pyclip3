@@ -106,8 +106,8 @@ def executeService(service, elm, status = [], param = '', cache = False):
         rsp = rspStrip(rsp, commandToSend)
         for rspk in list(service.responces.keys()):
             if rsp.startswith(rspk):
-                if rspk in list(service.responces.keys()) and service.responces[rspk].status in status:
-                    first_rsp = status[service.responces[rspk].status]
+                if rsp in list(service.responces.keys()) and service.responces[rsp].status in status:
+                    first_rsp = status[service.responces[rsp].status]
                 break
 
         flag = True
@@ -116,7 +116,7 @@ def executeService(service, elm, status = [], param = '', cache = False):
                 flag = False
                 break
 
-        if not flag:
+        if flag:
             return first_rsp
     return first_rsp
 
